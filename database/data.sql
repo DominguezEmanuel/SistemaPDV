@@ -35,6 +35,34 @@ INSERT INTO usuarios (id_usuario, nombre, apellido, username, password, activo, 
 (2, 'María', 'Gómez', 'cajero1', '$2a$10$hashdeejemploCAJERO00000000000000000000000000000000', TRUE, 'CAJERO'),
 (3, 'Lucía', 'Romero', 'cajero2', '$2a$10$hashdeejemploCAJERO2000000000000000000000000000000', TRUE, 'CAJERO');
 
+-- =========================================================
+-- ETAPA 2: CAJAS
+-- Objetivo:
+-- Registrar las sesiones de caja abiertas por los usuarios.
+-- Esto permite asociar posteriormente las ventas y los
+-- movimientos monetarios a una caja específica.
+-- =========================================================
+
+INSERT INTO cajas (
+    id_caja,
+    id_usuario,
+    fecha_apertura,
+    fecha_cierre,
+    monto_inicial,
+    monto_final,
+    saldo_esperado,
+    estado
+) VALUES
+(1, 2, '2026-07-20 08:00:00', '2026-07-20 18:00:00', 50000.00, 79800.00, 79800.00, 'CERRADA'),
+(2, 3, '2026-07-21 08:15:00', '2026-07-21 18:10:00', 50000.00, 62000.00, 62000.00, 'CERRADA'),
+(3, 2, '2026-07-22 08:00:00', NULL, 60000.00, NULL, NULL, 'ABIERTA');
+
+SELECT setval(
+    pg_get_serial_sequence('cajas', 'id_caja'),
+    (SELECT COALESCE(MAX(id_caja),1) FROM cajas),
+    true
+);
+
 -- Ajuste de secuencias para que los futuros INSERT automáticos
 -- de la aplicación no choquen con los IDs cargados aquí.
 SELECT setval(pg_get_serial_sequence('categorias', 'id_categoria'), (SELECT COALESCE(MAX(id_categoria), 1) FROM categorias), true);
@@ -194,6 +222,7 @@ SELECT setval(pg_get_serial_sequence('stock', 'id_stock'), (SELECT COALESCE(MAX(
 
 INSERT INTO ventas (
     id_venta,
+    id_caja,
     id_usuario,
     fecha_hora,
     subtotal,
@@ -201,11 +230,11 @@ INSERT INTO ventas (
     total,
     estado
 ) VALUES
-(1, 2, '2026-07-20 10:15:00', 10500.00, 500.00, 10000.00, 'COMPLETADA'),
-(2, 2, '2026-07-20 12:40:00', 17800.00, 0.00, 17800.00, 'COMPLETADA'),
-(3, 3, '2026-07-21 18:05:00', 12900.00, 900.00, 12000.00, 'COMPLETADA'),
-(4, 2, '2026-07-22 09:30:00', 7500.00, 0.00, 7500.00, 'PENDIENTE'),
-(5, 3, '2026-07-22 17:20:00', 22400.00, 1400.00, 21000.00, 'CANCELADA');
+(1, 1, 2, '2026-07-20 10:15:00', 10500.00, 500.00, 10000.00, 'COMPLETADA'),
+(2, 1, 2, '2026-07-20 12:40:00', 17800.00, 0.00, 17800.00, 'COMPLETADA'),
+(3, 2, 3, '2026-07-21 18:05:00', 12900.00, 900.00, 12000.00, 'COMPLETADA'),
+(4, 3, 2, '2026-07-22 09:30:00', 7500.00, 0.00, 7500.00, 'PENDIENTE'),
+(5, 3, 3, '2026-07-22 17:20:00', 22400.00, 1400.00, 21000.00, 'CANCELADA');
 
 INSERT INTO detalle_ventas (
     id_detalle_venta,
@@ -254,8 +283,94 @@ SELECT setval(pg_get_serial_sequence('ventas', 'id_venta'), (SELECT COALESCE(MAX
 SELECT setval(pg_get_serial_sequence('detalle_ventas', 'id_detalle_venta'), (SELECT COALESCE(MAX(id_detalle_venta), 1) FROM detalle_ventas), true);
 SELECT setval(pg_get_serial_sequence('pagos', 'id_pago'), (SELECT COALESCE(MAX(id_pago), 1) FROM pagos), true);
 
+
 -- =========================================================
--- ETAPA 5: MOVIMIENTOS DE STOCK
+-- ETAPA 5: MOVIMIENTOS DE CAJA
+-- Objetivo:
+-- Registrar todas las operaciones monetarias realizadas
+-- durante la sesión de caja.
+-- =========================================================
+
+INSERT INTO movimientos_caja (
+    id_movimiento_caja,
+    id_caja,
+    fecha_hora,
+    tipo_movimiento,
+    importe,
+    descripcion
+) VALUES
+
+(
+    1,
+    1,
+    '2026-07-20 08:00:00',
+    'APERTURA',
+    50000.00,
+    'Monto inicial de caja'
+),
+
+(
+    2,
+    1,
+    '2026-07-20 18:00:00',
+    'CIERRE',
+    79800.00,
+    'Cierre de caja'
+),
+
+(
+    3,
+    2,
+    '2026-07-21 08:15:00',
+    'APERTURA',
+    50000.00,
+    'Monto inicial'
+),
+
+(
+    4,
+    2,
+    '2026-07-21 18:10:00',
+    'CIERRE',
+    62000.00,
+    'Cierre del turno'
+),
+
+(
+    5,
+    3,
+    '2026-07-22 08:00:00',
+    'APERTURA',
+    60000.00,
+    'Inicio de jornada'
+),
+
+(
+    6,
+    3,
+    '2026-07-22 12:10:00',
+    'RETIRO',
+    15000.00,
+    'Retiro de efectivo para depósito'
+),
+
+(
+    7,
+    3,
+    '2026-07-22 15:45:00',
+    'INGRESO',
+    5000.00,
+    'Corrección de caja'
+);
+
+SELECT setval(
+    pg_get_serial_sequence('movimientos_caja', 'id_movimiento_caja'),
+    (SELECT COALESCE(MAX(id_movimiento_caja),1) FROM movimientos_caja),
+    true
+);
+
+-- =========================================================
+-- ETAPA 6: MOVIMIENTOS DE STOCK
 -- Objetivo:
 -- Registrar entradas, salidas y ajustes para auditar
 -- los cambios de inventario.
