@@ -26,22 +26,24 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
+    // Busca un usuario de acuerdo a un username y lo devuelve en caso de encontrarlo
     @GetMapping("/buscar/{username}")
-    public ResponseEntity<?> findByUsername(@PathVariable String username) {
-        try {
-            logger.info("Buscando usuario con username: {}", username);
-            // Cambiar por DTO
-            Usuario usuario = usuarioService.findByUsername(username);
-
-            logger.info("Usuario {} encontrado", username);
-            return ResponseEntity.ok(usuario);
-        } catch (Exception e) {
-            logger.warn("Usuario {} no encontrado (Controller)", username, e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Usuario no encontrado con username: " + username);
-        }
+    public ResponseEntity<UsuarioResponseDTO> findByUsername(@PathVariable String username) {
+        UsuarioResponseDTO usuarioEncontrado = usuarioService.findByUsername(username);
+        logger.info("Usuario {} encontrado", username);
+        return ResponseEntity.ok(usuarioEncontrado);
     }
 
+    // Busca un usuario de acuerdo a su ID y lo devuelve en caso de encontrarlo
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable Integer id){
+        UsuarioResponseDTO usuarioEncontrado = usuarioService.findById(id);
+        logger.info("Usuario encontrado con ID {}", id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(usuarioEncontrado);
+    }
+
+    // ???
     @GetMapping("/verificar/{username}")
     public ResponseEntity<?> verifyUsername(@PathVariable String username){
         if(!usuarioService.verifyUsername(username))
@@ -52,30 +54,28 @@ public class UsuarioController {
                 .body("Usuario " + username + " encontrado");
     }
 
+    // Devuelve la lista de todos los usuarios registrados
     @GetMapping("/")
     @ResponseBody
-    public List<Usuario> findAllUsers(){
-        List<Usuario> usuarios = new ArrayList<Usuario>();
-        usuarios = usuarioService.findAllUsers();
+    public List<UsuarioResponseDTO> findAllUsers(){
+        List<UsuarioResponseDTO> usuarios = usuarioService.findAllUsers();
         logger.info("Devolviendo a todos los usuarios");
         return usuarios;
     }
 
+    // Agrega un nuevo usuario al sistema
     @PostMapping("/")
     public ResponseEntity<UsuarioResponseDTO> addUser(@RequestBody UsuarioRequestDTO request){
         UsuarioResponseDTO response = usuarioService.createUser(request);
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }
 
-    /*
-    @GetMapping("/activos/{rol}")
-    @ResponseBody
-    public List<Usuario> findUsersActivesByRol(@PathVariable RolUsuario rol){
-        List<Usuario> usuariosActivos = new ArrayList<Usuario>();
-        usuariosActivos = usuarioService.findActivesByRol(rol);
-        logger.info("Devolviendo a todos los usuarios activos con el rol {}", rol);
-        return usuariosActivos;
-    }*/
+    // Activa o desactiva un usuario registrado sin eliminarlo
+    @PatchMapping("/{username}/activo")
+    public ResponseEntity<UsuarioResponseDTO> setActive(@PathVariable String username, @RequestParam boolean activo){
+        UsuarioResponseDTO response = usuarioService.setActiveUser(username, activo);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
 }

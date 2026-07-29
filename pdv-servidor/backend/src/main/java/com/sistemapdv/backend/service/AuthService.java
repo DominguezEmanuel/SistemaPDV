@@ -1,8 +1,10 @@
 package com.sistemapdv.backend.service;
 
+import com.sistemapdv.backend.dto.UsuarioResponseDTO;
 import com.sistemapdv.backend.dto.login.LoginRequestDTO;
-import com.sistemapdv.backend.dto.login.LoginResponseDTO;
 import com.sistemapdv.backend.entity.Usuario;
+import com.sistemapdv.backend.exception.InvalidCredentialsException;
+import com.sistemapdv.backend.mapper.UsuarioMapper;
 import com.sistemapdv.backend.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,10 +14,12 @@ public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UsuarioMapper usuarioMapper;
 
-    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, UsuarioMapper usuarioMapper) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.usuarioMapper = usuarioMapper;
     }
 
     /**
@@ -26,23 +30,16 @@ public class AuthService {
      *     Comprueba que el usuario esté activo</li>
      * @author Emanuel Dev
      */
-    public LoginResponseDTO login(LoginRequestDTO request){
+    public UsuarioResponseDTO login(LoginRequestDTO request){
         Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
-                .orElseThrow( ()-> new RuntimeException("Usuario o contraseña incorrectos"));
+                .orElseThrow( ()-> new InvalidCredentialsException("Usuario o contraseña incorrectos"));
 
         if(!passwordEncoder.matches(request.getPassword(), usuario.getPassword()))
-            throw new RuntimeException("Usuario o contraseña incorrectos");
+            throw new InvalidCredentialsException("Usuario o contraseña incorrectos");
 
         if(!usuario.getActivo())
-            throw new RuntimeException("Usuario inactivo");
+            throw new InvalidCredentialsException("Usuario inactivo");
 
-        LoginResponseDTO response = new LoginResponseDTO();
-
-        response.setId(usuario.getIdUsuario());
-        response.setNombre(usuario.getNombre());
-        response.setApellido(usuario.getApellido());
-        response.setUsername(usuario.getUsername());
-
-        return response;
+        return usuarioMapper.toResponseDTO(usuario);
     }
 }

@@ -3,9 +3,10 @@ package com.sistemapdv.backend.service;
 import com.sistemapdv.backend.dto.UsuarioRequestDTO;
 import com.sistemapdv.backend.dto.UsuarioResponseDTO;
 import com.sistemapdv.backend.entity.Usuario;
+import com.sistemapdv.backend.exception.ResourceDuplicatedException;
+import com.sistemapdv.backend.exception.ResourceNotFoundException;
 import com.sistemapdv.backend.mapper.UsuarioMapper;
 import com.sistemapdv.backend.repository.UsuarioRepository;
-import com.sistemapdv.backend.utils.enums.RolUsuario;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,35 +28,55 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Usuario findByUsername(String username){
+    public UsuarioResponseDTO findByUsername(String username){
         Usuario usuario = usuarioRepository.findByUsername(username)
-                .orElseThrow( ()-> new RuntimeException("Usuario no encontrado (Service)"));
-        return usuario;
+                .orElseThrow( ()-> new ResourceNotFoundException("Usuario no encontrado"));
+        return usuarioMapper.toResponseDTO(usuario);
     }
 
-    public List<Usuario> findAllUsers(){
-        List<Usuario> usuarios = new ArrayList<Usuario>();
-        usuarios = usuarioRepository.findAll();
-        return usuarios;
+    public UsuarioResponseDTO findById(Integer id){
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow( ()-> new ResourceNotFoundException("Usuario no encontrado"));
+        return usuarioMapper.toResponseDTO(usuario);
+    }
+
+    public List<UsuarioResponseDTO> findAllUsers(){
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<UsuarioResponseDTO> listadoUsuarios = new ArrayList<UsuarioResponseDTO>();
+        for (Usuario u: usuarios){
+            listadoUsuarios.add(usuarioMapper.toResponseDTO(u));
+        }
+        return listadoUsuarios;
     }
 
     public UsuarioResponseDTO createUser(UsuarioRequestDTO request){
         if(usuarioRepository.existsByUsername(request.getUsername()))
-            throw new RuntimeException("El nombre de usuario ya existe");
+            throw new ResourceDuplicatedException("El nombre de usuario ya existe");
 
         Usuario usuario = usuarioMapper.toUsuario(request);
 
+        // Hasheo de password
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
-        log.info("Password luego de Bcrypt {}", usuario.getPassword());
         usuario.setActivo(true);
 
-        Usuario newUser = usuarioRepository.save(usuario);
+        Usuario usuarioCreado = usuarioRepository.save(usuario);
 
-        return usuarioMapper.toResponseDTO(newUser);
+        return usuarioMapper.toResponseDTO(usuarioCreado);
     }
 
-
+    // ????
     public boolean verifyUsername(String username){
         return usuarioRepository.existsByUsername(username);
+    }
+
+    // Activa o desactiva un usuario existente (no lo elimina)
+    public UsuarioResponseDTO setActiveUser(String username, boolean activo){
+        Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        usuario.setActivo(activo);
+        Usuario usuarioActualizado = usuarioRepository.save(usuario);
+
+        return usuarioMapper.toResponseDTO(usuarioActualizado);
     }
 }
