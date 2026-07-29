@@ -1,0 +1,250 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+:host,
+.page-shell {
+  font-family: "Outfit", sans-serif;
+  color: #14181c;
+  background: #ffffff;
+}
+
+.page-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+}
+
+.washes {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.wash {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+}
+
+.wash-1 {
+  width: 520px;
+  height: 520px;
+  top: -160px;
+  left: -160px;
+  background: radial-gradient(circle at 30% 30%, #3e93c7, transparent 70%);
+}
+
+.wash-2 {
+  width: 460px;
+  height: 460px;
+  bottom: -180px;
+  right: -140px;
+  background: radial-gradient(circle at 70% 70%, #1c5a85, transparent 70%);
+  opacity: 0.4;
+}
+
+.ring-deco {
+  position: absolute;
+  border: 1.5px solid #14181c;
+  border-radius: 50%;
+  opacity: 0.08;
+  z-index: 0;
+}
+
+.ring-deco.r1 {
+  width: 640px;
+  height: 640px;
+  top: -120px;
+  right: -220px;
+}
+
+.ring-deco.r2 {
+  width: 600px;
+  height: 600px;
+  top: -100px;
+  right: -200px;
+}
+
+.login-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 44px 38px 38px;
+  box-shadow:
+    0 30px 60px -20px rgba(28, 90, 133, 0.28),
+    0 2px 8px rgba(20, 24, 28, 0.06);
+  border: 1px solid rgba(62, 147, 199, 0.12);
+}
+
+.logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+
+.logo-wrap img {
+  width: 92px;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow:
+    0 0 0 3px #dceef8,
+    0 8px 20px -6px rgba(28, 90, 133, 0.35);
+}
+
+.brand-name {
+  text-align: center;
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: #1c5a85;
+  margin-bottom: 2px;
+  letter-spacing: 0.2px;
+}
+
+.brand-sub {
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #5b6670;
+  margin-bottom: 30px;
+  font-weight: 500;
+}
+
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #14181c;
+  margin-bottom: 6px;
+}
+
+.input-group-custom {
+  margin-bottom: 18px;
+}
+
+.field-wrap {
+  position: relative;
+}
+
+.form-control-custom {
+  width: 100%;
+  padding: 13px 44px 13px 44px;
+  border-radius: 12px;
+  border: 1.5px solid #e4edf3;
+  background: #fbfdfe;
+  font-size: 0.95rem;
+  color: #14181c;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.form-control-custom::placeholder {
+  color: #a9b6bf;
+}
+
+.form-control-custom:focus {
+  outline: none;
+  border-color: #3e93c7;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px #dceef8;
+}
+
+.field-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #3e93c7;
+  opacity: 0.85;
+  pointer-events: none;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.field-action-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: #f3f8fc;
+  color: #1c5a85;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 7px 9px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.field-action-btn:hover {
+  background: #dceef8;
+  color: #1c5a85;
+}
+
+.btn-ingresar {
+  width: 100%;
+  border: none;
+  padding: 13px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #3e93c7, #1c5a85);
+  box-shadow: 0 10px 24px -8px rgba(28, 90, 133, 0.55);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
+  margin-top: 8px;
+}
+
+.btn-ingresar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px -8px rgba(28, 90, 133, 0.6);
+  filter: brightness(1.04);
+  color: #ffffff;
+}
+
+.btn-ingresar:active {
+  transform: translateY(0);
+}
+
+.btn-ingresar:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.alert {
+  border-radius: 10px;
+}
+
+@media (max-width: 420px) {
+  .login-card {
+    padding: 34px 24px 28px;
+    border-radius: 18px;
+  }
+}
