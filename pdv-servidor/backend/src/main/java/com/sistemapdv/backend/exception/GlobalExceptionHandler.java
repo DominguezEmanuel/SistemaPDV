@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -45,7 +46,8 @@ public class GlobalExceptionHandler {
 
         ErrorResponseDTO error = new ErrorResponseDTO();
 
-        error.setFecha(LocalDateTime.now());
+        DateTimeFormatter formateador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        error.setFecha(LocalDateTime.now().toLocalDate().format(formateador));
         error.setStatus(status.value());
         error.setError(status.getReasonPhrase());
         error.setMensaje(ex.getMessage());

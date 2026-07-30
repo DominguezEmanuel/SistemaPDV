@@ -12,7 +12,6 @@ public class UsuarioResponseDTO {
     String nombre;
     String apellido;
     String username;
-    //String password;
     Boolean activo;
     RolUsuario rol;
 }

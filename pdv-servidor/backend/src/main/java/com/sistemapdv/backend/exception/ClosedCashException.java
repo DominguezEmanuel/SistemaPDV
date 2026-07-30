@@ -1,4 +1,4 @@
 package com.sistemapdv.backend.exception;
 
-public class StockInsufficientException {
+public class ClosedCashException {
 }

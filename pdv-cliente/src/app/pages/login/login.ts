@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { Auth } from '../../core/services/auth';
 import { LoginRequest } from '../../models/login-request';
 import { Router } from '@angular/router';
+import { UsuarioResponse } from '../../models/UsuarioResponse';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -13,6 +15,7 @@ import { Router } from '@angular/router';
   styleUrl: './login.css',
 })
 export class Login {
+  // Variables para el formulario de login
   username = '';
   password = '';
   showPassword = false;
@@ -37,14 +40,18 @@ export class Login {
     this.isLoading = true;
 
     this.authService.login(request).subscribe({
-      next: () => {
+      next: (response: UsuarioResponse) => {
+        //console.log('Login exitoso:', response);
         this.successMessage = 'Inicio de sesión correcto';
         this.isLoading = false;
+        // Redirige hacia el dashbboard
         this.router.navigate(['/dashboard']);
       },
-      error: () => {
+      error: (error: HttpErrorResponse) => {
+        //console.log('Error al iniciar sesión: ', error.error);
         this.errorMessage =
-          'No fue posible iniciar sesión. Verifica tus credenciales.';
+          error.error?.mensaje ?? 'Ocurrió un error al iniciar sesión';
+
         this.isLoading = false;
       },
     });

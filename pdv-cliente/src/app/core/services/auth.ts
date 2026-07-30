@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { LoginRequest } from '../../models/login-request';
-import { LoginResponse } from '../../models/login-response';
+import { UsuarioResponse } from '../../models/UsuarioResponse';
 
 import { environment } from '../../../environment/environment';
 @Injectable({
@@ -13,8 +13,8 @@ import { environment } from '../../../environment/environment';
 export class Auth {
   constructor(private http: HttpClient) {}
 
-  login(request: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(
+  login(request: LoginRequest): Observable<UsuarioResponse> {
+    return this.http.post<UsuarioResponse>(
       `${environment.apiUrl}/auth/login`,
       request,
     );

@@ -2,6 +2,7 @@ package com.sistemapdv.backend.controller;
 
 import com.sistemapdv.backend.dto.UsuarioResponseDTO;
 import com.sistemapdv.backend.dto.login.LoginRequestDTO;
+import com.sistemapdv.backend.dto.login.LoginResponseDTO;
 import com.sistemapdv.backend.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UsuarioResponseDTO> login(@RequestBody LoginRequestDTO loginRequest){
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequest){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(authService.login(loginRequest));
     }

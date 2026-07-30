@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ErrorResponseDTO {
-    private LocalDateTime fecha;
+    private String fecha;
     private int status;
     private String error;
     private String mensaje;

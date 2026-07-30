@@ -10,6 +10,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class UsuarioMapper {
 
+    // Para asegurar que la clase no sea instanciada, en caso de que pase lanza excepcion
+    private UsuarioMapper(){
+        throw new UnsupportedOperationException("Esta clase NUNCA debe ser instanciada");
+    }
+
     public Usuario toUsuario(UsuarioRequestDTO dto){
 
         Usuario usuario = new Usuario();
