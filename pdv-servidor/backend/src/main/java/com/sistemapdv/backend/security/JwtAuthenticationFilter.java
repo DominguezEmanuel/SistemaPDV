@@ -1,5 +1,6 @@
 package com.sistemapdv.backend.security;
 
+import com.sistemapdv.backend.exception.ResourceNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,40 +48,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        
         try {
             // Paso 1: Extraer el token JWT del header Authorization
             String jwt = extractJwtFromRequest(request);
 
             // Paso 2: Validar que el token exista
-            if (jwt != null) {
-                // Paso 3: Extraer el username del token
-                String username = jwtService.extractUsername(jwt);
-
-                // Paso 4: Cargar los detalles del usuario desde la base de datos
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                // Paso 5: Validar que el token sea válido para este usuario
-                if (jwtService.isTokenValid(jwt, userDetails)) {
-                    // Paso 6: Crear un token de autenticación con los detalles del usuario
-                    UsernamePasswordAuthenticationToken authenticationToken = 
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            );
-                    
-                    // Paso 7: Establecer detalles de la web (IP, session ID, etc.)
-                    authenticationToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
-
-                    // Paso 8: Guardar la autenticación en el contexto de seguridad
-                    // Esto permite que Spring Security sepa que el usuario está autenticado
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
+            if(jwt == null){
+                filterChain.doFilter(request, response);
+                return;
             }
-        } catch (Exception e) {
+
+            // Paso 3: Extraer el username del token
+            String username = jwtService.extractUsername(jwt);
+
+            // Paso 4: Cargar los detalles del usuario desde la base de datos
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            // Paso 5: Validar que el token sea válido para este usuario
+            if (jwtService.isTokenValid(jwt, userDetails)) {
+                // Paso 6: Crear un token de autenticación con los detalles del usuario
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+
+                // Paso 7: Establecer detalles de la web (IP, session ID, etc.)
+                authenticationToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+
+                // Paso 8: Guardar la autenticación en el contexto de seguridad
+                // Esto permite que Spring Security sepa que el usuario está autenticado
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        } catch (ResourceNotFoundException e) {
             // Si ocurre cualquier error (token inválido, usuario no encontrado, etc.)
             // simplemente no autenticamos la request y dejamos que continúe
             // Spring Security rechazará la request si el endpoint lo requiere

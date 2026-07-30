@@ -8,22 +8,26 @@ import com.sistemapdv.backend.exception.InvalidCredentialsException;
 import com.sistemapdv.backend.mapper.UsuarioMapper;
 import com.sistemapdv.backend.repository.UsuarioRepository;
 import com.sistemapdv.backend.security.JwtService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
 
+    private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder;
+    //private final PasswordEncoder passwordEncoder;
     private final UsuarioMapper usuarioMapper;
     private final JwtService jwtService;
 
-    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, 
-                       UsuarioMapper usuarioMapper, JwtService jwtService) {
+    public AuthService(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper,
+                       AuthenticationManager authenticationManager, UsuarioMapper usuarioMapper1,
+                       JwtService jwtService) {
         this.usuarioRepository = usuarioRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.usuarioMapper = usuarioMapper;
+        this.authenticationManager = authenticationManager;
+        this.usuarioMapper = usuarioMapper1;
         this.jwtService = jwtService;
     }
 
@@ -43,26 +47,30 @@ public class AuthService {
      * @author Emanuel Dev
      */
     public LoginResponseDTO login(LoginRequestDTO request){
-        // Paso 1: Buscar el usuario por username
+
+        // Autenticar credenciales
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()
+                )
+        );
+
+        // Buscar el usuario ya autenticado
         Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new InvalidCredentialsException("Usuario o contraseña incorrectos"));
+                .orElseThrow(() -> new InvalidCredentialsException("Usuario no encontrado"));
 
-        // Paso 2: Validar que la contraseña sea correcta
-        // passwordEncoder.matches() compara la contraseña sin encriptar con la hash almacenada
-        if(!passwordEncoder.matches(request.getPassword(), usuario.getPassword()))
-            throw new InvalidCredentialsException("Usuario o contraseña incorrectos");
-
-        // Paso 3: Verificar que el usuario esté activo
+        // Verificar que el usuario esté activo
         if(!usuario.getActivo())
             throw new InvalidCredentialsException("Usuario inactivo");
 
-        // Paso 4: Generar token JWT para el usuario autenticado
+        // Generar token JWT para el usuario autenticado
         String token = jwtService.generateToken(usuario);
 
-        // Paso 5: Convertir usuario a DTO
+        // Convertir usuario a DTO
         UsuarioResponseDTO usuarioDTO = usuarioMapper.toResponseDTO(usuario);
 
-        // Paso 6: Retornar respuesta con token e información del usuario
+        // Retornar respuesta con token e información del usuario
         return LoginResponseDTO.builder()
                 .token(token)
                 .tokenType("Bearer")

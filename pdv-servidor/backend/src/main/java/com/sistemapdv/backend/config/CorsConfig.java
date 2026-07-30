@@ -2,45 +2,58 @@ package com.sistemapdv.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.List;
+
 /**
- * Clase encargada de configurar CORS (Cross-Origin Resource Sharing)
- * Habilita la comunicación entre el frontend Angular y el backend Spring Boot
+ * Configuración global de CORS
+ *
+ * Permite que el frontend Angular se comunique con el backend
+ * durante el desarrollo.
+ *
+ * En producción deberá modificarse el origen permitido
+ * según dónde se encuentre desplegado el frontend.
  */
 @Configuration
 public class CorsConfig {
 
-    /**
-     * Crea un bean WebMvcConfigurer que configura globalmente las políticas CORS
-     * Permite solicitudes desde orígenes externos autorizados
-     */
     @Bean
-    public WebMvcConfigurer corsConfigurer(){
+    public CorsConfigurationSource corsConfigurationSource() {
 
-        return new WebMvcConfigurer(){
-            /**
-             * Configura los mappings CORS para permitir que Angular se comunique con Spring Boot
-             * 
-             * NOTA: Para producción, reemplazar "http://localhost:4200" con la URL real del frontend
-             * NOTA: Por seguridad, especificar solo los métodos y headers necesarios en producción
-             */
-            @Override
-            public void addCorsMappings(CorsRegistry registry){
+        CorsConfiguration configuration = new CorsConfiguration();
 
-                // Aplica CORS a todas las rutas de la API
-                registry.addMapping("/**")
-                        // Solo permite solicitudes desde el frontend Angular (ambiente local)
-                        // Cambiar a URL real en producción
-                        .allowedOrigins("http://localhost:4200")
-                        // Permite todos los métodos HTTP (GET, POST, PUT, DELETE, OPTIONS, etc.)
-                        // En producción: .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedMethods("*")
-                        // Permite todos los headers en las solicitudes
-                        // En producción: .allowedHeaders("Content-Type", "Authorization")
-                        .allowedHeaders("*");
-            }
-        };
+        // Dirección del frontend Angular
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+
+        // Métodos HTTP permitidos
+        configuration.setAllowedMethods(List.of(
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE",
+                "PATCH",
+                "OPTIONS"
+        ));
+
+        // Headers permitidos
+        configuration.setAllowedHeaders(List.of("*"));
+
+        // Headers que el frontend podrá leer
+        configuration.setExposedHeaders(List.of("Authorization"));
+
+        // Solo si usarás cookies o sesiones
+        configuration.setAllowCredentials(false);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 }
