@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { Auth } from '../../core/services/auth';
-import { LoginRequest } from '../../models/login-request';
+import { LoginRequest } from '../../models/LoginRequest';
 import { Router } from '@angular/router';
 import { UsuarioResponse } from '../../models/UsuarioResponse';
 import { HttpErrorResponse } from '@angular/common/http';
+import { LoginResponse } from '../../models/LoginResponse';
 
 @Component({
   selector: 'app-login',
@@ -40,12 +41,13 @@ export class Login {
     this.isLoading = true;
 
     this.authService.login(request).subscribe({
-      next: (response: UsuarioResponse) => {
+      next: (response: LoginResponse) => {
         //console.log('Login exitoso:', response);
-        this.successMessage = 'Inicio de sesión correcto';
+        this.saveUserSession(response);
+        //this.successMessage = 'Inicio de sesión correcto';
         this.isLoading = false;
         // Redirige hacia el dashbboard
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/pdv']);
       },
       error: (error: HttpErrorResponse) => {
         //console.log('Error al iniciar sesión: ', error.error);
@@ -55,5 +57,14 @@ export class Login {
         this.isLoading = false;
       },
     });
+  }
+
+  saveUserSession(response: LoginResponse): void {
+    localStorage.setItem('token', response.token);
+    //localStorage.setItem('usuario', JSON.stringify(response.usuario));
+    localStorage.setItem('nombre', response.usuario.nombre);
+    localStorage.setItem('apellido', response.usuario.apellido);
+    localStorage.setItem('username', response.usuario.username);
+    localStorage.setItem('rol', response.usuario.rol);
   }
 }

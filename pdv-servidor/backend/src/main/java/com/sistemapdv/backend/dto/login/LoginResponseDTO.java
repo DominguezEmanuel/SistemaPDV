@@ -14,20 +14,6 @@ import lombok.Setter;
  * - token: JWT firmado que el cliente debe usar en futuras requests
  * - usuario: Información del usuario autenticado
  * - tokenType: Tipo de token (siempre "Bearer" para JWT)
- * 
- * Ejemplo de respuesta JSON:
- * {
- *   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwiaWF0IjoxNTE2MjM5MDIyfQ...",
- *   "tokenType": "Bearer",
- *   "usuario": {
- *     "idUsuario": 1,
- *     "nombre": "Juan",
- *     "apellido": "Pérez",
- *     "username": "juan.perez",
- *     "activo": true,
- *     "rol": "ADMINISTRADOR"
- *   }
- * }
  */
 @Getter
 @Setter

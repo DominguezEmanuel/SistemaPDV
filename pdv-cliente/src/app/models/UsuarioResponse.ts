@@ -5,5 +5,4 @@ export interface UsuarioResponse {
   username: string;
   rol: string;
   activo: boolean;
-  //token: string;
 }

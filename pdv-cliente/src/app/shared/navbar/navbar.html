@@ -1,1 +1,112 @@
-<p>navbar works!</p>
+<!-- ===== TOPBAR ===== -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <!-- Empresa -->
+    <div class="brand-block">
+      <img src="assets/images/logo.jpg" alt="Romina Albornoz Logo" />
+      <div class="brand-text">
+        <span class="app-name">Sistema Punto de Venta</span>
+        <span class="app-sub">Romina Albornoz - Insumos</span>
+      </div>
+    </div>
+
+    <!-- Navegacion -->
+    <nav class="nav-links">
+      <a routerLink="/pdv/dashboard" class="nav-item-link active">
+        <i class="bi bi-boxes"></i>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-bag"></i>
+        Ventas
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-box-seam"></i>
+        Productos
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-layout-wtf"></i>
+        Inventario
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-graph-up"></i>
+        Reportes
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-gear-fill"></i>
+        Configuración
+      </a>
+    </nav>
+
+    <!-- Información del Usuario logueado -->
+    <div class="user-block dropdown">
+      <button
+        class="user-toggle"
+        type="button"
+        id="userMenuBtn"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        data-bs-auto-close="outside"
+      >
+        <div class="avatar-circle">
+          {{ rol === 'ADMINISTRADOR' ? 'AD' : 'CJ' }}
+        </div>
+        <div class="user-meta">
+          <span class="u-name">{{ nombre }} {{apellido}}</span>
+          <span class="u-role">{{ rol }}</span>
+        </div>
+        <i class="bi bi-chevron-up chevron-ico"></i>
+      </button>
+
+      <ul
+        class="dropdown-menu dropdown-menu-end user-dropdown-menu"
+        aria-labelledby="userMenuBtn"
+      >
+        <!-- INFORMACIÓN DEL USUARIO -->
+        <li>
+          <div class="dropdown-user-header">
+            <div class="avatar-circle">
+              {{ rol === 'ADMINISTRADOR' ? 'AD' : 'CJ' }}
+            </div>
+            <div>
+              <span class="u-name"> {{ nombre }} {{apellido}} </span>
+              <span class="badge-rol"> {{ rol }} </span>
+            </div>
+          </div>
+        </li>
+        <!-- LINEA DIVISORA -->
+        <li><hr class="dropdown-divider" /></li>
+        <!-- MI PERFIL -->
+        <li>
+          <a class="dropdown-action" routerLink="/pdv/perfil">
+            <i class="bi bi-person"></i>
+            Mi perfil
+          </a>
+        </li>
+        <!-- CONFIGURACIÓN DE CUENTA -->
+        <li>
+          <a class="dropdown-action" href="#">
+            <i class="bi bi-gear-fill"></i>
+            Configuración de cuenta
+          </a>
+        </li>
+        <!-- HISTORIAL DE ACTIVIDAD -->
+        <li>
+          <a class="dropdown-action" href="#">
+            <i class="bi bi-activity"></i>
+            Historial de actividad
+          </a>
+        </li>
+        <!-- LINEA DIVISORA -->
+        <li><hr class="dropdown-divider" /></li>
+        <!-- CERRAR SESIÓN -->
+        <li>
+          <a class="dropdown-action logout" href="#">
+            <i class="bi bi-box-arrow-right"></i>
+            Cerrar sesión
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

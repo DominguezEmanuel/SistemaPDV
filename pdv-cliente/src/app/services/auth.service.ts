@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { LoginRequest } from '../models/login-request';
-import { UsuarioResponse } from '../models/UsuarioResponse';
+import { LoginRequest } from '../models/LoginRequest';
 import { environment } from '../../environment/environment';
+import { LoginResponse } from '../models/LoginResponse';
 
 @Injectable({
   providedIn: 'root',
@@ -14,13 +14,14 @@ export class AuthService {
 
   constructor(private readonly http: HttpClient) {}
 
-  login(credentials: LoginRequest): Observable<UsuarioResponse> {
-    return this.http.post<UsuarioResponse>(
+  login(request: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(
       `${environment.apiUrl}/auth/login`,
-      credentials,
+      request,
     );
   }
 
+  //////
   logout(): void {
     localStorage.removeItem(this.storageKey);
   }

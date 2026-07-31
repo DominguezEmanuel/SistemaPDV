@@ -1,0 +1,28 @@
+/* ===== CONTENIDO DEMO ===== */
+.page-body {
+  padding: 32px 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.page-title {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  color: #1c5a85;
+  font-size: 1.7rem;
+  margin-bottom: 4px;
+}
+.page-desc {
+  color: #5b6670;
+  font-size: 0.9rem;
+  margin-bottom: 26px;
+}
+
+.stub-card {
+  background: #fff;
+  border: 1px solid #e4edf3;
+  border-radius: 16px;
+  padding: 26px;
+  box-shadow: 0 8px 24px -16px rgba(28, 90, 133, 0.18);
+  color: #5b6670;
+  font-size: 0.88rem;
+}
