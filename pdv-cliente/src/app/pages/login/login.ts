@@ -42,6 +42,7 @@ export class Login {
 
     this.authService.login(request).subscribe({
       next: (response: LoginResponse) => {
+        console.log('Login exitoso', response);
         this.saveUserSession(response);
         this.isLoading = false;
         // Redirige hacia a la página principal del sistema

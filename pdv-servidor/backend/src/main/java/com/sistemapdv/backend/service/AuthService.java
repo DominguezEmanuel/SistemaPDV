@@ -9,7 +9,9 @@ import com.sistemapdv.backend.mapper.UsuarioMapper;
 import com.sistemapdv.backend.repository.UsuarioRepository;
 import com.sistemapdv.backend.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,13 +50,17 @@ public class AuthService {
      */
     public LoginResponseDTO login(LoginRequestDTO request){
 
-        // Autenticar credenciales
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+        try {
+            // Autenticar credenciales
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
+                    )
+            );
+        }catch (AuthenticationException e){
+            throw new InvalidCredentialsException("Usuario o contraseña incorrectos");
+        }
 
         // Buscar el usuario ya autenticado
         Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
@@ -62,7 +68,7 @@ public class AuthService {
 
         // Verificar que el usuario esté activo
         if(!usuario.getActivo())
-            throw new InvalidCredentialsException("Usuario inactivo");
+            throw new InvalidCredentialsException("El usuario se encuentra inactivo");
 
         // Generar token JWT para el usuario autenticado
         String token = jwtService.generateToken(usuario);

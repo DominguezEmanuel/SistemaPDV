@@ -198,7 +198,7 @@
   min-width: 220px;
   max-width: 320px;
 }
-.search-box svg {
+.search-box i {
   position: absolute;
   left: 13px;
   top: 50%;
@@ -321,14 +321,11 @@
   background: #dceef8;
   color: #1c5a85;
 }
-.badge-pill.rol-vendedor {
+.badge-pill.rol-cajero {
   background: #efe7fb;
   color: #6b3fa0;
 }
-.badge-pill.rol-inventario {
-  background: #fff3de;
-  color: #a6710c;
-}
+
 .badge-pill.activo {
   background: #e7f7ed;
   color: #2e9e5b;
@@ -336,12 +333,6 @@
 .badge-pill.inactivo {
   background: #fbeaea;
   color: #c13b3b;
-}
-.badge-pill .dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentColor;
 }
 
 .acciones-cell {
@@ -384,17 +375,6 @@
   background: #fbeaea;
   color: #c13b3b;
   border-color: #c13b3b;
-}
-
-.tabla-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 4px;
-  font-size: 0.78rem;
-  color: #5b6670;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
 @media (max-width: 576px) {

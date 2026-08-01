@@ -29,7 +29,7 @@
           <label>DNI</label>
           <div class="info-value">
             <i class="bi bi-person-video2"></i>
-            32314794
+            32.314.794
           </div>
         </div>
         <div class="info-field">
@@ -77,37 +77,11 @@
   <div class="usuarios-card">
     <div class="usuarios-toolbar">
       <div class="search-box">
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.3-4.3"></path>
-        </svg>
+        <i class="bi bi-gender-neuter"></i>
         <input type="text" placeholder="Buscar usuario..." />
       </div>
       <button class="btn-nuevo-usuario" type="button">
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <line x1="19" y1="8" x2="19" y2="14"></line>
-          <line x1="16" y1="11" x2="22" y2="11"></line>
-        </svg>
+        <i class="bi bi-person-add"></i>
         Nuevo usuario
       </button>
     </div>
@@ -125,297 +99,69 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="id-cell">#000124</td>
-            <td>romina.albornoz</td>
+          <tr *ngFor="let usuario of usuarios">
+            <td class="id-cell">{{ usuario.idUsuario }}</td>
+            <td>{{usuario.username}}</td>
             <td>
               <div class="user-cell">
-                <div class="mini-avatar">RA</div>
+                <div class="mini-avatar">
+                  {{ getInitials(usuario.nombre, usuario.apellido) }}
+                </div>
                 <div>
-                  <div class="u-nombre">Romina Albornoz</div>
+                  <div class="u-nombre">
+                    {{usuario.nombre}} {{usuario.apellido}}
+                  </div>
                 </div>
               </div>
             </td>
-            <td>
-              <span class="badge-pill rol-admin">Administradora</span>
+            <td class="text-center">
+              <span
+                *ngIf="usuario.rol === 'CAJERO'"
+                class="badge-pill rol-cajero"
+              >
+                {{ usuario.rol }}
+              </span>
+              <span
+                *ngIf="usuario.rol === 'ADMINISTRADOR'"
+                class="badge-pill rol-admin"
+              >
+                {{ usuario.rol }}
+              </span>
             </td>
-            <td>
-              <span class="badge-pill activo"
-                ><span class="dot"></span>Activo</span
+            <td class="text-center">
+              <span *ngIf="usuario.activo == true" class="badge-pill activo"
+                ><i class="bi bi-record-fill"></i>Activo</span
+              >
+              <span *ngIf="usuario.activo == false" class="badge-pill inactivo"
+                ><i class="bi bi-record-fill"></i>Inactivo</span
               >
             </td>
             <td>
+              <!-- BOTONES -->
               <div class="acciones-cell">
+                <!-- MODIFICAR -->
                 <button class="btn-accion editar" title="Modificar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                    ></path>
-                    <path
-                      d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                    ></path>
-                  </svg>
+                  <i class="bi bi-pencil-square"></i>
                 </button>
-                <button class="btn-accion deshabilitar" title="Deshabilitar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-                  </svg>
+                <!-- DESHABILITAR -->
+                <button
+                  *ngIf="usuario.activo == true"
+                  class="btn-accion deshabilitar"
+                  title="Deshabilitar"
+                >
+                  <i class="bi bi-ban"></i>
                 </button>
+                <!-- HABILITAR -->
+                <button
+                  *ngIf="usuario.activo == false"
+                  class="btn-accion habilitar"
+                  title="Habilitar"
+                >
+                  <i class="bi bi-check2-circle"></i>
+                </button>
+                <!-- ELIMINAR -->
                 <button class="btn-accion eliminar" title="Eliminar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M3 6h18"></path>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="id-cell">#000131</td>
-            <td>lucas.gimenez</td>
-            <td>
-              <div class="user-cell">
-                <div class="mini-avatar">LG</div>
-                <div>
-                  <div class="u-nombre">Lucas Giménez</div>
-                </div>
-              </div>
-            </td>
-            <td><span class="badge-pill rol-vendedor">Vendedor</span></td>
-            <td>
-              <span class="badge-pill activo"
-                ><span class="dot"></span>Activo</span
-              >
-            </td>
-            <td>
-              <div class="acciones-cell">
-                <button class="btn-accion editar" title="Modificar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                    ></path>
-                    <path
-                      d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                    ></path>
-                  </svg>
-                </button>
-                <button class="btn-accion deshabilitar" title="Deshabilitar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-                  </svg>
-                </button>
-                <button class="btn-accion eliminar" title="Eliminar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M3 6h18"></path>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="id-cell">#000142</td>
-            <td>fabiana.rios</td>
-            <td>
-              <div class="user-cell">
-                <div class="mini-avatar">FR</div>
-                <div>
-                  <div class="u-nombre">Fabiana Ríos</div>
-                </div>
-              </div>
-            </td>
-            <td>
-              <span class="badge-pill rol-inventario">Inventario</span>
-            </td>
-            <td>
-              <span class="badge-pill inactivo"
-                ><span class="dot"></span>Inactivo</span
-              >
-            </td>
-            <td>
-              <div class="acciones-cell">
-                <button class="btn-accion editar" title="Modificar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                    ></path>
-                    <path
-                      d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                    ></path>
-                  </svg>
-                </button>
-                <button class="btn-accion habilitar" title="Habilitar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </button>
-                <button class="btn-accion eliminar" title="Eliminar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M3 6h18"></path>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="id-cell">#000156</td>
-            <td>marcos.torres</td>
-            <td>
-              <div class="user-cell">
-                <div class="mini-avatar">MT</div>
-                <div>
-                  <div class="u-nombre">Marcos Torres</div>
-                </div>
-              </div>
-            </td>
-            <td><span class="badge-pill rol-vendedor">Vendedor</span></td>
-            <td>
-              <span class="badge-pill activo"
-                ><span class="dot"></span>Activo</span
-              >
-            </td>
-            <td>
-              <div class="acciones-cell">
-                <button class="btn-accion editar" title="Modificar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                    ></path>
-                    <path
-                      d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                    ></path>
-                  </svg>
-                </button>
-                <button class="btn-accion deshabilitar" title="Deshabilitar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-                  </svg>
-                </button>
-                <button class="btn-accion eliminar" title="Eliminar">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M3 6h18"></path>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
+                  <i class="bi bi-trash"></i>
                 </button>
               </div>
             </td>
