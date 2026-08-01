@@ -13,7 +13,7 @@ import { PublicLayout } from './shared/public-layout/public-layout';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  //{ path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'pdv',
     component: PublicLayout,

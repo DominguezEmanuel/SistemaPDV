@@ -4,6 +4,15 @@
   max-width: 1200px;
   margin: 0 auto;
 }
+.breadcrumb-custom {
+  font-size: 0.78rem;
+  color: #5b6670;
+  margin-bottom: 6px;
+}
+.breadcrumb-custom span {
+  color: #1c5a85;
+  font-weight: 600;
+}
 .page-title {
   font-family: "Playfair Display", serif;
   font-style: italic;

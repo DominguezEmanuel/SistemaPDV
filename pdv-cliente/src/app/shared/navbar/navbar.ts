@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
 
+import { UsuarioResponse } from '../../models/UsuarioResponse';
+
+import { Auth } from '../../core/services/auth';
+
 @Component({
   selector: 'app-navbar',
   imports: [RouterLink, CommonModule],
@@ -10,30 +14,35 @@ import { Router } from '@angular/router';
   styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit {
+  usuario!: UsuarioResponse;
   nombre!: string;
   apellido!: string;
   username!: string;
   activo!: boolean;
   rol!: string;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: Auth,
+  ) {}
 
   ngOnInit() {
-    const usuario = JSON.parse(localStorage.getItem('usuario')!);
-    this.nombre = usuario.nombre || '';
-    this.apellido = usuario.apellido || '';
-    this.username = usuario.username || '';
-    this.activo = usuario.activo || false;
-    this.rol = usuario.rol || '';
+    const usuario = this.authService.getUserLogued();
+    if (usuario) {
+      this.usuario = usuario;
+      this.loadUserData();
+    }
+  }
+
+  loadUserData() {
+    this.nombre = this.usuario.nombre || '';
+    this.apellido = this.usuario.apellido || '';
+    this.username = this.usuario.username || '';
+    this.activo = this.usuario.activo || false;
+    this.rol = this.usuario.rol || '';
   }
 
   logout() {
-    localStorage.clear();
-    this.nombre = '';
-    this.apellido = '';
-    this.username = '';
-    this.activo = false;
-    this.rol = '';
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }

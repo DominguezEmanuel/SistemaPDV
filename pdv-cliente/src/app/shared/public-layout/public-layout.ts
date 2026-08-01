@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Navbar } from '../navbar/navbar';
-import { Router } from '@angular/router';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -11,5 +10,5 @@ import { CommonModule } from '@angular/common';
   styleUrl: './public-layout.css',
 })
 export class PublicLayout {
-  constructor(private router: Router) {}
+  constructor() {}
 }

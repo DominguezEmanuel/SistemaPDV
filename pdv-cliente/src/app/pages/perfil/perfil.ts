@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+
+import { UsuarioResponse } from '../../models/UsuarioResponse';
+
+import { Auth } from '../../core/services/auth';
 
 @Component({
   selector: 'app-perfil',
@@ -9,6 +12,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './perfil.css',
 })
 export class Perfil implements OnInit {
+  usuario!: UsuarioResponse;
   idUsuario!: number;
   nombre!: string;
   apellido!: string;
@@ -16,15 +20,22 @@ export class Perfil implements OnInit {
   activo!: boolean;
   rol!: string;
 
-  constructor(private router: Router) {}
+  constructor(private authService: Auth) {}
 
   ngOnInit() {
-    const usuario = JSON.parse(localStorage.getItem('usuario')!);
-    this.idUsuario = usuario.idUsuario || 0;
-    this.nombre = usuario.nombre || '';
-    this.apellido = usuario.apellido || '';
-    this.username = usuario.username || '';
-    this.activo = usuario.activo || false;
-    this.rol = usuario.rol || '';
+    const usuario = this.authService.getUserLogued();
+    if (usuario) {
+      this.usuario = usuario;
+      this.cargarUsuario();
+    }
+  }
+
+  private cargarUsuario() {
+    this.idUsuario = this.usuario.idUsuario || 0;
+    this.nombre = this.usuario.nombre || '';
+    this.apellido = this.usuario.apellido || '';
+    this.username = this.usuario.username || '';
+    this.activo = this.usuario.activo || false;
+    this.rol = this.usuario.rol || '';
   }
 }
