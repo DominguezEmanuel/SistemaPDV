@@ -28,6 +28,6 @@ export const routes: Routes = [
       { path: 'perfil', component: Perfil },
     ],
   },
-  { path: '', component: Login },
+  { path: 'login', component: Login },
   // Crear una pagina de error
 ];

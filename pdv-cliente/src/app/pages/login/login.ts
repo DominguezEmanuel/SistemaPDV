@@ -42,15 +42,12 @@ export class Login {
 
     this.authService.login(request).subscribe({
       next: (response: LoginResponse) => {
-        //console.log('Login exitoso:', response);
         this.saveUserSession(response);
-        //this.successMessage = 'Inicio de sesión correcto';
         this.isLoading = false;
-        // Redirige hacia el dashbboard
+        // Redirige hacia a la página principal del sistema
         this.router.navigate(['/pdv']);
       },
       error: (error: HttpErrorResponse) => {
-        //console.log('Error al iniciar sesión: ', error.error);
         this.errorMessage =
           error.error?.mensaje ?? 'Ocurrió un error al iniciar sesión';
 
@@ -61,10 +58,7 @@ export class Login {
 
   saveUserSession(response: LoginResponse): void {
     localStorage.setItem('token', response.token);
-    //localStorage.setItem('usuario', JSON.stringify(response.usuario));
-    localStorage.setItem('nombre', response.usuario.nombre);
-    localStorage.setItem('apellido', response.usuario.apellido);
-    localStorage.setItem('username', response.usuario.username);
-    localStorage.setItem('rol', response.usuario.rol);
+    localStorage.setItem('usuario', JSON.stringify(response.usuario));
+    console.log('Usuario guardado', localStorage.getItem('usuario'));
   }
 }

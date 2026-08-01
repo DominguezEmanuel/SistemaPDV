@@ -232,11 +232,15 @@
   display: flex;
   align-items: center;
   gap: 11px;
+  width: 100%;
   padding: 11px 18px;
   font-size: 0.86rem;
-  color: var(--tinta);
+  color: #14181c;
   text-decoration: none;
   transition: background 0.12s ease;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 }
 
 .dropdown-action i {
@@ -250,6 +254,7 @@
 }
 
 .dropdown-action.logout {
+  background: #fbeaea;
   color: #c13b3b;
 }
 .dropdown-action.logout i {

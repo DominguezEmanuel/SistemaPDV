@@ -12,7 +12,7 @@
 
     <!-- Navegacion -->
     <nav class="nav-links">
-      <a routerLink="/pdv/dashboard" class="nav-item-link active">
+      <a routerLink="dashboard" class="nav-item-link active">
         <i class="bi bi-boxes"></i>
         Dashboard
       </a>
@@ -101,10 +101,14 @@
         <li><hr class="dropdown-divider" /></li>
         <!-- CERRAR SESIÓN -->
         <li>
-          <a class="dropdown-action logout" href="#">
+          <button
+            type="button"
+            class="dropdown-action logout"
+            (click)="logout()"
+          >
             <i class="bi bi-box-arrow-right"></i>
             Cerrar sesión
-          </a>
+          </button>
         </li>
       </ul>
     </div>

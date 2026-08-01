@@ -1,0 +1,222 @@
+/* ===== PAGE ===== */
+.page-body {
+  padding: 32px 28px 60px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.breadcrumb-custom {
+  font-size: 0.78rem;
+  color: var(--gris-texto);
+  margin-bottom: 6px;
+}
+.breadcrumb-custom span {
+  color: var(--azul-profundo);
+  font-weight: 600;
+}
+.page-title {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  color: #1c5a85;
+  font-size: 1.7rem;
+  margin-bottom: 4px;
+}
+.page-desc {
+  color: #5b6670;
+  font-size: 0.9rem;
+  margin-bottom: 26px;
+}
+
+/* Tarjeta encabezado de perfil */
+.profile-hero {
+  background: #fff;
+  border: 1px solid #e4edf3;
+  border-radius: 20px;
+  padding: 30px 32px;
+  box-shadow: 0 10px 30px -18px rgba(28, 90, 133, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+.profile-hero::before {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  top: -120px;
+  right: -100px;
+  background: radial-gradient(circle, #3e93c7, transparent 70%);
+  opacity: 0.12;
+  border-radius: 50%;
+}
+.profile-avatar-lg {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3e93c7, #1c5a85);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 10px 24px -8px rgba(28, 90, 133, 0.5);
+  position: relative;
+  z-index: 1;
+}
+.profile-hero-info {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 220px;
+}
+.profile-hero-info h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+.profile-hero-info .profile-username {
+  color: #5b6670;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin-right: 8px;
+}
+.badge-pill.rol {
+  background: #dceef8;
+  color: #1c5a85;
+  text-transform: uppercase;
+}
+.badge-pill.activo {
+  background: #e7f7ed;
+  color: #2e9e5b;
+}
+.badge-pill.inactivo {
+  background: var(--rojo-off-bg);
+  color: var(--rojo-off);
+}
+
+.profile-hero-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.btn-outline-brand {
+  border: 1.5px solid #3e93c7;
+  color: #1c5a85;
+  background: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 9px 18px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.btn-outline-brand:hover {
+  background: #dceef8;
+  color: #1c5a85;
+}
+.btn-solid-brand {
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 9px 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3e93c7, #1c5a85);
+  box-shadow: 0 8px 18px -8px rgba(28, 90, 133, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+.btn-solid-brand:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  color: #fff;
+}
+
+/* Tarjeta de datos */
+.info-card {
+  background: #fff;
+  border: 1px solid #e4edf3;
+  border-radius: 18px;
+  padding: 26px 28px;
+  box-shadow: 0 8px 24px -16px rgba(28, 90, 133, 0.16);
+  margin-bottom: 22px;
+}
+.info-card h5 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #14181c;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.info-card h5 i {
+  color: #3e93c7;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px 26px;
+}
+.info-field label {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #5b6670;
+  margin-bottom: 5px;
+}
+.info-field .info-value {
+  font-size: 0.94rem;
+  font-weight: 500;
+  color: #14181c;
+  background: #fbfdfe;
+  border: 1.5px solid #e4edf3;
+  padding: 10px 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.info-field .info-value i {
+  color: #3e93c7;
+  flex-shrink: 0;
+}
+
+@media (max-width: 576px) {
+  .profile-hero {
+    padding: 24px;
+  }
+  .profile-hero-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+}

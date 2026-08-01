@@ -10,17 +10,30 @@ import { Router } from '@angular/router';
   styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit {
-  nombre: string = '';
-  apellido: string = '';
-  username: string = '';
-  rol: string = '';
+  nombre!: string;
+  apellido!: string;
+  username!: string;
+  activo!: boolean;
+  rol!: string;
 
   constructor(private router: Router) {}
 
   ngOnInit() {
-    this.nombre = localStorage.getItem('nombre') || '';
-    this.apellido = localStorage.getItem('apellido') || '';
-    this.username = localStorage.getItem('username') || '';
-    this.rol = localStorage.getItem('rol') || '';
+    const usuario = JSON.parse(localStorage.getItem('usuario')!);
+    this.nombre = usuario.nombre || '';
+    this.apellido = usuario.apellido || '';
+    this.username = usuario.username || '';
+    this.activo = usuario.activo || false;
+    this.rol = usuario.rol || '';
+  }
+
+  logout() {
+    localStorage.clear();
+    this.nombre = '';
+    this.apellido = '';
+    this.username = '';
+    this.activo = false;
+    this.rol = '';
+    this.router.navigate(['/login']);
   }
 }
