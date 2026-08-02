@@ -1,6 +1,7 @@
 package com.sistemapdv.backend.config;
 
 import com.sistemapdv.backend.security.CustomUserDetailsService;
+import com.sistemapdv.backend.security.JwtAuthenticationEntryPoint;
 import com.sistemapdv.backend.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     /**
      * Encriptador de contraseñas usando BCrypt
@@ -62,11 +64,17 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                    // Endpoint público
                 .requestMatchers("/api/auth/login").permitAll()
+                    // Toda request que no haya sido permitida, requiere un usuario autenticado
                 .anyRequest().authenticated()
             )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authenticationProvider(authenticationProvider())
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint))
+                    // No guardar sesiones, cada request debe traer nuevamente el JWT
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    // Encargado de autenticar usuarios
+                .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

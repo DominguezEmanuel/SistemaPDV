@@ -43,8 +43,8 @@ public class CategoriaService {
 
         Categoria categoria = categoriaMapper.toCategoria(request);
 
-        Categoria categoriaCreada = categoriaRepository.save(categoria);
+        Categoria nuevaCategoria = categoriaRepository.save(categoria);
 
-        return categoriaMapper.toCategoriaDTO(categoriaCreada);
+        return categoriaMapper.toCategoriaDTO(nuevaCategoria);
     }
 }
