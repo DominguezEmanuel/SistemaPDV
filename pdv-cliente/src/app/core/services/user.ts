@@ -17,4 +17,14 @@ export class User {
   getAllUsers(): Observable<any> {
     return this.http.get<any>(`${this.hostBase}`);
   }
+
+  changeUserStatus(username: string, activo: boolean): Observable<any> {
+    const params = { activo: activo };
+
+    return this.http.patch<any>(
+      `${this.hostBase}estado/${username}`,
+      {},
+      { params },
+    );
+  }
 }

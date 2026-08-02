@@ -8,6 +8,7 @@ import com.sistemapdv.backend.exception.ResourceNotFoundException;
 import com.sistemapdv.backend.mapper.UsuarioMapper;
 import com.sistemapdv.backend.repository.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,7 @@ public class UsuarioService {
 
     public List<UsuarioResponseDTO> findAllUsers(){
         List<Usuario> usuarios = usuarioRepository.findAll();
+        //List<Usuario> usuarios = usuarioRepository.findAllByOrderByIdAsc();
         List<UsuarioResponseDTO> listadoUsuarios = new ArrayList<UsuarioResponseDTO>();
         for (Usuario u: usuarios){
             listadoUsuarios.add(usuarioMapper.toResponseDTO(u));
@@ -69,12 +71,12 @@ public class UsuarioService {
         return usuarioRepository.existsByUsername(username);
     }
 
-    // Activa o desactiva un usuario existente (no lo elimina)
-    public UsuarioResponseDTO setActiveUser(String username, boolean activo){
+    // Activa o desactiva un usuario existente
+    public UsuarioResponseDTO setActiveUser(String username, boolean nuevoEstado){
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        usuario.setActivo(activo);
+        usuario.setActivo(nuevoEstado);
         Usuario usuarioActualizado = usuarioRepository.save(usuario);
 
         return usuarioMapper.toResponseDTO(usuarioActualizado);

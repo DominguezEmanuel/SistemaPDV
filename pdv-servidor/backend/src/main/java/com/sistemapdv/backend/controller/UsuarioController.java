@@ -72,7 +72,7 @@ public class UsuarioController {
     }
 
     // Activa o desactiva un usuario registrado sin eliminarlo
-    @PatchMapping("/{username}/activo")
+    @PatchMapping("/estado/{username}")
     public ResponseEntity<UsuarioResponseDTO> setActive(@PathVariable String username, @RequestParam boolean activo){
         UsuarioResponseDTO response = usuarioService.setActiveUser(username, activo);
         return ResponseEntity.status(HttpStatus.OK)
