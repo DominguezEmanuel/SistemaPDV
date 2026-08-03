@@ -1,7 +1,7 @@
 package com.sistemapdv.backend.controller;
 
-import com.sistemapdv.backend.dto.UsuarioRequestDTO;
-import com.sistemapdv.backend.dto.UsuarioResponseDTO;
+import com.sistemapdv.backend.dto.request.UsuarioRequestDTO;
+import com.sistemapdv.backend.dto.response.UsuarioResponseDTO;
 import com.sistemapdv.backend.entity.Usuario;
 import com.sistemapdv.backend.service.UsuarioService;
 import com.sistemapdv.backend.utils.enums.RolUsuario;

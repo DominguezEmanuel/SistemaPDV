@@ -1,7 +1,7 @@
 package com.sistemapdv.backend.service;
 
-import com.sistemapdv.backend.dto.UsuarioRequestDTO;
-import com.sistemapdv.backend.dto.UsuarioResponseDTO;
+import com.sistemapdv.backend.dto.request.UsuarioRequestDTO;
+import com.sistemapdv.backend.dto.response.UsuarioResponseDTO;
 import com.sistemapdv.backend.entity.Usuario;
 import com.sistemapdv.backend.exception.ResourceDuplicatedException;
 import com.sistemapdv.backend.exception.ResourceNotFoundException;

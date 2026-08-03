@@ -66,6 +66,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     // Endpoint público
                 .requestMatchers("/api/auth/login").permitAll()
+                    .requestMatchers("/api/productos/**").permitAll()
                     // Toda request que no haya sido permitida, requiere un usuario autenticado
                 .anyRequest().authenticated()
             )

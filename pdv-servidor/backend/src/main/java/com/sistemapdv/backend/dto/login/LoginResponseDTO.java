@@ -1,6 +1,6 @@
 package com.sistemapdv.backend.dto.login;
 
-import com.sistemapdv.backend.dto.UsuarioResponseDTO;
+import com.sistemapdv.backend.dto.response.UsuarioResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.sistemapdv.backend.utils.enums;
+package com.sistemapdv.backend.utils;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;

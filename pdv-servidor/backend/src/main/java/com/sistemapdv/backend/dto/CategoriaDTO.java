@@ -3,7 +3,8 @@ package com.sistemapdv.backend.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoriaDTO {

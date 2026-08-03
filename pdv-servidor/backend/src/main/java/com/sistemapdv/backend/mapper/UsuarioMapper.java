@@ -1,7 +1,7 @@
 package com.sistemapdv.backend.mapper;
 
-import com.sistemapdv.backend.dto.UsuarioRequestDTO;
-import com.sistemapdv.backend.dto.UsuarioResponseDTO;
+import com.sistemapdv.backend.dto.request.UsuarioRequestDTO;
+import com.sistemapdv.backend.dto.response.UsuarioResponseDTO;
 import com.sistemapdv.backend.entity.Usuario;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

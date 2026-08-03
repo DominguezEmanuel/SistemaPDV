@@ -3,7 +3,11 @@ package com.sistemapdv.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

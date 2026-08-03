@@ -1,6 +1,6 @@
 package com.sistemapdv.backend.service;
 
-import com.sistemapdv.backend.dto.UsuarioResponseDTO;
+import com.sistemapdv.backend.dto.response.UsuarioResponseDTO;
 import com.sistemapdv.backend.dto.login.LoginRequestDTO;
 import com.sistemapdv.backend.dto.login.LoginResponseDTO;
 import com.sistemapdv.backend.entity.Usuario;
