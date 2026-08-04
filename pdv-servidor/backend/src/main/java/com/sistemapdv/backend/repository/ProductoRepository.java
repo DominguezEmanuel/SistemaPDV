@@ -13,6 +13,8 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 
     List<Producto> findByActivoTrue();
 
+    Optional<Producto> findByNombreIgnoreCase(String nombre);
+
     boolean existsByNombreIgnoreCase(String nombre);
 
     @Query("""

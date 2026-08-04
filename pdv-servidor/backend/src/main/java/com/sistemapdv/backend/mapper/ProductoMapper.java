@@ -1,6 +1,5 @@
 package com.sistemapdv.backend.mapper;
 
-import com.sistemapdv.backend.dto.CategoriaDTO;
 import com.sistemapdv.backend.dto.request.ProductoRequestDTO;
 import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
 import com.sistemapdv.backend.entity.Categoria;
@@ -32,16 +31,16 @@ public class ProductoMapper {
     }
 
     public ProductoResponseDTO toResponseDTO(Producto producto){
-        ProductoResponseDTO dto = new ProductoResponseDTO();
-        dto.setIdProducto(producto.getIdProducto());
-        dto.setNombre(producto.getNombre());
-        dto.setImagen(producto.getImagen());
-        dto.setPrecioMinorista(producto.getPrecioMinorista());
-        dto.setPrecioMayorista(producto.getPrecioMayorista());
-        dto.setMinimoMayorista(producto.getMinimoMayorista());
-        dto.setActivo(producto.getActivo());
-        CategoriaDTO categoria = categoriaMapper.toCategoriaDTO(producto.getCategoria());
-        dto.setCategoria(categoria);
+        ProductoResponseDTO dto = ProductoResponseDTO.builder()
+                .idProducto(producto.getIdProducto())
+                .nombre(producto.getNombre())
+                .imagen(producto.getImagen())
+                .precioMinorista(producto.getPrecioMinorista())
+                .precioMayorista(producto.getPrecioMayorista())
+                .minimoMayorista(producto.getMinimoMayorista())
+                .activo(producto.getActivo())
+                .categoria(categoriaMapper.toCategoriaDTO(producto.getCategoria()))
+                .build();
         return dto;
     }
 }

@@ -53,4 +53,20 @@ public class ProductoController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(nuevoProducto);
     }
+
+    @PatchMapping("/estado/{nombre}")
+    public ResponseEntity<ProductoResponseDTO> changeStatus(@PathVariable String nombre,
+                                                            @RequestParam boolean activo){
+        ProductoResponseDTO response = productoService.changeStatusProduct(nombre, activo);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductoResponseDTO> updateProduct(@PathVariable Integer id,
+                                                             @Valid @RequestBody ProductoRequestDTO request){
+        ProductoResponseDTO productoActualizado = productoService.updateProduct(id, request);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(productoActualizado);
+    }
 }

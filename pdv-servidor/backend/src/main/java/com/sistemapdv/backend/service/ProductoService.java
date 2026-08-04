@@ -4,14 +4,15 @@ import com.sistemapdv.backend.dto.request.ProductoRequestDTO;
 import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
 import com.sistemapdv.backend.entity.Categoria;
 import com.sistemapdv.backend.entity.Producto;
+import com.sistemapdv.backend.exception.ResourceDuplicatedException;
 import com.sistemapdv.backend.exception.ResourceNotFoundException;
 import com.sistemapdv.backend.mapper.ProductoMapper;
 import com.sistemapdv.backend.repository.CategoriaRepository;
 import com.sistemapdv.backend.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductoService {
@@ -26,6 +27,7 @@ public class ProductoService {
         this.productoMapper = productoMapper;
     }
 
+    @Transactional(readOnly = true)
     public ProductoResponseDTO findById(Integer id){
         Producto producto = productoRepository.findByIdWithCategoria(id)
                 .orElseThrow( ()->
@@ -33,6 +35,7 @@ public class ProductoService {
         return productoMapper.toResponseDTO(producto);
     }
 
+    @Transactional(readOnly = true)
     public ProductoResponseDTO findByName(String nombre){
         Producto producto = productoRepository.findByNombreWithCategoria(nombre)
                 .orElseThrow(()->
@@ -40,6 +43,7 @@ public class ProductoService {
         return productoMapper.toResponseDTO(producto);
     }
 
+    @Transactional(readOnly = true)
     public List<ProductoResponseDTO> findAllProducts(){
         List<Producto> productos = productoRepository.findAllWithCategoria();
         return productos.stream()
@@ -47,6 +51,7 @@ public class ProductoService {
                 .toList();
     }
 
+    @Transactional
     public ProductoResponseDTO createProduct(ProductoRequestDTO request){
         Categoria categoria = categoriaRepository.findById(request.getIdCategoria())
                 .orElseThrow(()-> new ResourceNotFoundException(
@@ -63,8 +68,66 @@ public class ProductoService {
 
         Producto producto = productoMapper.toProducto(request, categoria);
 
-        Producto productoGuardado = productoRepository.save(producto);
+        productoRepository.save(producto);
 
-        return productoMapper.toResponseDTO(productoGuardado);
+        return productoMapper.toResponseDTO(producto);
+    }
+
+    @Transactional
+    public ProductoResponseDTO changeStatusProduct(String nombre, boolean activo){
+        Producto producto = productoRepository.findByNombreWithCategoria(nombre)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Producto con id " + nombre + " no encontrado"
+                        ));
+
+        if(producto.getActivo().equals(activo)){
+            throw new IllegalArgumentException(
+                    "El producto ya se encuentra "
+                            + (activo ? "habilitado" : "deshabilitado")
+            );
+        }
+
+        producto.setActivo(activo);
+
+        return productoMapper.toResponseDTO(producto);
+    }
+
+    @Transactional
+    public ProductoResponseDTO updateProduct(Integer id,
+                                             ProductoRequestDTO request){
+        // Buscar el producto
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(()->
+                        new ResourceNotFoundException("Producto con id " + id + " no encontrado"));
+
+        // Buscar la categoría
+        Categoria categoria = categoriaRepository.findById(request.getIdCategoria())
+                .orElseThrow(()-> new ResourceNotFoundException("Categoria con ID "
+                        + request.getIdCategoria() + " no encontrada"));
+
+        // Validar que NO exista otro producto con el mismo nombre
+        Optional<Producto> productoExistente =
+                productoRepository.findByNombreIgnoreCase(request.getNombre());
+        if(productoExistente.isPresent() &&
+            !productoExistente.get().getIdProducto().equals(id)){
+            throw new ResourceDuplicatedException("Ya existe un producto con ese nombre.");
+        }
+
+        // Validar precios
+        if (request.getPrecioMayorista()
+                .compareTo(request.getPrecioMinorista()) > 0) {
+            throw new IllegalArgumentException("El precio mayorista no puede ser mayor al precio minorista.");
+        }
+
+        // Actualizar datos
+        producto.setNombre(request.getNombre().trim());
+        producto.setImagen(request.getImagen().trim());
+        producto.setPrecioMinorista(request.getPrecioMinorista());
+        producto.setPrecioMayorista(request.getPrecioMayorista());
+        producto.setMinimoMayorista(request.getMinimoMayorista());
+        producto.setCategoria(categoria);
+
+        return productoMapper.toResponseDTO(producto);
     }
 }
