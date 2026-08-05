@@ -2,13 +2,17 @@ package com.sistemapdv.backend.service;
 
 import com.sistemapdv.backend.dto.request.ProductoRequestDTO;
 import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
+import com.sistemapdv.backend.dto.response.VarianteProductoResponseDTO;
 import com.sistemapdv.backend.entity.Categoria;
 import com.sistemapdv.backend.entity.Producto;
+import com.sistemapdv.backend.entity.VarianteProducto;
 import com.sistemapdv.backend.exception.ResourceDuplicatedException;
 import com.sistemapdv.backend.exception.ResourceNotFoundException;
 import com.sistemapdv.backend.mapper.ProductoMapper;
+import com.sistemapdv.backend.mapper.VarianteProductoMapper;
 import com.sistemapdv.backend.repository.CategoriaRepository;
 import com.sistemapdv.backend.repository.ProductoRepository;
+import com.sistemapdv.backend.repository.VarianteProductoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -19,12 +23,16 @@ public class ProductoService {
 
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final VarianteProductoRepository varianteRepository;
     private final ProductoMapper productoMapper;
+    private final VarianteProductoMapper varianteMapper;
 
-    public ProductoService(ProductoRepository productoRepository, CategoriaRepository categoriaRepository, ProductoMapper productoMapper) {
+    public ProductoService(ProductoRepository productoRepository, CategoriaRepository categoriaRepository, VarianteProductoRepository varianteRepository, ProductoMapper productoMapper, VarianteProductoMapper varianteMapper) {
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.varianteRepository = varianteRepository;
         this.productoMapper = productoMapper;
+        this.varianteMapper = varianteMapper;
     }
 
     @Transactional(readOnly = true)
@@ -48,6 +56,26 @@ public class ProductoService {
         List<Producto> productos = productoRepository.findAllWithCategoria();
         return productos.stream()
                 .map(productoMapper::toResponseDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<VarianteProductoResponseDTO> getVariantsByProduct(Integer idProducto){
+        // Verificar que el ID de Producto existe
+        if(!productoRepository.existsById(idProducto))
+            throw new ResourceNotFoundException("Producto con id " + idProducto + " no encontrado");
+        // Buscar las variantes del producto
+        List<VarianteProducto> variantes = varianteRepository.findByProductoId(idProducto);
+        // Si el producto no posee variantes, se informa
+        if(variantes.size() == 0) {
+            // Podria usarse otro tipo de Excepcion, debido a que se encontró el recurso,
+            // pero está vacío
+            throw new ResourceNotFoundException("El producto con ID " + idProducto +
+                    " no tiene variantes asociadas");
+        }
+
+        return variantes.stream()
+                .map(varianteMapper::toResponseDTO)
                 .toList();
     }
 
@@ -84,8 +112,7 @@ public class ProductoService {
         if(producto.getActivo().equals(activo)){
             throw new IllegalArgumentException(
                     "El producto ya se encuentra "
-                            + (activo ? "habilitado" : "deshabilitado")
-            );
+                            + (activo ? "habilitado" : "deshabilitado"));
         }
 
         producto.setActivo(activo);

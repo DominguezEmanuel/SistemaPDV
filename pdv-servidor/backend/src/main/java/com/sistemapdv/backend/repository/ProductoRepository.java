@@ -17,6 +17,8 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 
     boolean existsByNombreIgnoreCase(String nombre);
 
+    boolean existsById(Integer id);
+
     @Query("""
         SELECT p
         FROM Producto p

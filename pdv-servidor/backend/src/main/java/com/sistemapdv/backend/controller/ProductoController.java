@@ -2,6 +2,7 @@ package com.sistemapdv.backend.controller;
 
 import com.sistemapdv.backend.dto.request.ProductoRequestDTO;
 import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
+import com.sistemapdv.backend.dto.response.VarianteProductoResponseDTO;
 import com.sistemapdv.backend.service.ProductoService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -45,10 +46,16 @@ public class ProductoController {
         return productos;
     }
 
+    @GetMapping("{id}/variantes")
+    @ResponseBody
+    public List<VarianteProductoResponseDTO> getVariantsByProduct(@PathVariable Integer id){
+        List<VarianteProductoResponseDTO> variantes = productoService.getVariantsByProduct(id);
+        return variantes;
+    }
+
     @PostMapping("/")
     public ResponseEntity<ProductoResponseDTO> createProduct(
             @Valid @RequestBody ProductoRequestDTO request){
-        logger.info("Entró al endpoint crear producto");
         ProductoResponseDTO nuevoProducto = productoService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(nuevoProducto);

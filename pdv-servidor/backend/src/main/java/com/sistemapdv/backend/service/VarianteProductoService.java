@@ -1,0 +1,110 @@
+package com.sistemapdv.backend.service;
+
+import com.sistemapdv.backend.dto.request.VarianteProductoRequestDTO;
+import com.sistemapdv.backend.dto.response.VarianteProductoResponseDTO;
+import com.sistemapdv.backend.entity.Producto;
+import com.sistemapdv.backend.entity.VarianteProducto;
+import com.sistemapdv.backend.exception.ResourceDuplicatedException;
+import com.sistemapdv.backend.exception.ResourceNotFoundException;
+import com.sistemapdv.backend.mapper.VarianteProductoMapper;
+import com.sistemapdv.backend.repository.ProductoRepository;
+import com.sistemapdv.backend.repository.VarianteProductoRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class VarianteProductoService {
+
+    private final VarianteProductoRepository varianteProductoRepository;
+    private final ProductoRepository productoRepository;
+    private final VarianteProductoMapper varianteMapper;
+
+    public VarianteProductoService(VarianteProductoRepository varianteProductoRepository, ProductoRepository productoRepository, VarianteProductoMapper varianteMapper) {
+        this.varianteProductoRepository = varianteProductoRepository;
+        this.productoRepository = productoRepository;
+        this.varianteMapper = varianteMapper;
+    }
+
+    @Transactional(readOnly = true)
+    public List<VarianteProductoResponseDTO> getAllVariants(){
+        List<VarianteProducto> variantes = varianteProductoRepository.findAll();
+        return variantes.stream()
+                .map(varianteMapper::toResponseDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public VarianteProductoResponseDTO getVariantById(Integer id){
+        VarianteProducto variante = varianteProductoRepository.findById(id)
+                .orElseThrow(()->
+                        new ResourceNotFoundException("Variante con ID " + id + " no encontrada"));
+        return varianteMapper.toResponseDTO(variante);
+    }
+
+    @Transactional
+    public VarianteProductoResponseDTO createVariant(VarianteProductoRequestDTO request){
+        Producto producto = productoRepository.findById(request.getIdProducto())
+                .orElseThrow(()-> new ResourceNotFoundException(
+                        "Producto con id " + request.getIdProducto() + " no encontrado"));
+
+        if(request.getCodigoBarras() != null)
+            if(varianteProductoRepository.existsByCodigoBarras(request.getCodigoBarras()))
+                throw new ResourceDuplicatedException("El código de barras " +
+                        request.getCodigoBarras() + " ya se encuentra registrado");
+
+
+        VarianteProducto variante = varianteMapper.toVariante(request, producto);
+
+        varianteProductoRepository.save(variante);
+
+        return varianteMapper.toResponseDTO(variante);
+    }
+
+    @Transactional
+    public VarianteProductoResponseDTO updateVariant(Integer idVariante,
+                                                     VarianteProductoRequestDTO request){
+        // Validar que exista el ID de variante
+        VarianteProducto variante = varianteProductoRepository.findById(idVariante)
+                .orElseThrow(()->
+                        new ResourceNotFoundException("Variante con ID " + idVariante +
+                                " no encontrada"));
+        // Verificar que la variante le sigue perteneciendo al mismo producto
+        if(!variante.getProducto().getIdProducto().equals(request.getIdProducto()))
+            throw new IllegalArgumentException("No es posible cambiar el producto asociado a la variante");
+
+        // Verificar que el código de barras no se encuentre registrado
+        if(request.getCodigoBarras() != null)
+            if(varianteProductoRepository.existsByCodigoBarras(request.getCodigoBarras()))
+                throw new ResourceDuplicatedException("El código de barras " +
+                        request.getCodigoBarras() + " ya se encuentra registrado");
+
+        variante.setNombre(request.getNombre().trim());
+        variante.setCodigoBarras(request.getCodigoBarras());
+
+        return varianteMapper.toResponseDTO(variante);
+    }
+
+    @Transactional
+    public VarianteProductoResponseDTO changeStatusVariant(Integer id, boolean activo){
+        VarianteProducto variante = varianteProductoRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Variante con ID " + id + " no encontrada"));
+
+        if(variante.getActivo().equals(activo))
+            throw new IllegalArgumentException("La variante ya se encuentra "
+                        + (activo ? "habilitada" : "deshabilitada"));
+
+        variante.setActivo(activo);
+
+        return varianteMapper.toResponseDTO(variante);
+    }
+
+    @Transactional(readOnly = true)
+    public VarianteProductoResponseDTO findByBarCode(String codigoBarras){
+        VarianteProducto variante = varianteProductoRepository.findByCodigoBarras(codigoBarras)
+                .orElseThrow(()-> new ResourceNotFoundException("Variante con código "
+                + codigoBarras + " no encontrada"));
+        return varianteMapper.toResponseDTO(variante);
+    }
+}
