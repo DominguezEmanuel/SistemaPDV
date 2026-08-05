@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface CanalVentaRepository extends JpaRepository<CanalVenta, Integer> {
 
     boolean existsByNombreIgnoreCase(String nombre);
+
+    boolean existsById(Integer id);
 }

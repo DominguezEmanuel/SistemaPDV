@@ -54,7 +54,8 @@ public class ProductoService {
     @Transactional(readOnly = true)
     public List<ProductoResponseDTO> findAllProducts(){
         List<Producto> productos = productoRepository.findAllWithCategoria();
-        return productos.stream()
+        return productos
+                .stream()
                 .map(productoMapper::toResponseDTO)
                 .toList();
     }
@@ -74,7 +75,8 @@ public class ProductoService {
                     " no tiene variantes asociadas");
         }
 
-        return variantes.stream()
+        return variantes
+                .stream()
                 .map(varianteMapper::toResponseDTO)
                 .toList();
     }
