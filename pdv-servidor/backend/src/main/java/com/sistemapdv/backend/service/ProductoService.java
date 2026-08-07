@@ -67,13 +67,6 @@ public class ProductoService {
             throw new ResourceNotFoundException("Producto con id " + idProducto + " no encontrado");
         // Buscar las variantes del producto
         List<VarianteProducto> variantes = varianteRepository.findByProductoId(idProducto);
-        // Si el producto no posee variantes, se informa
-        if(variantes.size() == 0) {
-            // Podria usarse otro tipo de Excepcion, debido a que se encontró el recurso,
-            // pero está vacío
-            throw new ResourceNotFoundException("El producto con ID " + idProducto +
-                    " no tiene variantes asociadas");
-        }
 
         return variantes
                 .stream()

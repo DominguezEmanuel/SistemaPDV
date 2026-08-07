@@ -65,7 +65,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                     // Endpoint público
-                .requestMatchers("/api/auth/login").permitAll()
+                    .requestMatchers("/api/auth/login").permitAll()
+                    .requestMatchers("/api/categorias/**").permitAll()
                     .requestMatchers("/api/productos/**").permitAll()
                     .requestMatchers("/api/variantes/**").permitAll()
                     .requestMatchers("/api/canales/**").permitAll()

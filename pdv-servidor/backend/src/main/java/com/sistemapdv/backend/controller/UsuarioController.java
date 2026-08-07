@@ -59,7 +59,6 @@ public class UsuarioController {
     @ResponseBody
     public List<UsuarioResponseDTO> findAllUsers(){
         List<UsuarioResponseDTO> usuarios = usuarioService.findAllUsers();
-        logger.info("Devolviendo a todos los usuarios");
         return usuarios;
     }
 

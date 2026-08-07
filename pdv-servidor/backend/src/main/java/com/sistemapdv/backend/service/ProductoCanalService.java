@@ -74,6 +74,22 @@ public class ProductoCanalService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public ProductoCanalResponseDTO findByCanalAndProducto(Integer idCanal, Integer idProducto){
+
+        if(!productoRepository.existsById(idProducto))
+            throw new ResourceNotFoundException("Producto con ID " + idProducto + " no encontrado");
+
+        if(!canalVentaRepository.existsById(idCanal))
+            throw new ResourceNotFoundException("Canal Venta con ID " + idCanal + " no encontrado");
+
+        ProductoCanal productoCanal = repository.findByProductoIdProductoAndCanalVentaIdCanalVenta(idProducto, idCanal)
+                .orElseThrow(()-> new ResourceNotFoundException("Registro no encontrado para Canal "
+                + idCanal + " Producto " + idProducto));
+
+        return mapper.toResponseDTO(productoCanal);
+    }
+
     @Transactional
     public ProductoCanalResponseDTO saveProductoCanal(ProductoCanalRequestDTO request){
 

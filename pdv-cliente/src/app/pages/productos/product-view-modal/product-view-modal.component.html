@@ -1,0 +1,313 @@
+<!-- Overlay: se muestra solo si "visible" es true y hay un producto cargado -->
+<div class="mv-overlay" *ngIf="visible && producto" (click)="cerrarModal()">
+  <div class="mv-modal" (click)="detenerPropagacion($event)">
+    <!-- Header -->
+    <div class="mv-header">
+      <div class="mv-header-info">
+        <h2 class="mv-title">{{ producto.nombre }}</h2>
+        <div class="mv-header-sub">
+          <span class="mv-id-chip">ID-0{{ producto.idProducto }}</span>
+          <span>{{ producto.categoria.nombre }}</span>
+        </div>
+      </div>
+      <button
+        class="mv-close-btn"
+        type="button"
+        (click)="cerrarModal()"
+        aria-label="Cerrar"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mv-tabs" role="tablist">
+      <button
+        *ngFor="let tab of tabs"
+        type="button"
+        class="mv-tab-btn"
+        [class.active]="esTabActiva(tab.id)"
+        role="tab"
+        [attr.aria-selected]="esTabActiva(tab.id)"
+        (click)="seleccionarTab(tab.id)"
+      >
+        <i [class]="tab.icon" class="mv-tab-icon"></i>
+        <span>{{ tab.label }}</span>
+      </button>
+    </div>
+
+    <!-- Panel: Información -->
+    <div
+      class="mv-tab-panel"
+      *ngIf="esTabActiva('informacion')"
+      role="tabpanel"
+    >
+      <div class="mv-info-grid">
+        <div class="mv-image-column">
+          <div class="mv-field full">
+            <label>Imagen</label>
+            <div class="mv-image-card">
+              <img
+                src="assets/images/producto_prueba.jpeg"
+                alt="Producto Prueba"
+                class="mv-product-image"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="mv-details-column">
+          <div class="mv-field">
+            <label>ID</label>
+            <div class="mv-value">ID-0{{ producto.idProducto }}</div>
+          </div>
+          <div class="mv-field">
+            <label>Nombre del producto</label>
+            <div class="mv-value">{{ producto.nombre }}</div>
+          </div>
+          <div class="mv-field">
+            <label>Categoría</label>
+            <div class="mv-value">{{ producto.categoria.nombre }}</div>
+          </div>
+          <div class="mv-field">
+            <label>Precio minorista</label>
+            <div class="mv-value">
+              {{ formatearMoneda(producto.precioMinorista) }}
+            </div>
+          </div>
+          <div class="mv-field">
+            <label>Precio mayorista</label>
+            <div class="mv-value">
+              {{ formatearMoneda(producto.precioMayorista) }}
+            </div>
+          </div>
+          <div class="mv-field">
+            <label>Cantidad mínima mayorista</label>
+            <div class="mv-value">{{ producto.minimoMayorista }} unidades</div>
+          </div>
+          <div class="mv-field">
+            <label>Estado</label>
+            <div class="mv-value">
+              <span
+                class="mv-badge"
+                [class.activo]="producto.activo == true"
+                [class.inactivo]="producto.activo == false"
+              >
+                <span class="dot"></span>
+                {{ producto.activo === true ? "Activo" : "Inactivo" }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel: Variantes del producto -->
+    <div class="mv-tab-panel" *ngIf="esTabActiva('variantes')" role="tabpanel">
+      <div class="mv-variants-header">
+        <div>
+          <h3 class="mv-section-title">Variantes del producto</h3>
+          <p class="mv-section-text">
+            Gestioná los distintos registros de variantes del producto
+          </p>
+        </div>
+        <button type="button" class="mv-btn-primary">
+          <i class="bi bi-plus-lg"></i>
+          Agregar variante
+        </button>
+      </div>
+
+      <table class="mv-table" *ngIf="variantes.length; else sinVariantes">
+        <thead>
+          <tr>
+            <th>ID Variante</th>
+            <th>Código de barras</th>
+            <th>Nombre de la variante</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let variante of variantes">
+            <td>{{ variante.idVariante }}</td>
+            <td>{{ variante.codigoBarras }}</td>
+            <td>{{ variante.nombre }}</td>
+            <td>
+              <span
+                class="mv-badge"
+                [class.activo]="variante.activo"
+                [class.inactivo]="!variante.activo"
+              >
+                <span class="dot"></span>
+                {{ variante.activo ? "Activo" : "Inactivo" }}
+              </span>
+            </td>
+            <td>
+              <div class="mv-actions">
+                <button type="button" class="mv-action-btn" title="Actualizar">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button
+                  type="button"
+                  class="mv-action-btn"
+                  [class.mv-positivo]="!variante.activo"
+                  [class.mv-negativo]="variante.activo"
+                  [title]="variante.activo ? 'Deshabilitar' : 'Habilitar'"
+                >
+                  @if (variante.activo) {
+                    <i class="bi bi-ban"></i>
+                  } @else {
+                    <i class="bi bi-check2-circle"></i>
+                  }
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #sinVariantes>
+        <div class="mv-empty-state">
+          <i class="bi bi-boxes"></i>
+          <div>No hay variantes cargadas para este producto</div>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Panel: Stock -->
+    <div class="mv-tab-panel" *ngIf="esTabActiva('stock')" role="tabpanel">
+      <div class="mv-stock-hero">
+        <div class="mv-stock-box">
+          <div class="mv-stock-num">{{ variantes.length }}</div>
+          <div class="mv-stock-label">Variantes cargadas</div>
+        </div>
+        <div class="mv-stock-box">
+          <div class="mv-stock-num">
+            {{ canales.length }}
+          </div>
+          <div class="mv-stock-label">Canales de venta</div>
+        </div>
+      </div>
+
+      <div class="mv-stock-layout">
+        <div class="mv-stock-list-card">
+          <h3 class="mv-section-title">Variantes del producto</h3>
+          <p class="mv-section-text">
+            Seleccioná una variante para ver su stock por canal
+          </p>
+
+          <div
+            class="mv-variant-list"
+            *ngIf="variantes.length; else sinVariantesStock"
+          >
+            <button
+              type="button"
+              class="mv-variant-item"
+              *ngFor="let variante of variantes"
+              [class.active]="varianteSeleccionadaId === variante.idVariante"
+              (click)="
+                seleccionarVariante(variante.idVariante, variante.nombre)
+              "
+            >
+              <i class="bi bi-box-seam"></i>
+              <span>{{ variante.nombre }}</span>
+            </button>
+          </div>
+
+          <ng-template #sinVariantesStock>
+            <div class="mv-empty-state mv-empty-state-small">
+              <i class="bi bi-boxes"></i>
+              <div>No hay variantes disponibles para mostrar</div>
+            </div>
+          </ng-template>
+        </div>
+
+        <div class="mv-stock-detail-card">
+          <h3 class="mv-section-title">Stock por canal</h3>
+          <p
+            class="mv-section-text"
+            *ngIf="varianteSeleccionadaNombre !== null; else sinDetalleStock"
+          >
+            {{ varianteSeleccionadaNombre }}
+          </p>
+          <ng-template #sinDetalleStock>
+            <p class="mv-section-text">
+              Seleccioná una variante para ver el detalle
+            </p>
+          </ng-template>
+
+          <div
+            class="mv-stock-grid"
+            *ngIf="canales.length; else sinDetalleStockGrid"
+          >
+            <div class="mv-stock-channel" *ngFor="let canal of canales">
+              <div class="mv-channel-name">{{ canal.nombre }}</div>
+              <div class="mv-channel-stock">
+                {{ obtenerCantidadByCanal(canal.idCanalVenta) }}
+              </div>
+            </div>
+          </div>
+
+          <ng-template #sinDetalleStockGrid>
+            <div class="mv-empty-state mv-empty-state-small">
+              <i class="bi bi-graph-up"></i>
+              <div>Esperando selección de variante</div>
+            </div>
+          </ng-template>
+        </div>
+
+        <div class="mv-stock-detail-card" *ngIf="totalStockPorCanal.length">
+          <h3 class="mv-section-title">Stock total del Producto</h3>
+          <p class="mv-section-text">
+            Stock total del producto en cada canal de venta
+          </p>
+          <div class="mv-total-row" *ngFor="let total of totalStockPorCanal">
+            <div class="mv-total-canal">{{ total.nombreCanal }}</div>
+            <div class="mv-total-cantidad">{{ total.cantidad }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel: Configuración Comercial -->
+    <div class="mv-tab-panel" *ngIf="esTabActiva('comercial')" role="tabpanel">
+      <div class="mv-variants-header">
+        <div>
+          <h3 class="mv-section-title">Configuración Comercial</h3>
+          <p class="mv-section-text">
+            Configuración sobre cómo se vende el producto
+          </p>
+        </div>
+      </div>
+
+      <table class="mv-table" *ngIf="canales.length; else sinProductosCanales">
+        <thead>
+          <tr>
+            <th>Canal</th>
+            <th>Limite mayorista</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let canal of canales">
+            <td>{{ canal.nombre }}</td>
+            <td>{{ obtenerCantidadByCanal(canal.idCanalVenta) }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #sinProductosCanales>
+        <div class="mv-empty-state">
+          <i class="bi bi-boxes"></i>
+          <div>No hay registros para esta combinación de Producto y Canal</div>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Footer -->
+    <div class="mv-footer">
+      <button type="button" class="mv-btn-cerrar" (click)="cerrarModal()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

@@ -42,6 +42,13 @@ public class ProductoCanalController {
         return ResponseEntity.ok(productoCanalService.findByCanal(idCanal));
     }
 
+    @GetMapping("/canal/{idCanal}/producto/{idProducto}")
+    public ResponseEntity<ProductoCanalResponseDTO> findByCanalAndProducto(@PathVariable Integer idCanal,
+                                                                           @PathVariable Integer idProducto){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(productoCanalService.findByCanalAndProducto(idCanal, idProducto));
+    }
+
     @PostMapping("/")
     public ResponseEntity<ProductoCanalResponseDTO> addProductoCanal(
             @Valid @RequestBody ProductoCanalRequestDTO request){
