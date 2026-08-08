@@ -1,0 +1,313 @@
+<!-- ===== MODAL: NUEVO USUARIO ===== -->
+<div class="mv-overlay" *ngIf="visible" (click)="cerrarModal()">
+  <div class="mv-modal" (click)="detenerPropagacion($event)">
+    <!-- HEADER (título y botón cerrar)-->
+    <div class="mv-header">
+      <div class="mv-header-info">
+        <h3 class="mv-title">
+          <i class="bi bi-person-add"></i>
+          Nuevo usuario
+        </h3>
+      </div>
+      <button
+        type="button"
+        class="mv-close-btn"
+        (click)="cerrarModal()"
+        aria-label="Cerrar"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+
+    <div class="mv-body">
+      <form [formGroup]="formUsuario" (ngSubmit)="procesarFormulario()">
+        <!-- Datos personales -->
+        <div class="nu-section-title">
+          <i class="bi bi-person"></i>
+          Datos personales
+        </div>
+
+        <div class="nu-row">
+          <!-- CAMPO NOMBRES -->
+          <div class="nu-field">
+            <label class="nu-label" for="nombres"
+              >Nombre<span class="req">*</span></label
+            >
+            <input
+              type="text"
+              id="nombres"
+              class="nu-input"
+              placeholder="Ej: Romina del Valle"
+              formControlName="nombres"
+            />
+            <div
+              *ngIf="formUsuario.get('nombres')?.touched && formUsuario.get('nombres')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="formUsuario.get('nombres')?.errors?.['required']">
+                Este campo es obligatorio.
+              </div>
+              <div *ngIf="formUsuario.get('nombres')?.errors?.['minlength']">
+                Debe tener al menos 3 caracteres.
+              </div>
+              <div *ngIf="formUsuario.get('nombres')?.errors?.['pattern']">
+                Solo se permiten letras y espacios.
+              </div>
+              <div
+                *ngIf="formUsuario.get('nombres')?.errors?.['sinPrimerLetraMayuscula']"
+              >
+                La primer letra debe ser mayúscula.
+              </div>
+            </div>
+          </div>
+          <!-- CAMPO APELLIDO -->
+          <div class="nu-field">
+            <label class="nu-label" for="apellido"
+              >Apellido<span class="req">*</span></label
+            >
+            <input
+              type="text"
+              id="apellido"
+              class="nu-input"
+              placeholder="Ej: Albornoz"
+              formControlName="apellido"
+            />
+            <div
+              *ngIf="formUsuario.get('apellido')?.touched && formUsuario.get('apellido')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="formUsuario.get('apellido')?.errors?.['required']">
+                Este campo es obligatorio.
+              </div>
+              <div *ngIf="formUsuario.get('apellido')?.errors?.['minlength']">
+                Debe tener al menos 3 caracteres.
+              </div>
+              <div *ngIf="formUsuario.get('apellido')?.errors?.['pattern']">
+                Solo se permiten letras y espacios.
+              </div>
+              <div
+                *ngIf="formUsuario.get('apellido')?.errors?.['sinPrimerLetraMayuscula']"
+              >
+                La primer letra debe ser mayúscula.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Credenciales de acceso -->
+        <div class="nu-section-title">
+          <i class="bi bi-lock field-icon"></i>
+          Credenciales de acceso
+        </div>
+
+        <!-- NOMBRE DE USUARIO -->
+        <div class="nu-field">
+          <label class="nu-label" for="username"
+            >Nombre de usuario<span class="req">*</span></label
+          >
+          <input
+            type="text"
+            id="username"
+            class="nu-input"
+            placeholder="Ej: romina_albornoz"
+            formControlName="username"
+          />
+          <div class="nu-hint">
+            Solo minúsculas, mayúsculas, números, y guiones bajos. Sin espacios.
+          </div>
+          <div
+            *ngIf="formUsuario.get('username')?.touched && formUsuario.get('username')?.invalid"
+            class="form-error-msg"
+          >
+            <i class="bi bi-exclamation-circle"></i>
+            <div *ngIf="formUsuario.get('username')?.errors?.['required']">
+              Este campo es obligatorio.
+            </div>
+            <div *ngIf="formUsuario.get('username')?.errors?.['minlength']">
+              Debe tener al menos 4 caracteres.
+            </div>
+            <div *ngIf="formUsuario.get('username')?.errors?.['pattern']">
+              No se permiten caracteres especiales.
+            </div>
+          </div>
+        </div>
+        <!-- CAMPO CONTRASEÑA -->
+        <div class="nu-row">
+          <div class="nu-field">
+            <label class="nu-label" for="password"
+              >Contraseña<span class="req">*</span></label
+            >
+            <div class="nu-pass-group">
+              <input
+                [type]="mostrarPassword ? 'text' : 'password'"
+                id="password"
+                class="nu-input"
+                placeholder="Mínimo 8 caracteres"
+                formControlName="password"
+              />
+              <button
+                type="button"
+                class="nu-toggle-pass"
+                (click)="cambioPassword()"
+                [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              >
+                <i
+                  class="bi"
+                  [ngClass]="mostrarPassword ? 'bi-eye-slash' : 'bi-eye'"
+                ></i>
+              </button>
+            </div>
+            <div class="nu-strength-label">
+              Debe incluir mayúscula, minúscula y número.
+            </div>
+            <div
+              *ngIf="formUsuario.get('password')?.touched && formUsuario.get('password')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="formUsuario.get('password')?.errors?.['required']">
+                Este campo es obligatorio.
+              </div>
+              <div *ngIf="formUsuario.get('password')?.errors?.['minlength']">
+                Debe tener al menos 8 caracteres.
+              </div>
+              <div
+                *ngIf="formUsuario.get('password')?.errors?.['sinMayuscula']"
+              >
+                Debe contener al menos una letra mayúscula.
+              </div>
+              <div
+                *ngIf="formUsuario.get('password')?.errors?.['sinMinuscula']"
+              >
+                Debe contener al menos una letra minúscula.
+              </div>
+              <div *ngIf="formUsuario.get('password')?.errors?.['sinNumero']">
+                Debe contener al menos un número.
+              </div>
+            </div>
+          </div>
+          <!-- CONFIRMAR CONTRASEÑA -->
+          <div class="nu-field">
+            <label class="nu-label" for="confirmPassword"
+              >Confirmar contraseña<span class="req">*</span></label
+            >
+            <div class="nu-pass-group">
+              <input
+                [type]="mostrarConfirmPassword ? 'text' : 'password'"
+                id="confirmPassword"
+                class="nu-input"
+                placeholder="Repetí la contraseña"
+                formControlName="confirmPassword"
+              />
+              <button
+                type="button"
+                class="nu-toggle-pass"
+                (click)="mostrarConfirmPassword = !mostrarConfirmPassword"
+                [attr.aria-label]="
+                  mostrarConfirmPassword
+                    ? 'Ocultar contraseña'
+                    : 'Mostrar contraseña'
+                "
+              >
+                <i
+                  class="bi"
+                  [ngClass]="
+                    mostrarConfirmPassword
+                      ? 'bi-eye-slash'
+                      : 'bi-eye'
+                  "
+                ></i>
+              </button>
+            </div>
+            <div>
+              <div
+                *ngIf="formUsuario.get('confirmPassword')?.touched &&
+                formUsuario.get('confirmPassword')?.errors?.['required']"
+                class="form-error-msg"
+              >
+                <i class="bi bi-exclamation-circle"></i>
+                Este campo es obligatorio.
+              </div>
+              <div
+                *ngIf="
+                  formUsuario.get('confirmPassword')?.touched &&
+                  formUsuario.hasError('passwordsMismatch')
+                "
+                class="form-error-msg"
+              >
+                <i class="bi bi-exclamation-circle"></i>
+                Las contraseñas no coinciden.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rol Usuario
+        <div class="nu-section-title">
+          <i class="bi bi-shield-fill"></i>
+          Rol del usuario
+        </div>
+
+        <div class="nu-field">
+          <div class="nu-rol-options" id="nuRolOptions">
+            <label class="nu-rol-card" data-rol="ADMINISTRADOR">
+              <input type="radio" name="rol" value="ADMINISTRADOR" required />
+              <span class="nu-rol-icon">
+                <i class="bi bi-shield-fill"></i>
+              </span>
+              <span class="nu-rol-text">
+                <b>Administrador</b>
+                <span>Acceso total al sistema</span>
+              </span>
+            </label>
+
+            <label class="nu-rol-card" data-rol="CAJERO">
+              <input type="radio" name="rol" value="CAJERO" required />
+              <span class="nu-rol-icon">
+                <i class="bi bi-bag"></i>
+              </span>
+              <span class="nu-rol-text">
+                <b>Cajero</b>
+                <span>Acceso a ventas y caja</span>
+              </span>
+            </label>
+          </div>
+          <div class="nu-error-msg" id="nuErrorRol">
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Seleccioná un rol para el usuario.
+          </div>
+        </div>-->
+
+        <button
+          [disabled]="formUsuario.invalid"
+          type="submit"
+          class="nu-btn-guardar"
+        >
+          <i class="bi bi-floppy-fill"></i>
+          Guardar usuario
+        </button>
+      </form>
+    </div>
+
+    <div class="mv-footer">
+      <button type="button" class="mv-btn-cancelar" (click)="cerrarModal()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

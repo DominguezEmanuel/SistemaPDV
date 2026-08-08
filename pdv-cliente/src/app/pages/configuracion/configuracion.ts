@@ -1,31 +1,78 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { FormControl, FormsModule } from '@angular/forms';
 import { User } from '../../core/services/user';
 import { Auth } from '../../core/services/auth';
 
 import { UsuarioResponse } from '../../models/UsuarioResponse';
+import { UsuarioForm } from '../usuarios/usuario-form/usuario-form';
 
 import { ToastrService } from 'ngx-toastr';
 
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
+import { Validadores } from '../../validators/validadores';
+
 @Component({
   selector: 'app-configuracion',
-  imports: [CommonModule],
+  imports: [CommonModule, UsuarioForm, ReactiveFormsModule, FormsModule],
   templateUrl: './configuracion.html',
   styleUrl: './configuracion.css',
 })
 export class Configuracion implements OnInit {
-  usuarios: any[] = [];
+  usuarios: UsuarioResponse[] = [];
   usuarioLogueado!: UsuarioResponse;
-
+  usuarioSeleccionado: UsuarioResponse | null = null;
+  modalVisible = false;
   constructor(
     private userService: User,
     private authService: Auth,
     private toastr: ToastrService,
+    private fb: FormBuilder,
   ) {}
 
   ngOnInit() {
     this.loadUsers();
+  }
+
+  abrirModal(usuario?: UsuarioResponse): void {
+    if (usuario) {
+      this.usuarioSeleccionado = usuario;
+    } else {
+      this.usuarioSeleccionado = null;
+    }
+    this.modalVisible = true;
+    console.log('Modal abierto: ', this.modalVisible, this.usuarioSeleccionado);
+  }
+
+  cerrarModal(): void {
+    this.modalVisible = false;
+    this.usuarioSeleccionado = null;
+  }
+
+  guardarUsuario(
+    usuario: Partial<UsuarioResponse> & { password?: string },
+  ): void {
+    const peticion = usuario.idUsuario
+      ? this.userService.updateUser(usuario.idUsuario, usuario)
+      : this.userService.createUser(usuario);
+
+    peticion.subscribe({
+      next: () => {
+        const accion = usuario.idUsuario ? 'actualizado' : 'creado';
+        this.toastr.success(`Usuario ${accion} correctamente`, 'Éxito');
+        this.loadUsers();
+        this.cerrarModal();
+      },
+      error: (error) => {
+        console.error('Error al guardar usuario:', error);
+        this.toastr.error('Error al guardar el usuario', 'Error');
+      },
+    });
   }
 
   loadUsers(): void {

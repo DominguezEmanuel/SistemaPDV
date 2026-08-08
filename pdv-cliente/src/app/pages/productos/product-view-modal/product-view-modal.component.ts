@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ProductoResponse } from '../../../models/ProductoResponse';
@@ -25,10 +32,12 @@ type TabId = 'informacion' | 'variantes' | 'stock' | 'comercial';
   templateUrl: './product-view-modal.component.html',
   styleUrls: ['./product-view-modal.component.css'],
 })
-export class ProductViewModalComponent {
+export class ProductViewModalComponent implements OnChanges {
   @Input() producto: ProductoResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
+  variantesCargadas = false;
+  canalesCargados = false;
 
   tabs: { id: TabId; label: string; icon: string }[] = [
     {
@@ -58,6 +67,7 @@ export class ProductViewModalComponent {
   stock: StockResponse | null = null;
   configuracionCanales: ConfiguracionCanal[] = [];
   totalStockPorCanal: ConfiguracionCanal[] = [];
+  private totalStockRequestId = 0;
 
   constructor(
     private varianteService: VarianteService,
@@ -66,10 +76,13 @@ export class ProductViewModalComponent {
     private productoCanalService: ProductoCanalService,
   ) {}
 
-  ngOnChanges() {
-    if (this.producto) {
-      this.cargarVariantes();
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['producto'] && this.producto) {
       this.resetearStock();
+      this.cargarVariantes();
+      if (this.tabActiva === 'stock' || this.tabActiva === 'comercial') {
+        this.cargarCanales();
+      }
     }
   }
 
@@ -91,11 +104,8 @@ export class ProductViewModalComponent {
             this.cargarStockPorCanales(this.varianteSeleccionadaId);
           }
 
-          // Si estamos en la pestaña Stock y ya tenemos canales cargados,
-          // calcular el total por canal sumando todas las variantes.
-          if (this.tabActiva === 'stock' && this.canales.length) {
-            this.cargarTotalStockPorCanales();
-          }
+          this.variantesCargadas = true;
+          this.actualizarStockTotalSiEsNecesario();
         },
         error: (error) => {
           console.error('Error al cargar variantes:', error);
@@ -115,11 +125,8 @@ export class ProductViewModalComponent {
           this.cargarStockPorCanales(this.varianteSeleccionadaId);
         }
 
-        // Si estamos en la pestaña Stock y ya tenemos variantes cargadas,
-        // calcular el total por canal sumando todas las variantes.
-        if (this.tabActiva === 'stock' && this.variantes.length) {
-          this.cargarTotalStockPorCanales();
-        }
+        this.canalesCargados = true;
+        this.actualizarStockTotalSiEsNecesario();
       },
       error: (error) => {
         console.error('Error al obtener canales:', error);
@@ -204,6 +211,7 @@ export class ProductViewModalComponent {
       return;
     }
 
+    const requestId = ++this.totalStockRequestId;
     this.totalStockPorCanal = [];
 
     this.canales.forEach((canal) => {
@@ -224,6 +232,9 @@ export class ProductViewModalComponent {
           .getStockByCanalAndVariante(canal.idCanalVenta, variante.idVariante)
           .subscribe({
             next: (response) => {
+              if (requestId !== this.totalStockRequestId) {
+                return;
+              }
               total += response?.cantidadDisponible ?? 0;
               pendientes -= 1;
               if (pendientes === 0) {
@@ -235,6 +246,9 @@ export class ProductViewModalComponent {
               }
             },
             error: (error) => {
+              if (requestId !== this.totalStockRequestId) {
+                return;
+              }
               console.error(
                 `Error al sumar stock para canal ${canal.idCanalVenta} variante ${variante.idVariante}:`,
                 error,
@@ -270,6 +284,10 @@ export class ProductViewModalComponent {
   resetearStock(): void {
     this.varianteSeleccionadaId = null;
     this.varianteSeleccionadaNombre = null;
+    this.variantesCargadas = false;
+    this.canalesCargados = false;
+    this.totalStockPorCanal = [];
+    this.configuracionCanales = [];
   }
 
   seleccionarTab(id: TabId): void {
@@ -288,6 +306,18 @@ export class ProductViewModalComponent {
       this.cargarCanales();
       this.cargarProductosCanales();
     }
+  }
+
+  private actualizarStockTotalSiEsNecesario(): void {
+    if (this.tabActiva !== 'stock') {
+      return;
+    }
+
+    if (!this.canales.length || !this.variantes.length) {
+      return;
+    }
+
+    this.cargarTotalStockPorCanales();
   }
 
   esTabActiva(id: TabId): boolean {
