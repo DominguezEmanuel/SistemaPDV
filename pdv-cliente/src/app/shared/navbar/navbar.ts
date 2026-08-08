@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
 
-import { UsuarioResponse } from '../../models/UsuarioResponse';
+import { UsuarioResponse } from '../../models/Usuario';
 
 import { Auth } from '../../core/services/auth';
 

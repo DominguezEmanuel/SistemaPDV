@@ -43,17 +43,6 @@ public class UsuarioController {
                 .body(usuarioEncontrado);
     }
 
-    // ???
-    @GetMapping("/verificar/{username}")
-    public ResponseEntity<?> verifyUsername(@PathVariable String username){
-        if(!usuarioService.verifyUsername(username))
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Usuario " + username + " no existe");
-
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .body("Usuario " + username + " encontrado");
-    }
-
     // Devuelve la lista de todos los usuarios registrados
     @GetMapping("/")
     @ResponseBody

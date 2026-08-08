@@ -66,6 +66,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     // Endpoint público
                     .requestMatchers("/api/auth/login").permitAll()
+                    .requestMatchers("/api/usuarios/**").permitAll()
                     .requestMatchers("/api/categorias/**").permitAll()
                     .requestMatchers("/api/productos/**").permitAll()
                     .requestMatchers("/api/variantes/**").permitAll()

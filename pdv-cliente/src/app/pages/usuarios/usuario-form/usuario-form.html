@@ -150,7 +150,7 @@
               <button
                 type="button"
                 class="nu-toggle-pass"
-                (click)="cambioPassword()"
+                (click)="mostrarPassword = !mostrarPassword"
                 [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
               >
                 <i
@@ -244,16 +244,20 @@
           </div>
         </div>
 
-        <!-- Rol Usuario
+        <!-- Rol Usuario -->
         <div class="nu-section-title">
           <i class="bi bi-shield-fill"></i>
           Rol del usuario
         </div>
 
         <div class="nu-field">
-          <div class="nu-rol-options" id="nuRolOptions">
-            <label class="nu-rol-card" data-rol="ADMINISTRADOR">
-              <input type="radio" name="rol" value="ADMINISTRADOR" required />
+          <div class="nu-rol-options">
+            <!-- ADMINISTRADOR -->
+            <label
+              class="nu-rol-card"
+              [class.seleccionada]="formUsuario.get('rol')?.value === 'ADMINISTRADOR'"
+            >
+              <input type="radio" formControlName="rol" value="ADMINISTRADOR" />
               <span class="nu-rol-icon">
                 <i class="bi bi-shield-fill"></i>
               </span>
@@ -262,9 +266,12 @@
                 <span>Acceso total al sistema</span>
               </span>
             </label>
-
-            <label class="nu-rol-card" data-rol="CAJERO">
-              <input type="radio" name="rol" value="CAJERO" required />
+            <!-- CAJERO -->
+            <label
+              class="nu-rol-card"
+              [class.seleccionada]="formUsuario.get('rol')?.value === 'CAJERO'"
+            >
+              <input type="radio" formControlName="rol" value="CAJERO" />
               <span class="nu-rol-icon">
                 <i class="bi bi-bag"></i>
               </span>
@@ -274,24 +281,19 @@
               </span>
             </label>
           </div>
-          <div class="nu-error-msg" id="nuErrorRol">
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            Seleccioná un rol para el usuario.
+          <div
+            *ngIf="
+              formUsuario.get('rol')?.touched &&
+              formUsuario.get('rol')?.invalid
+            "
+            class="form-error-msg"
+          >
+            <i class="bi bi-exclamation-circle"></i>
+            <div *ngIf="formUsuario.get('rol')?.errors?.['required']">
+              Seleccioná un rol para el usuario.
+            </div>
           </div>
-        </div>-->
+        </div>
 
         <button
           [disabled]="formUsuario.invalid"

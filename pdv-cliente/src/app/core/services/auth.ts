@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 
 // Models
 import { LoginRequest } from '../../models/LoginRequest';
-import { UsuarioResponse } from '../../models/UsuarioResponse';
+import { UsuarioResponse } from '../../models/Usuario';
 import { LoginResponse } from '../../models/LoginResponse';
 // Environment
 import { environment } from '../../../environment/environment';

@@ -1,25 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormsModule } from '@angular/forms';
-import { User } from '../../core/services/user';
+
+import { UsuarioService } from '../../core/services/usuario-service';
 import { Auth } from '../../core/services/auth';
 
-import { UsuarioResponse } from '../../models/UsuarioResponse';
+import { UsuarioResponse } from '../../models/Usuario';
 import { UsuarioForm } from '../usuarios/usuario-form/usuario-form';
 
 import { ToastrService } from 'ngx-toastr';
-
-import {
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
-import { Validadores } from '../../validators/validadores';
+import { AlertService } from '../../core/services/alert-service';
 
 @Component({
   selector: 'app-configuracion',
-  imports: [CommonModule, UsuarioForm, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, UsuarioForm],
   templateUrl: './configuracion.html',
   styleUrl: './configuracion.css',
 })
@@ -29,10 +22,10 @@ export class Configuracion implements OnInit {
   usuarioSeleccionado: UsuarioResponse | null = null;
   modalVisible = false;
   constructor(
-    private userService: User,
+    private usuarioService: UsuarioService,
     private authService: Auth,
     private toastr: ToastrService,
-    private fb: FormBuilder,
+    private alertService: AlertService,
   ) {}
 
   ngOnInit() {
@@ -46,7 +39,6 @@ export class Configuracion implements OnInit {
       this.usuarioSeleccionado = null;
     }
     this.modalVisible = true;
-    console.log('Modal abierto: ', this.modalVisible, this.usuarioSeleccionado);
   }
 
   cerrarModal(): void {
@@ -54,6 +46,7 @@ export class Configuracion implements OnInit {
     this.usuarioSeleccionado = null;
   }
 
+  /*
   guardarUsuario(
     usuario: Partial<UsuarioResponse> & { password?: string },
   ): void {
@@ -73,10 +66,10 @@ export class Configuracion implements OnInit {
         this.toastr.error('Error al guardar el usuario', 'Error');
       },
     });
-  }
+  }*/
 
   loadUsers(): void {
-    this.userService.getAllUsers().subscribe({
+    this.usuarioService.getAllUsers().subscribe({
       next: (response) => {
         console.log('Usuarios obtenidos:', response);
         this.usuarios = response;
@@ -99,25 +92,36 @@ export class Configuracion implements OnInit {
   // Devuelve el username del usuario logueado, o null si no hay usuario logueado
   userLogged(): string | null {
     const usuario = this.authService.getUserLogued();
-    if (usuario) this.usuarioLogueado = usuario;
+    if (usuario) {
+      this.usuarioLogueado = usuario;
+    }
     return this.usuarioLogueado ? this.usuarioLogueado.username : null;
   }
 
-  changeUserStatus(username: string, newState: boolean): void {
-    console.log(`Cambiando estado del usuario ${username} a ${newState}`);
-    this.userService.changeUserStatus(username, newState).subscribe({
-      next: (response) => {
-        console.log('Estado del usuario actualizado:', response);
-        this.toastr.success(
-          'Estado del usuario actualizado correctamente',
-          'Éxito',
-        );
-        this.loadUsers(); // Recargar la lista de usuarios después de actualizar el estado
-      },
-      error: (error) => {
-        console.error('Error al actualizar el estado del usuario:', error);
-        this.toastr.error('Error al actualizar el estado del usuario', 'Error');
-      },
-    });
+  onUsuarioCreado(usuario: UsuarioResponse): void {
+    this.modalVisible = false;
+    this.loadUsers();
+    this.toastr.success('Usuario creado correctamente', 'Usuario creado');
+  }
+
+  changeUserStatus(username: string, activo: boolean): void {
+    this.alertService
+      .confirmarCambioEstado('usuario', username, activo)
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.usuarioService.changeUserStatus(username, activo).subscribe({
+            next: (response) => {
+              this.toastr.success(
+                'Estado del usuario actualizado correctamente',
+                'Éxito',
+              );
+              this.loadUsers(); // Recargar la lista de usuarios después de actualizar el estado
+            },
+            error: (error) => {
+              this.toastr.error(error.error.mensaje, 'Error');
+            },
+          });
+        }
+      });
   }
 }

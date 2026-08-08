@@ -280,7 +280,9 @@
   box-shadow: 0 8px 18px -8px rgba(28, 90, 133, 0.5);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
+  margin: 20px auto 0;
   transition:
     transform 0.15s ease,
     filter 0.15s ease;
@@ -298,19 +300,6 @@
   transform: none;
   filter: none;
   opacity: 1;
-}
-
-.nu-alert-exito {
-  display: none;
-  align-items: center;
-  gap: 10px;
-  background: #e7f7ed;
-  color: #2e9e5b;
-  border-radius: 12px;
-  padding: 12px 16px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 18px;
 }
 
 /* Footer */

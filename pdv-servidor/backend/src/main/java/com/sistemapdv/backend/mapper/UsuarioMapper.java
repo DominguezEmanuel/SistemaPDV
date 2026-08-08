@@ -12,28 +12,27 @@ public class UsuarioMapper {
 
     public Usuario toUsuario(UsuarioRequestDTO dto){
 
-        Usuario usuario = new Usuario();
-
-        usuario.setNombre(dto.getNombre());
-        usuario.setApellido(dto.getApellido());
-        usuario.setUsername(dto.getUsername());
-        usuario.setPassword(dto.getPassword());
-        log.info("Password en Mapper {}", usuario.getPassword());
-        usuario.setRol(dto.getRol());
+        Usuario usuario = Usuario.builder()
+                .nombre(dto.getNombre().trim())
+                .apellido(dto.getApellido().trim())
+                .username(dto.getUsername().trim())
+                .password(dto.getPassword())
+                .rol(dto.getRol())
+                .build();
 
         return usuario;
     }
 
     public UsuarioResponseDTO toResponseDTO(Usuario usuario){
 
-        UsuarioResponseDTO dto = new UsuarioResponseDTO();
-
-        dto.setIdUsuario(usuario.getIdUsuario());
-        dto.setNombre(usuario.getNombre());
-        dto.setApellido(usuario.getApellido());
-        dto.setUsername(usuario.getUsername());
-        dto.setActivo(usuario.getActivo());
-        dto.setRol(usuario.getRol());
+        UsuarioResponseDTO dto = UsuarioResponseDTO.builder()
+                .idUsuario(usuario.getIdUsuario())
+                .nombre(usuario.getNombre())
+                .apellido(usuario.getApellido())
+                .username(usuario.getUsername())
+                .activo(usuario.getActivo())
+                .rol(usuario.getRol())
+                .build();
 
         return dto;
     }

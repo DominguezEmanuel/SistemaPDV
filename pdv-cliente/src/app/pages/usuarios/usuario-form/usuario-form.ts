@@ -16,7 +16,10 @@ import {
   Validators,
 } from '@angular/forms';
 import { Validadores } from '../../../validators/validadores';
-import { UsuarioResponse } from '../../../models/UsuarioResponse';
+import { UsuarioResponse } from '../../../models/Usuario';
+import { UsuarioRequest } from '../../../models/Usuario';
+
+import { UsuarioService } from '../../../core/services/usuario-service';
 
 @Component({
   selector: 'app-usuario-form',
@@ -29,12 +32,15 @@ export class UsuarioForm implements OnChanges {
   @Input() usuario: UsuarioResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
+  @Output() usuarioCreado = new EventEmitter<UsuarioResponse>();
 
   formUsuario!: FormGroup;
   mostrarPassword: boolean = false;
   mostrarConfirmPassword: boolean = false;
+  nuevoUsuario: UsuarioRequest | null = null;
 
   constructor(
+    private usuarioService: UsuarioService,
     private toastr: ToastrService,
     private fb: FormBuilder,
   ) {
@@ -44,6 +50,7 @@ export class UsuarioForm implements OnChanges {
     });
   }
 
+  //???
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && this.visible) {
       if (!this.usuario) {
@@ -98,6 +105,11 @@ export class UsuarioForm implements OnChanges {
         nonNullable: true,
         validators: [Validators.required],
       }),
+      // Rol CAJERO por defecto
+      rol: new FormControl<string>('CAJERO', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
     };
   }
 
@@ -107,19 +119,33 @@ export class UsuarioForm implements OnChanges {
       return;
     }
     this.asignarValores();
+    this.crearUsuario();
   }
 
-  asignarValores() {
-    console.log('Formulario válido');
-    console.log(this.formUsuario.value);
+  asignarValores(): void {
+    // Carga los valores del formulario
+    const valores = this.formUsuario.getRawValue();
+    // Asigna los valores del form a un nuevo usuario
+    this.nuevoUsuario = {
+      nombre: valores.nombres,
+      apellido: valores.apellido,
+      username: valores.username,
+      password: valores.password,
+      rol: valores.rol,
+    };
   }
 
-  cambioPassword() {
-    this.mostrarPassword = !this.mostrarPassword;
-  }
-
-  detenerPropagacion(evento: MouseEvent): void {
-    evento.stopPropagation();
+  crearUsuario() {
+    this.usuarioService.createUser(this.nuevoUsuario).subscribe({
+      next: (result) => {
+        this.usuarioCreado.emit(result);
+        this.cerrarModal();
+      },
+      error: (error) => {
+        this.toastr.error(error.error.mensaje, 'Error');
+        console.log(error);
+      },
+    });
   }
 
   cerrarModal(): void {
@@ -133,5 +159,9 @@ export class UsuarioForm implements OnChanges {
     this.mostrarPassword = false;
     this.mostrarConfirmPassword = false;
     this.cerrar.emit();
+  }
+
+  detenerPropagacion(evento: MouseEvent): void {
+    evento.stopPropagation();
   }
 }

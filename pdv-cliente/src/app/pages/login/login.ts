@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Auth } from '../../core/services/auth';
 import { LoginRequest } from '../../models/LoginRequest';
 import { Router } from '@angular/router';
-import { UsuarioResponse } from '../../models/UsuarioResponse';
+import { UsuarioResponse } from '../../models/Usuario';
 import { HttpErrorResponse } from '@angular/common/http';
 import { LoginResponse } from '../../models/LoginResponse';
 

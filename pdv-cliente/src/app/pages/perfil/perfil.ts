@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { UsuarioResponse } from '../../models/UsuarioResponse';
+import { UsuarioResponse } from '../../models/Usuario';
 
 import { Auth } from '../../core/services/auth';
 

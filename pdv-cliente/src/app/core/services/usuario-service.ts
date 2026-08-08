@@ -1,43 +1,43 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+
 import { environment } from '../../../environment/environment';
+
+import { UsuarioRequest, UsuarioResponse } from '../../models/Usuario';
 import { Observable } from 'rxjs';
-import { UsuarioResponse } from '../../models/Usuario';
 
 @Injectable({
   providedIn: 'root',
 })
-export class User {
+export class UsuarioService {
   private hostBase!: string;
 
   constructor(private http: HttpClient) {
     this.hostBase = environment.apiUrl + '/usuarios/';
   }
 
-  getAllUsers(): Observable<any> {
-    return this.http.get<any>(`${this.hostBase}`);
+  getAllUsers() {
+    return this.http.get<UsuarioResponse[]>(`${this.hostBase}`);
   }
 
-  changeUserStatus(username: string, activo: boolean): Observable<any> {
+  changeUserStatus(username: string, activo: boolean) {
     const params = { activo: activo };
 
-    return this.http.patch<any>(
+    return this.http.patch<UsuarioResponse>(
       `${this.hostBase}estado/${username}`,
       {},
       { params },
     );
   }
 
-  createUser(
-    usuario: Partial<UsuarioResponse> & { password?: string },
-  ): Observable<any> {
-    return this.http.post<any>(`${this.hostBase}`, usuario);
+  createUser(usuario: UsuarioRequest | null): Observable<UsuarioResponse> {
+    return this.http.post<UsuarioResponse>(`${this.hostBase}`, usuario);
   }
 
   updateUser(
     idUsuario: number,
     usuario: Partial<UsuarioResponse> & { password?: string },
-  ): Observable<any> {
+  ) {
     return this.http.put<any>(`${this.hostBase}${idUsuario}`, usuario);
   }
 }

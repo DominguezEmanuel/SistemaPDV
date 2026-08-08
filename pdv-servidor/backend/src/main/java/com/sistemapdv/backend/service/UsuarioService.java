@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,18 +30,21 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional(readOnly = true)
     public UsuarioResponseDTO findByUsername(String username){
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow( ()-> new ResourceNotFoundException("Usuario no encontrado"));
         return usuarioMapper.toResponseDTO(usuario);
     }
 
+    @Transactional(readOnly = true)
     public UsuarioResponseDTO findById(Integer id){
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow( ()-> new ResourceNotFoundException("Usuario no encontrado"));
         return usuarioMapper.toResponseDTO(usuario);
     }
 
+    @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> findAllUsers(){
         List<Usuario> usuarios = usuarioRepository.findAll();
         //List<Usuario> usuarios = usuarioRepository.findAllByOrderByIdAsc();
@@ -51,6 +55,7 @@ public class UsuarioService {
         return listadoUsuarios;
     }
 
+    @Transactional
     public UsuarioResponseDTO createUser(UsuarioRequestDTO request){
         if(usuarioRepository.existsByUsername(request.getUsername()))
             throw new ResourceDuplicatedException("El nombre de usuario ya existe");
@@ -61,17 +66,13 @@ public class UsuarioService {
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         usuario.setActivo(true);
 
-        Usuario usuarioCreado = usuarioRepository.save(usuario);
+        usuarioRepository.save(usuario);
 
-        return usuarioMapper.toResponseDTO(usuarioCreado);
-    }
-
-    // ????
-    public boolean verifyUsername(String username){
-        return usuarioRepository.existsByUsername(username);
+        return usuarioMapper.toResponseDTO(usuario);
     }
 
     // Activa o desactiva un usuario existente
+    @Transactional
     public UsuarioResponseDTO setActiveUser(String username, boolean nuevoEstado){
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));

@@ -1,13 +1,7 @@
-import {
-  FormControl,
-  ValidationErrors,
-  ValidatorFn,
-  FormGroup,
-  AbstractControl,
-} from '@angular/forms';
+import { ValidationErrors, AbstractControl } from '@angular/forms';
 
 export class Validadores {
-  static validarPrimerLetra(c: FormControl): ValidationErrors | null {
+  static validarPrimerLetra(c: AbstractControl): ValidationErrors | null {
     const nombre = c.value as string;
 
     if (!nombre) {
@@ -21,7 +15,7 @@ export class Validadores {
     return null;
   }
 
-  static validarPassword(c: FormControl): ValidationErrors | null {
+  static validarPassword(c: AbstractControl): ValidationErrors | null {
     let password: string = String(c.value);
 
     if (!password) {
