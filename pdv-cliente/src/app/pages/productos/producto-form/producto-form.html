@@ -1,0 +1,254 @@
+<div class="mv-overlay" *ngIf="visible" (click)="cerrarModal()">
+  <div class="mv-modal" (click)="detenerPropagacion($event)">
+    <!-- HEADER -->
+    <div class="mv-header">
+      <div class="mv-header-info">
+        <h3 class="mv-title">
+          <i class="bi bi-plus-circle"></i>
+          Nuevo producto
+        </h3>
+      </div>
+      <button
+        type="button"
+        class="mv-close-btn"
+        (click)="cerrarModal()"
+        aria-label="Cerrar"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <!-- CONTENIDO -->
+    <div class="mv-body">
+      <form [formGroup]="formProducto" (ngSubmit)="procesarFormulario()">
+        <!-- Datos generales -->
+        <div class="nu-section-title">
+          <i class="bi bi-square"></i>
+          Datos generales
+        </div>
+
+        <div class="nu-row">
+          <!-- NOMBRE DEL PRODUCTO -->
+          <div class="nu-field">
+            <label class="nu-label" for="nombre"
+              >Nombre del producto<span class="req">*</span></label
+            >
+            <input
+              type="text"
+              id="nombre"
+              class="nu-input"
+              placeholder="Ej: Labial Mate Larga Duración"
+              formControlName="nombre"
+            />
+            <div
+              *ngIf="formProducto.get('nombre')?.touched && formProducto.get('nombre')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="formProducto.get('nombre')?.errors?.['required']">
+                El nombre es obligatorio.
+              </div>
+              <div *ngIf="formProducto.get('nombre')?.errors?.['minlength']">
+                El nombre debe tener al menos 3 caracteres.
+              </div>
+            </div>
+          </div>
+          <!-- CATEGORÍA -->
+          <div class="nu-field">
+            <label class="nu-label" for="categoria"
+              >Categoría<span class="req">*</span></label
+            >
+            <select
+              id="categoria"
+              class="nu-select"
+              formControlName="categoria"
+            >
+              <option [ngValue]="null" disabled>
+                Seleccioná una categoría
+              </option>
+              <option
+                *ngFor="let categoria of categorias"
+                [value]="categoria.idCategoria"
+              >
+                {{ categoria.nombre }}
+              </option>
+            </select>
+            <div
+              *ngIf="formProducto.get('categoria')?.touched && formProducto.get('categoria')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="formProducto.get('categoria')?.errors?.['required']">
+                Seleccioná una categoría.
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- IMAGEN -->
+        <div class="nu-field">
+          <label class="nu-label">Imagen del producto</label>
+          <div class="mp-dropzone">
+            <!-- Estado: imagen seleccionada -->
+            <ng-container *ngIf="previewImagen; else sinImagen">
+              <img
+                [src]="previewImagen"
+                class="mp-preview-img"
+                alt="Vista previa"
+              />
+
+              <button
+                type="button"
+                class="mp-remove-btn"
+                (click)="quitarImagen($event)"
+              >
+                <i class="bi bi-trash3-fill"></i>
+                Quitar imagen
+              </button>
+            </ng-container>
+            <!-- Estado: sin imagen -->
+            <ng-template #sinImagen>
+              <i class="bi bi-box-arrow-up mp-upload-icon"></i>
+
+              <div class="mp-dz-text">Hacé clic para agregar una imagen</div>
+
+              <div class="mp-dz-hint">JPG o PNG</div>
+            </ng-template>
+
+            <input
+              #inputImagen
+              type="file"
+              accept="image/png, image/jpeg"
+              (change)="handleImagenChange($event)"
+            />
+          </div>
+          <div
+            *ngIf="formProducto.get('imagen')?.touched && formProducto.get('imagen')?.invalid"
+            class="form-error-msg"
+          >
+            <i class="bi bi-exclamation-circle"></i>
+            <div *ngIf="formProducto.get('imagen')?.errors?.['required']">
+              Agregá una imagen del producto.
+            </div>
+          </div>
+        </div>
+
+        <!-- Precios -->
+        <div class="nu-section-title">
+          <i class="bi bi-currency-dollar"></i>
+          Precios y venta mayorista
+        </div>
+        <!-- PRECIO MINORISTA -->
+        <div class="nu-row">
+          <div class="nu-field">
+            <label class="nu-label" for="precioMinorista"
+              >Precio minorista<span class="req">*</span></label
+            >
+            <div class="mp-input-group">
+              <span class="mp-prefix">$</span>
+              <input
+                type="number"
+                id="precioMinorista"
+                class="nu-input"
+                placeholder="0.00"
+                formControlName="precioMinorista"
+              />
+            </div>
+            <div
+              *ngIf="formProducto.get('precioMinorista')?.touched && formProducto.get('precioMinorista')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div
+                *ngIf="formProducto.get('precioMinorista')?.errors?.['required']"
+              >
+                El precio minorista es obligatorio.
+              </div>
+              <div *ngIf="formProducto.get('precioMinorista')?.errors?.['min']">
+                El precio debe ser mayor a $0.00.
+              </div>
+            </div>
+          </div>
+          <!-- PRECIO MAYORISTA -->
+          <div class="nu-field">
+            <label class="nu-label" for="precioMayorista"
+              >Precio mayorista<span class="req">*</span></label
+            >
+            <div class="mp-input-group">
+              <span class="mp-prefix">$</span>
+              <input
+                type="number"
+                id="precioMayorista"
+                class="nu-input"
+                placeholder="0.00"
+                formControlName="precioMayorista"
+              />
+            </div>
+            <div
+              *ngIf="formProducto.get('precioMayorista')?.touched && formProducto.get('precioMayorista')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div
+                *ngIf="formProducto.get('precioMayorista')?.errors?.['required']"
+              >
+                El precio mayorista es obligatorio.
+              </div>
+              <div *ngIf="formProducto.get('precioMayorista')?.errors?.['min']">
+                El precio debe ser mayor a $0.00.
+              </div>
+            </div>
+          </div>
+          <!-- CANTIDAD MINIMA MAYORISTA -->
+          <div class="nu-field">
+            <label class="nu-label" for="minimoMayorista"
+              >Cantidad mínima mayorista<span class="req">*</span></label
+            >
+            <input
+              type="number"
+              id="minimoMayorista"
+              class="nu-input"
+              placeholder="Ej: 6"
+              formControlName="minimoMayorista"
+            />
+            <div class="nu-hint">
+              Unidades mínimas para acceder al precio mayorista.
+            </div>
+            <div
+              *ngIf="formProducto.get('minimoMayorista')?.touched && formProducto.get('minimoMayorista')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div
+                *ngIf="formProducto.get('minimoMayorista')?.errors?.['required']"
+              >
+                La cantidad mínima es obligatoria.
+              </div>
+              <div *ngIf="formProducto.get('minimoMayorista')?.errors?.['min']">
+                La cantidad mínima debe ser 1 o más.
+              </div>
+              <div
+                *ngIf="formProducto.get('minimoMayorista')?.errors?.['pattern']"
+              >
+                Ingresá un número entero válido.
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- BOTÓN GUARDAR -->
+        <button
+          [disabled]="formProducto.invalid"
+          type="submit"
+          class="nu-btn-guardar"
+        >
+          <i class="bi bi-floppy-fill"></i>
+          Guardar producto
+        </button>
+      </form>
+    </div>
+
+    <div class="mv-footer">
+      <button type="button" class="mv-btn-cancelar" (click)="cerrarModal()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

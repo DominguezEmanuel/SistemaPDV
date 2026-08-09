@@ -1,4 +1,4 @@
-import { CategoriaResponse } from './CategoriaResponse';
+import { CategoriaResponse } from './Categoria';
 
 export interface ProductoResponse {
   idProducto: number;
@@ -9,4 +9,13 @@ export interface ProductoResponse {
   minimoMayorista: number;
   activo: boolean;
   categoria: CategoriaResponse;
+}
+
+export interface ProductoRequest {
+  nombre: string;
+  imagen: string;
+  precioMinorista: number;
+  precioMayorista: number;
+  minimoMayorista: number;
+  idCategoria: number;
 }

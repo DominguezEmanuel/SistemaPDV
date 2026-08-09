@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { ProductoResponse } from '../../../models/ProductoResponse';
+import { ProductoResponse } from '../../../models/Producto';
 import { CanalResponse } from '../../../models/CanalResponse';
 import { VarianteResponse } from '../../../models/VarianteResponse';
 import { StockResponse } from '../../../models/StockResponse';

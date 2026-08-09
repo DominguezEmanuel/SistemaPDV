@@ -2,23 +2,13 @@ import { Injectable, Inject } from '@angular/core';
 // Router: permite redireccionar o construir una nueva ruta
 import { CanActivate, Router } from '@angular/router';
 
-// Servicio en donde se encuentra la lógica del login
-import { AuthService } from '../services/auth.service';
+import { Auth } from '../core/services/auth';
 
 @Injectable({ providedIn: 'root' })
 export class authGuard implements CanActivate {
-  constructor(
-    @Inject(AuthService) private auth: AuthService,
-    private router: Router,
-  ) {}
+  constructor(@Inject(Auth) private auth: Auth) {}
 
   canActivate(): boolean {
     return true;
   }
-  /*const authService = inject(AuthService);
-  const router = inject(Router);
-
-  return authService.isAuthenticated()
-    ? true
-    : router.createUrlTree(['/login']);*/
 }

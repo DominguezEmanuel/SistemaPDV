@@ -3,13 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CategoriaService } from '../../core/services/categoria-service';
 import { ProductoService } from '../../core/services/producto-service';
-import { CategoriaResponse } from '../../models/CategoriaResponse';
-import { ProductoResponse } from '../../models/ProductoResponse';
+import { CategoriaResponse } from '../../models/Categoria';
+import { ProductoResponse } from '../../models/Producto';
 import { ProductViewModalComponent } from './product-view-modal/product-view-modal.component';
+import { ProductoForm } from './producto-form/producto-form';
 
 @Component({
   selector: 'app-productos',
-  imports: [CommonModule, ProductViewModalComponent, FormsModule],
+  imports: [CommonModule, FormsModule, ProductViewModalComponent, ProductoForm],
   templateUrl: './productos.html',
   styleUrl: './productos.css',
 })
@@ -31,6 +32,7 @@ export class Productos implements OnInit {
   ];
 
   modalVisible = false;
+  modalFormularioProducto = false;
   productoSeleccionado: ProductoResponse | null = null;
 
   get categoriaSeleccionada(): string {
@@ -49,13 +51,26 @@ export class Productos implements OnInit {
     this.cargarProductos();
   }
 
+  verFormulario(producto?: ProductoResponse): void {
+    if (producto) {
+      this.productoSeleccionado = producto;
+    } else {
+      this.productoSeleccionado = null;
+    }
+    this.modalFormularioProducto = true;
+  }
+
   verProducto(producto: ProductoResponse): void {
     this.productoSeleccionado = producto;
     this.modalVisible = true;
   }
 
   cerrarModal(): void {
-    this.modalVisible = false;
+    if (this.modalVisible) {
+      this.modalVisible = false;
+    } else {
+      this.modalFormularioProducto = false;
+    }
     this.productoSeleccionado = null;
   }
 
@@ -81,9 +96,12 @@ export class Productos implements OnInit {
     });
   }
 
-  getCategoriaStyle(categoria?: CategoriaResponse | null): Record<string, string> {
+  getCategoriaStyle(
+    categoria?: CategoriaResponse | null,
+  ): Record<string, string> {
     const seed = categoria?.idCategoria ?? categoria?.nombre?.length ?? 0;
-    const palette = this.paletasCategorias[seed % this.paletasCategorias.length];
+    const palette =
+      this.paletasCategorias[seed % this.paletasCategorias.length];
 
     return {
       '--cat-bg': palette.bg,

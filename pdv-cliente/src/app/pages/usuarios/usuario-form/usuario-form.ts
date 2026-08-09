@@ -18,7 +18,6 @@ import {
 import { Validadores } from '../../../validators/validadores';
 import { UsuarioResponse } from '../../../models/Usuario';
 import { UsuarioRequest } from '../../../models/Usuario';
-
 import { UsuarioService } from '../../../core/services/usuario-service';
 
 @Component({
