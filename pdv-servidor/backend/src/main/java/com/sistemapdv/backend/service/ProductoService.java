@@ -21,13 +21,15 @@ import java.util.Optional;
 @Service
 public class ProductoService {
 
+    private final CloudinaryService cloudinaryService;
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
     private final VarianteProductoRepository varianteRepository;
     private final ProductoMapper productoMapper;
     private final VarianteProductoMapper varianteMapper;
 
-    public ProductoService(ProductoRepository productoRepository, CategoriaRepository categoriaRepository, VarianteProductoRepository varianteRepository, ProductoMapper productoMapper, VarianteProductoMapper varianteMapper) {
+    public ProductoService(CloudinaryService cloudinaryService, ProductoRepository productoRepository, CategoriaRepository categoriaRepository, VarianteProductoRepository varianteRepository, ProductoMapper productoMapper, VarianteProductoMapper varianteMapper) {
+        this.cloudinaryService = cloudinaryService;
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
         this.varianteRepository = varianteRepository;
@@ -89,11 +91,14 @@ public class ProductoService {
         if(productoRepository.existsByNombreIgnoreCase(request.getNombre()))
             throw new IllegalArgumentException("Ya existe un producto con el nombre ingresado");
 
-        Producto producto = productoMapper.toProducto(request, categoria);
+        // Sube imagen a Cloudinary y retorna la URL
+        String imagenUrl = cloudinaryService.uploadImage(request.getImagen());
 
-        productoRepository.save(producto);
+        Producto nuevoProducto = productoMapper.toProducto(request, categoria, imagenUrl);
 
-        return productoMapper.toResponseDTO(producto);
+        productoRepository.save(nuevoProducto);
+
+        return productoMapper.toResponseDTO(nuevoProducto);
     }
 
     @Transactional
@@ -115,6 +120,7 @@ public class ProductoService {
         return productoMapper.toResponseDTO(producto);
     }
 
+    /*
     @Transactional
     public ProductoResponseDTO updateProduct(Integer id,
                                              ProductoRequestDTO request){
@@ -151,5 +157,5 @@ public class ProductoService {
         producto.setCategoria(categoria);
 
         return productoMapper.toResponseDTO(producto);
-    }
+    }*/
 }

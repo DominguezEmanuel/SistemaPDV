@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { HttpClient } from '@angular/common/http';
 import { ProductoResponse } from '../../models/Producto';
@@ -15,5 +16,9 @@ export class ProductoService {
 
   getAllProductos() {
     return this.http.get<ProductoResponse[]>(this.hostBase);
+  }
+
+  crearProducto(formData: FormData): Observable<ProductoResponse> {
+    return this.http.post<ProductoResponse>(`${this.hostBase}`, formData);
   }
 }

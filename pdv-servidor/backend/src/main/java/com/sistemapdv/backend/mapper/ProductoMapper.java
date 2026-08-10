@@ -15,11 +15,12 @@ public class ProductoMapper {
         this.categoriaMapper = categoriaMapper;
     }
 
-    public Producto toProducto(ProductoRequestDTO dto, Categoria categoria){
+    public Producto toProducto(ProductoRequestDTO dto, Categoria categoria,
+                               String imagen){
 
         Producto producto = Producto.builder()
                 .nombre(dto.getNombre().trim())
-                .imagen(dto.getImagen().trim())
+                .imagen(imagen)
                 .precioMinorista(dto.getPrecioMinorista())
                 .precioMayorista(dto.getPrecioMayorista())
                 .minimoMayorista(dto.getMinimoMayorista())

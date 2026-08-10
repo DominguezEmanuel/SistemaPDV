@@ -18,6 +18,8 @@ import {
 import { ProductoRequest, ProductoResponse } from '../../../models/Producto';
 import { CategoriaResponse } from '../../../models/Categoria';
 import { CategoriaService } from '../../../core/services/categoria-service';
+import { ProductoService } from '../../../core/services/producto-service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-producto-form',
@@ -29,18 +31,21 @@ export class ProductoForm implements OnInit {
   @Input() producto: ProductoResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
+  @Output() productoCreado = new EventEmitter<ProductoResponse>();
   @ViewChild('inputImagen')
   inputImagen!: ElementRef<HTMLInputElement>;
   // Estructuras
   formProducto!: FormGroup;
   categorias: CategoriaResponse[] = [];
   nuevoProducto: ProductoRequest | null = null;
-  previewImagen: string | null = null;
   imagenSeleccionada: File | null = null;
+  previewImagen: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private categoriaService: CategoriaService,
+    private productoService: ProductoService,
+    private toastr: ToastrService,
   ) {
     this.formProducto = this.fb.group(this.getControlesFormulario());
   }
@@ -60,7 +65,7 @@ export class ProductoForm implements OnInit {
         validators: [Validators.required],
       }),
 
-      imagen: new FormControl<string>('', {
+      imagen: new FormControl<string | null>(null, {
         nonNullable: true,
         validators: [Validators.required],
       }),
@@ -83,19 +88,56 @@ export class ProductoForm implements OnInit {
     };
   }
 
-  procesarFormulario(): void {}
+  procesarFormulario() {
+    // Si acción es == registrar
 
-  asignarValores(): void {
-    const valores = this.formProducto.getRawValue();
+    if (this.formProducto.invalid) {
+      this.formProducto.markAllAsTouched();
+      return;
+    }
 
-    this.nuevoProducto = {
-      nombre: valores.nombre,
-      imagen: valores.imagen,
-      precioMinorista: valores.precioMinorista,
-      precioMayorista: valores.precioMayorista,
-      minimoMayorista: valores.minimoMayorista,
-      idCategoria: valores.categoria,
-    };
+    if (!this.imagenSeleccionada) {
+      this.formProducto.get('imagen')?.markAsTouched();
+      return;
+    }
+
+    const formData = this.crearFormData();
+
+    formData.forEach((valor, clave) => {
+      console.log(clave, valor);
+    });
+
+    this.productoService.crearProducto(formData).subscribe({
+      next: (response) => {
+        //console.log('Producto creado:', response);
+        this.productoCreado.emit(response);
+        this.cerrarModal();
+      },
+      error: (error) => {
+        //console.error('Error al crear el producto', error);
+        this.toastr.error(error.error.mensaje, 'Error');
+      },
+    });
+  }
+
+  crearProducto(formData: FormData): void {
+    this.productoService;
+  }
+
+  crearFormData(): FormData {
+    const formData = new FormData();
+
+    formData.append('nombre', this.formProducto.value.nombre);
+    formData.append('precioMinorista', this.formProducto.value.precioMinorista);
+    formData.append('precioMayorista', this.formProducto.value.precioMayorista);
+    formData.append('minimoMayorista', this.formProducto.value.minimoMayorista);
+    formData.append('idCategoria', this.formProducto.value.categoria);
+
+    if (this.imagenSeleccionada) {
+      formData.append('imagen', this.imagenSeleccionada);
+    }
+
+    return formData;
   }
 
   cargarCategorias(): void {
@@ -122,14 +164,16 @@ export class ProductoForm implements OnInit {
       return;
     }
 
+    // Controla que el archivo no supere 2MB
     if (archivo.size > 2 * 1024 * 1024) {
       return;
     }
 
     this.imagenSeleccionada = archivo;
 
-    this.formProducto.get('imagen')?.setValue(archivo);
+    this.formProducto.get('imagen')?.setValue(archivo.name);
     this.formProducto.get('imagen')?.markAsTouched();
+    this.formProducto.get('imagen')?.updateValueAndValidity();
 
     const reader = new FileReader();
 
@@ -146,12 +190,22 @@ export class ProductoForm implements OnInit {
     this.imagenSeleccionada = null;
     this.previewImagen = null;
 
-    this.inputImagen.nativeElement.value = '';
+    this.formProducto.get('imagen')?.setValue(null);
 
-    this.formProducto.get('imagen')?.reset();
+    this.formProducto.get('imagen')?.markAsTouched();
+
+    this.formProducto.get('imagen')?.updateValueAndValidity();
   }
 
   cerrarModal(): void {
+    this.formProducto.reset();
+
+    this.formProducto.markAsPristine();
+    this.formProducto.markAsUntouched();
+
+    this.imagenSeleccionada = null;
+    this.previewImagen = null;
+
     this.cerrar.emit();
   }
 

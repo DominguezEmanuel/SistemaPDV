@@ -57,8 +57,7 @@
           <span class="dot"></span>{{ producto.activo ? 'Activo' : 'Inactivo' }}
         </div>
         @if (producto.imagen) {
-        <!-- <img [src]="producto.imagen" [alt]="producto.nombre" /> -->
-        <img src="assets/images/producto_prueba.jpeg" alt="Producto Prueba" />
+        <img [src]="producto.imagen" [alt]="producto.nombre" />
         } @else {
         <img src="assets/images/producto_prueba.jpeg" alt="Producto Prueba" />
         }
@@ -141,5 +140,9 @@
 </app-product-view-modal>
 
 <!-- MODAL AGREGAR PRODUCTO -->
-<app-producto-form [visible]="modalFormularioProducto" (cerrar)="cerrarModal()">
+<app-producto-form
+  [visible]="modalFormularioProducto"
+  (cerrar)="cerrarModal()"
+  (productoCreado)="onProductoCreado($event)"
+>
 </app-producto-form>

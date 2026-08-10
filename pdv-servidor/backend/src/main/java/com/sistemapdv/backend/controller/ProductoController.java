@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,9 +54,9 @@ public class ProductoController {
         return variantes;
     }
 
-    @PostMapping("/")
+    @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductoResponseDTO> createProduct(
-            @Valid @RequestBody ProductoRequestDTO request){
+            @Valid @ModelAttribute ProductoRequestDTO request){
         ProductoResponseDTO nuevoProducto = productoService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(nuevoProducto);
@@ -69,11 +70,12 @@ public class ProductoController {
                 .body(response);
     }
 
+    /*
     @PutMapping("/{id}")
     public ResponseEntity<ProductoResponseDTO> updateProduct(@PathVariable Integer id,
                                                              @Valid @RequestBody ProductoRequestDTO request){
         ProductoResponseDTO productoActualizado = productoService.updateProduct(id, request);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(productoActualizado);
-    }
+    }*/
 }

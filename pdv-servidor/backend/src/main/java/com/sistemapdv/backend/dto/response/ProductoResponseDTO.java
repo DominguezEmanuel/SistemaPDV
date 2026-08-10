@@ -11,8 +11,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductoResponseDTO {
-
-    // Es compatible usar Long??
     private Integer idProducto;
     private String nombre;
     private String imagen;

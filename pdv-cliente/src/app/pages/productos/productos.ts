@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CategoriaService } from '../../core/services/categoria-service';
 import { ProductoService } from '../../core/services/producto-service';
+import { ToastrService } from 'ngx-toastr';
 import { CategoriaResponse } from '../../models/Categoria';
 import { ProductoResponse } from '../../models/Producto';
 import { ProductViewModalComponent } from './product-view-modal/product-view-modal.component';
@@ -44,6 +45,7 @@ export class Productos implements OnInit {
   constructor(
     private categoriaService: CategoriaService,
     private productoService: ProductoService,
+    private toastr: ToastrService,
   ) {}
 
   ngOnInit() {
@@ -94,6 +96,12 @@ export class Productos implements OnInit {
         console.error('Error al obtener productos:', error);
       },
     });
+  }
+
+  onProductoCreado(producto: ProductoResponse) {
+    this.modalVisible = false;
+    this.cargarProductos();
+    this.toastr.success('Producto creado correctamente', 'Producto creado');
   }
 
   getCategoriaStyle(
