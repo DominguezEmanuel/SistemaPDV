@@ -7,10 +7,12 @@ import com.sistemapdv.backend.service.ProductoService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -34,10 +36,17 @@ public class ProductoController {
 
     @GetMapping("/buscar/{nombre}")
     public ResponseEntity<ProductoResponseDTO> findByName(@PathVariable String nombre){
-        logger.info("Buscando producto con nombre {}", nombre);
         ProductoResponseDTO productoEncontrado = productoService.findByName(nombre);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(productoEncontrado);
+    }
+
+    @GetMapping("/buscar")
+    @ResponseBody
+    public List<ProductoResponseDTO> findByFilters(@RequestParam(required = false) String nombre,
+                                                   @RequestParam(required = false) Integer idCategoria,
+                                                   @RequestParam(required = false) Boolean activo){
+        return productoService.filterByFilters(nombre, idCategoria, activo);
     }
 
     @GetMapping("/")
@@ -62,20 +71,27 @@ public class ProductoController {
                 .body(nuevoProducto);
     }
 
-    @PatchMapping("/estado/{nombre}")
-    public ResponseEntity<ProductoResponseDTO> changeStatus(@PathVariable String nombre,
+    @PatchMapping("/estado/{idProducto}")
+    public ResponseEntity<ProductoResponseDTO> changeStatus(@PathVariable Integer idProducto,
                                                             @RequestParam boolean activo){
-        ProductoResponseDTO response = productoService.changeStatusProduct(nombre, activo);
+        ProductoResponseDTO response = productoService.changeStatusProduct(idProducto, activo);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }
 
-    /*
-    @PutMapping("/{id}")
+    @PatchMapping("/imagen/{idProducto}")
+    public ResponseEntity<ProductoResponseDTO> updateImage(@PathVariable Integer idProducto,
+                                                           @RequestParam MultipartFile imagen){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(productoService.updateImage(idProducto, imagen));
+    }
+
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductoResponseDTO> updateProduct(@PathVariable Integer id,
-                                                             @Valid @RequestBody ProductoRequestDTO request){
+                                                             @Valid @ModelAttribute ProductoRequestDTO request){
         ProductoResponseDTO productoActualizado = productoService.updateProduct(id, request);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(productoActualizado);
-    }*/
+    }
 }

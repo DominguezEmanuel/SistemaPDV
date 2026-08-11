@@ -13,8 +13,14 @@ import com.sistemapdv.backend.mapper.VarianteProductoMapper;
 import com.sistemapdv.backend.repository.CategoriaRepository;
 import com.sistemapdv.backend.repository.ProductoRepository;
 import com.sistemapdv.backend.repository.VarianteProductoRepository;
+import com.sistemapdv.backend.repository.specification.ProductoSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +57,38 @@ public class ProductoService {
                 .orElseThrow(()->
                         new ResourceNotFoundException("Producto con nombre " + nombre + " no encontrado"));
         return productoMapper.toResponseDTO(producto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductoResponseDTO> filterByFilters(String nombre,
+                                                    Integer idCategoria,
+                                                     Boolean activo){
+        Specification<Producto> specification =
+                (root, query, criteriaBuilder) -> null;
+
+        if (nombre != null && !nombre.isBlank()) {
+            specification = specification.and(
+                    ProductoSpecification.nombreContiene(nombre.trim())
+            );
+        }
+
+        if (idCategoria != null) {
+            specification = specification.and(
+                    ProductoSpecification.perteneceACategoria(idCategoria)
+            );
+        }
+
+        if (activo != null) {
+            specification = specification.and(
+                    ProductoSpecification.tieneEstado(activo)
+            );
+        }
+
+        return productoRepository
+                .findAll(specification)
+                .stream()
+                .map(productoMapper::toResponseDTO)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -102,11 +140,25 @@ public class ProductoService {
     }
 
     @Transactional
-    public ProductoResponseDTO changeStatusProduct(String nombre, boolean activo){
-        Producto producto = productoRepository.findByNombreWithCategoria(nombre)
+    public ProductoResponseDTO updateImage(Integer idProducto, MultipartFile imagen){
+        Producto producto = productoRepository.findById(idProducto)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Producto con id " + nombre + " no encontrado"
+                                "Producto con id " + idProducto + " no encontrado"
+                        ));
+        String imagenUrl = cloudinaryService.uploadImage(imagen);
+
+        producto.setImagen(imagenUrl);
+
+        return productoMapper.toResponseDTO(producto);
+    }
+
+    @Transactional
+    public ProductoResponseDTO changeStatusProduct(Integer idProducto, boolean activo){
+        Producto producto = productoRepository.findById(idProducto)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Producto con id " + idProducto + " no encontrado"
                         ));
 
         if(producto.getActivo().equals(activo)){
@@ -120,7 +172,7 @@ public class ProductoService {
         return productoMapper.toResponseDTO(producto);
     }
 
-    /*
+
     @Transactional
     public ProductoResponseDTO updateProduct(Integer id,
                                              ProductoRequestDTO request){
@@ -139,7 +191,7 @@ public class ProductoService {
                 productoRepository.findByNombreIgnoreCase(request.getNombre());
         if(productoExistente.isPresent() &&
             !productoExistente.get().getIdProducto().equals(id)){
-            throw new ResourceDuplicatedException("Ya existe un producto con ese nombre.");
+            throw new ResourceDuplicatedException("Ya existe un producto con ese nombre");
         }
 
         // Validar precios
@@ -150,12 +202,13 @@ public class ProductoService {
 
         // Actualizar datos
         producto.setNombre(request.getNombre().trim());
-        producto.setImagen(request.getImagen().trim());
+        String imagenUrl = cloudinaryService.uploadImage(request.getImagen());
+        producto.setImagen(imagenUrl);
         producto.setPrecioMinorista(request.getPrecioMinorista());
         producto.setPrecioMayorista(request.getPrecioMayorista());
         producto.setMinimoMayorista(request.getMinimoMayorista());
         producto.setCategoria(categoria);
 
         return productoMapper.toResponseDTO(producto);
-    }*/
+    }
 }

@@ -8,8 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoriaDTO {
-    @NotBlank
     Integer idCategoria;
-    @NotBlank
+    @NotBlank(message = "El nombre de la categoria es obligatorio")
     String nombre;
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environment/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ProductoResponse } from '../../models/Producto';
 
 @Injectable({
@@ -14,8 +14,32 @@ export class ProductoService {
     this.hostBase = environment.apiUrl + '/productos/';
   }
 
-  getAllProductos() {
+  getAllProductos(): Observable<ProductoResponse[]> {
     return this.http.get<ProductoResponse[]>(this.hostBase);
+  }
+
+  findByFilters(
+    nombre: string,
+    idCategoria: number | null,
+    activo: boolean | null,
+  ): Observable<ProductoResponse[]> {
+    let params = new HttpParams();
+
+    if (nombre.trim()) {
+      params = params.set('nombre', nombre.trim());
+    }
+
+    if (idCategoria !== null) {
+      params = params.set('idCategoria', idCategoria.toString());
+    }
+
+    if (activo !== null) {
+      params = params.set('activo', activo.toString());
+    }
+
+    return this.http.get<ProductoResponse[]>(`${this.hostBase}buscar`, {
+      params,
+    });
   }
 
   crearProducto(formData: FormData): Observable<ProductoResponse> {

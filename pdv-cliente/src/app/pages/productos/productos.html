@@ -3,19 +3,28 @@
   <div class="breadcrumb-custom">Dashboard / <span>Productos</span></div>
   <h1 class="page-title">Productos</h1>
   <p class="page-desc">
-    Catálogo de insumos de belleza: maquillaje, cuidado del cabello, piel, uñas
-    y perfumería.
+    Catálogo de insumos de belleza: maquillaje, cuidado del cabello, piel, uñas,
+    pestañas, skincare, depilación, pedicura y perfumería.
   </p>
 
   <!-- Toolbar -->
   <div class="productos-toolbar">
     <!-- BUSCAR PRODUCTOS -->
     <div class="search-box">
-      <i class="bi bi-gender-neuter"></i>
-      <input type="text" placeholder="Buscar producto..." />
+      <i class="bi bi-search"></i>
+
+      <input
+        type="text"
+        placeholder="Buscar producto..."
+        [formControl]="busquedaControl"
+      />
     </div>
     <!-- FILTRAR POR CATEGORIA -->
-    <select class="filtro-select" [(ngModel)]="idCategoria">
+    <select
+      class="filtro-select"
+      [(ngModel)]="idCategoria"
+      (ngModelChange)="aplicarFiltros()"
+    >
       <option [ngValue]="null">Todas las categorías</option>
 
       @for (categoria of categorias; track categoria.idCategoria){
@@ -23,11 +32,26 @@
       }
     </select>
     <!-- FILTRAR POR ESTADO -->
-    <select class="filtro-select" [(ngModel)]="estado">
+    <select
+      class="filtro-select"
+      [(ngModel)]="estado"
+      (ngModelChange)="aplicarFiltros()"
+    >
       <option [ngValue]="null">Todos los estados</option>
-      <option [ngValue]="'Activo'">Activo</option>
-      <option [ngValue]="'Inactivo'">Inactivo</option>
+      <option [ngValue]="true">Activo</option>
+      <option [ngValue]="false">Inactivo</option>
     </select>
+    <!-- BOTÓN BORRAR FILTROS -->
+    @if (busquedaControl.value || idCategoria != null || estado != null) {
+    <button
+      type="button"
+      class="btn-limpiar-filtros"
+      (click)="limpiarFiltros()"
+      title="Limpiar filtros"
+    >
+      <i class="bi bi-eraser-fill"></i>
+    </button>
+    }
     <!-- AGREGAR PRODUCTO -->
     <button
       class="btn-nuevo-producto"
@@ -126,6 +150,11 @@
           </button>
         </div>
       </div>
+    </div>
+    } @if (productos.length === 0) {
+    <div class="sin-productos-mensaje">
+      <i class="bi bi-exclamation-circle"></i>
+      No se encontraron productos para los filtros aplicados.
     </div>
     }
   </div>

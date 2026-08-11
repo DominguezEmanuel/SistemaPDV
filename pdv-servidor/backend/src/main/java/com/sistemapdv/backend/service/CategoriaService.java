@@ -7,6 +7,7 @@ import com.sistemapdv.backend.exception.ResourceNotFoundException;
 import com.sistemapdv.backend.mapper.CategoriaMapper;
 import com.sistemapdv.backend.repository.CategoriaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,14 +38,15 @@ public class CategoriaService {
         return categoriaMapper.toCategoriaDTO(categoria);
     }
 
+    @Transactional
     public CategoriaDTO addCategory(CategoriaDTO request){
         if(categoriaRepository.existsByNombre(request.getNombre()))
             throw new ResourceDuplicatedException("El nombre de categoria ya existe");
 
         Categoria categoria = categoriaMapper.toCategoria(request);
 
-        Categoria nuevaCategoria = categoriaRepository.save(categoria);
+        categoriaRepository.save(categoria);
 
-        return categoriaMapper.toCategoriaDTO(nuevaCategoria);
+        return categoriaMapper.toCategoriaDTO(categoria);
     }
 }

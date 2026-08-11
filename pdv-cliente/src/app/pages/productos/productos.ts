@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CategoriaService } from '../../core/services/categoria-service';
 import { ProductoService } from '../../core/services/producto-service';
@@ -8,10 +8,17 @@ import { CategoriaResponse } from '../../models/Categoria';
 import { ProductoResponse } from '../../models/Producto';
 import { ProductViewModalComponent } from './product-view-modal/product-view-modal.component';
 import { ProductoForm } from './producto-form/producto-form';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-productos',
-  imports: [CommonModule, FormsModule, ProductViewModalComponent, ProductoForm],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ProductViewModalComponent,
+    ProductoForm,
+  ],
   templateUrl: './productos.html',
   styleUrl: './productos.css',
 })
@@ -19,7 +26,8 @@ export class Productos implements OnInit {
   categorias: CategoriaResponse[] = [];
   productos: ProductoResponse[] = [];
   idCategoria: number | null = null;
-  estado: string | null = null;
+  estado: boolean | null = null;
+  busquedaControl = new FormControl('');
 
   private readonly paletasCategorias = [
     { bg: '#fbe9f0', color: '#c7638f' },
@@ -48,9 +56,38 @@ export class Productos implements OnInit {
     private toastr: ToastrService,
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.cargarCategorias();
     this.cargarProductos();
+
+    this.busquedaControl.valueChanges
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe(() => {
+        this.aplicarFiltros();
+      });
+  }
+
+  aplicarFiltros(): void {
+    const nombre = this.busquedaControl.value?.trim() ?? '';
+
+    this.productoService
+      .findByFilters(nombre, this.idCategoria, this.estado)
+      .subscribe({
+        next: (response) => {
+          this.productos = response;
+        },
+        error: (error) => {
+          console.error('Error al filtrar productos: ', error);
+        },
+      });
+  }
+
+  limpiarFiltros(): void {
+    this.busquedaControl.setValue('');
+
+    this.idCategoria = null;
+
+    this.estado = null;
   }
 
   verFormulario(producto?: ProductoResponse): void {
