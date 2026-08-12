@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
   providedIn: 'root',
 })
 export class AlertService {
+  texto: string | null = null;
   userDisabled() {
     return Swal.fire({
       icon: 'success',
@@ -22,16 +23,19 @@ export class AlertService {
   ): Promise<any> {
     const entidad = tipo === 'usuario' ? 'usuario' : 'producto';
 
-    const texto =
-      tipo === 'usuario'
-        ? nuevoEstado
-          ? `El usuario "${nombre}" podrá iniciar sesión y acceder al sistema.`
-          : `El usuario "${nombre}" no podrá iniciar sesión ni acceder al sistema.`
-        : `El producto "${nombre}" dejará de estar disponible para nuevas ventas.`;
+    if (tipo === 'usuario') {
+      this.texto = nuevoEstado
+        ? `El usuario "${nombre}" podrá iniciar sesión y acceder al sistema`
+        : `El usuario "${nombre}" no podrá iniciar sesión ni acceder al sistema`;
+    } else {
+      this.texto = nuevoEstado
+        ? `El producto "${nombre}" estará habilitado para nuevas ventas`
+        : `El producto "${nombre}" dejará de estar disponible para nuevas ventas`;
+    }
 
     return Swal.fire({
       title: `${nuevoEstado ? '¿Habilitar' : '¿Deshabilitar'} ${entidad}?`,
-      text: texto,
+      text: this.texto,
       icon: nuevoEstado ? 'info' : 'warning',
       showCancelButton: true,
       confirmButtonText: `Sí, ${nuevoEstado ? 'habilitar' : 'deshabilitar'}`,

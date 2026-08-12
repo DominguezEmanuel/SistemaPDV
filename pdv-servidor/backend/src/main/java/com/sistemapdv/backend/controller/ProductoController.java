@@ -73,7 +73,7 @@ public class ProductoController {
 
     @PatchMapping("/estado/{idProducto}")
     public ResponseEntity<ProductoResponseDTO> changeStatus(@PathVariable Integer idProducto,
-                                                            @RequestParam boolean activo){
+                                                            @RequestParam Boolean activo){
         ProductoResponseDTO response = productoService.changeStatusProduct(idProducto, activo);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);

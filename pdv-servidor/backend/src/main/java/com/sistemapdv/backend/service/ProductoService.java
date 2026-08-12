@@ -61,7 +61,7 @@ public class ProductoService {
 
     @Transactional(readOnly = true)
     public List<ProductoResponseDTO> filterByFilters(String nombre,
-                                                    Integer idCategoria,
+                                                     Integer idCategoria,
                                                      Boolean activo){
         Specification<Producto> specification =
                 (root, query, criteriaBuilder) -> null;
@@ -161,7 +161,7 @@ public class ProductoService {
         Producto producto = productoRepository.findById(idProducto)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Producto con id " + idProducto + " no encontrado"
+                                "Producto con ID " + idProducto + " no encontrado"
                         ));
 
         if(producto.getActivo().equals(activo)){

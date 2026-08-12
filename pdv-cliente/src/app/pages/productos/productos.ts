@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { CategoriaService } from '../../core/services/categoria-service';
 import { ProductoService } from '../../core/services/producto-service';
 import { ToastrService } from 'ngx-toastr';
+import { AlertService } from '../../core/services/alert-service';
 import { CategoriaResponse } from '../../models/Categoria';
 import { ProductoResponse } from '../../models/Producto';
 import { ProductViewModalComponent } from './product-view-modal/product-view-modal.component';
@@ -49,6 +50,7 @@ export class Productos implements OnInit {
     private categoriaService: CategoriaService,
     private productoService: ProductoService,
     private toastr: ToastrService,
+    private alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -66,7 +68,7 @@ export class Productos implements OnInit {
     const nombre = this.busquedaControl.value?.trim() ?? '';
 
     this.productoService
-      .findByFilters(nombre, this.idCategoria, this.estado)
+      .buscarPorFiltros(nombre, this.idCategoria, this.estado)
       .subscribe({
         next: (response) => {
           this.productos = response;
@@ -83,6 +85,8 @@ export class Productos implements OnInit {
     this.idCategoria = null;
 
     this.estado = null;
+
+    this.aplicarFiltros();
   }
 
   verFormulario(producto?: ProductoResponse): void {
@@ -128,6 +132,33 @@ export class Productos implements OnInit {
         console.error('Error al obtener productos:', error);
       },
     });
+  }
+
+  cambiarEstadoProducto(
+    idProducto: number,
+    nombre: string,
+    activo: boolean,
+  ): void {
+    this.alertService
+      .confirmarCambioEstado('producto', nombre, activo)
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.productoService
+            .actualizarEstadoProducto(idProducto, activo)
+            .subscribe({
+              next: (response) => {
+                this.toastr.success(
+                  'Estado del producto actualizado correctamente',
+                  'Éxito',
+                );
+                this.cargarProductos();
+              },
+              error: (error) => {
+                this.toastr.error(error.error.mensaje, 'Error');
+              },
+            });
+        }
+      });
   }
 
   onProductoGuardado(event: {

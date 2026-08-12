@@ -153,24 +153,37 @@
                 >
                   <i class="bi bi-pencil-square"></i>
                 </button>
-                <!-- DESHABILITAR -->
+                <!-- DESHABILITAR/HABILITAR -->
                 <button
+                  class="btn-accion"
+                  [class.deshabilitar]="usuario.activo"
+                  [class.habilitar]="!usuario.activo"
+                  [title]="usuario.activo ? 'Deshabilitar' : 'Habilitar'"
+                  (click)="cambiarEstadoUsuario(usuario.username, !usuario.activo)"
+                >
+                  @if (usuario.activo) {
+                  <i class="bi bi-ban"></i>
+                  } @else {
+                  <i class="bi bi-check2-circle"></i>
+                  }
+                </button>
+                <!--<button
                   *ngIf="usuario.activo == true"
                   class="btn-accion deshabilitar"
                   title="Deshabilitar"
                   (click)="changeUserStatus(usuario.username, false)"
                 >
                   <i class="bi bi-ban"></i>
-                </button>
+                </button>-->
                 <!-- HABILITAR -->
-                <button
+                <!--<button
                   *ngIf="usuario.activo == false"
                   class="btn-accion habilitar"
                   title="Habilitar"
                   (click)="changeUserStatus(usuario.username, true)"
                 >
                   <i class="bi bi-check2-circle"></i>
-                </button>
+                </button>-->
               </div>
             </td>
             <td *ngIf="usuario.username === userLogged()">

@@ -29,7 +29,7 @@ export class Configuracion implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadUsers();
+    this.cargarUsuarios();
   }
 
   abrirModal(usuario?: UsuarioResponse): void {
@@ -46,36 +46,14 @@ export class Configuracion implements OnInit {
     this.usuarioSeleccionado = null;
   }
 
-  /*
-  guardarUsuario(
-    usuario: Partial<UsuarioResponse> & { password?: string },
-  ): void {
-    const peticion = usuario.idUsuario
-      ? this.userService.updateUser(usuario.idUsuario, usuario)
-      : this.userService.createUser(usuario);
-
-    peticion.subscribe({
-      next: () => {
-        const accion = usuario.idUsuario ? 'actualizado' : 'creado';
-        this.toastr.success(`Usuario ${accion} correctamente`, 'Éxito');
-        this.loadUsers();
-        this.cerrarModal();
-      },
-      error: (error) => {
-        console.error('Error al guardar usuario:', error);
-        this.toastr.error('Error al guardar el usuario', 'Error');
-      },
-    });
-  }*/
-
-  loadUsers(): void {
+  cargarUsuarios(): void {
     this.usuarioService.getAllUsers().subscribe({
       next: (response) => {
-        console.log('Usuarios obtenidos:', response);
+        //console.log('Usuarios obtenidos:', response);
         this.usuarios = response;
       },
       error: (error) => {
-        console.error('Error al obtener usuarios:', error);
+        this.toastr.error('Error al obtener usuarios');
       },
     });
   }
@@ -100,11 +78,11 @@ export class Configuracion implements OnInit {
 
   onUsuarioCreado(usuario: UsuarioResponse): void {
     this.modalVisible = false;
-    this.loadUsers();
+    this.cargarUsuarios();
     this.toastr.success('Usuario creado correctamente', 'Usuario creado');
   }
 
-  changeUserStatus(username: string, activo: boolean): void {
+  cambiarEstadoUsuario(username: string, activo: boolean): void {
     this.alertService
       .confirmarCambioEstado('usuario', username, activo)
       .then((result) => {
@@ -115,7 +93,7 @@ export class Configuracion implements OnInit {
                 'Estado del usuario actualizado correctamente',
                 'Éxito',
               );
-              this.loadUsers(); // Recargar la lista de usuarios después de actualizar el estado
+              this.cargarUsuarios(); // Recargar la lista de usuarios después de actualizar el estado
             },
             error: (error) => {
               this.toastr.error(error.error.mensaje, 'Error');

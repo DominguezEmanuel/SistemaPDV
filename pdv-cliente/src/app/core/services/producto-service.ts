@@ -18,7 +18,7 @@ export class ProductoService {
     return this.http.get<ProductoResponse[]>(this.hostBase);
   }
 
-  findByFilters(
+  buscarPorFiltros(
     nombre: string,
     idCategoria: number | null,
     activo: boolean | null,
@@ -53,6 +53,19 @@ export class ProductoService {
     return this.http.put<ProductoResponse>(
       `${this.hostBase}${idProducto}`,
       formData,
+    );
+  }
+
+  actualizarEstadoProducto(
+    idProducto: number,
+    activo: boolean,
+  ): Observable<ProductoResponse> {
+    const params = { activo: activo };
+
+    return this.http.patch<ProductoResponse>(
+      `${this.hostBase}estado/${idProducto}`,
+      {},
+      { params },
     );
   }
 }

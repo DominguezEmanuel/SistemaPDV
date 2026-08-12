@@ -80,11 +80,7 @@
         >
           <span class="dot"></span>{{ producto.activo ? 'Activo' : 'Inactivo' }}
         </div>
-        @if (producto.imagen) {
         <img [src]="producto.imagen" [alt]="producto.nombre" />
-        } @else {
-        <img src="assets/images/producto_prueba.jpeg" alt="Producto Prueba" />
-        }
       </div>
       <div class="producto-body">
         <!-- CATEGORIA DEL PRODUCTO -->
@@ -137,6 +133,8 @@
             [class.deshabilitar]="producto.activo"
             [class.habilitar]="!producto.activo"
             [title]="producto.activo ? 'Deshabilitar' : 'Habilitar'"
+            (click)="cambiarEstadoProducto(producto.idProducto, producto.nombre, 
+            !producto.activo)"
           >
             @if (producto.activo) {
             <i class="bi bi-ban"></i>
