@@ -1,3 +1,4 @@
+b
 <div class="mv-overlay" *ngIf="visible" (click)="cerrarModal()">
   <div class="mv-modal" (click)="detenerPropagacion($event)">
     <!-- HEADER -->
@@ -100,8 +101,15 @@
                 class="mp-remove-btn"
                 (click)="quitarImagen($event)"
               >
-                <i class="bi bi-trash3-fill"></i>
-                Quitar imagen
+                <i
+                  class="bi"
+                  [ngClass]="
+                    modo === 'editar'
+                      ? 'bi-arrow-counterclockwise'
+                      : 'bi-x-circle'
+                  "
+                ></i>
+                {{ modo === 'editar' ? 'Restaurar imagen' : 'Quitar imagen' }}
               </button>
             </ng-container>
             <!-- Estado: sin imagen -->

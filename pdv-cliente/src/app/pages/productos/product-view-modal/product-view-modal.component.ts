@@ -33,12 +33,13 @@ type TabId = 'informacion' | 'variantes' | 'stock' | 'comercial';
   styleUrls: ['./product-view-modal.component.css'],
 })
 export class ProductViewModalComponent implements OnChanges {
+  // Estructuras utilizadas
   @Input() producto: ProductoResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
   variantesCargadas = false;
   canalesCargados = false;
-
+  // Estructura para las secciones de la vista
   tabs: { id: TabId; label: string; icon: string }[] = [
     {
       id: 'informacion',
@@ -57,7 +58,7 @@ export class ProductViewModalComponent implements OnChanges {
       icon: 'bi bi-tag',
     },
   ];
-
+  // Seccion activada por defecto
   tabActiva: TabId = 'informacion';
 
   variantes: VarianteResponse[] = [];

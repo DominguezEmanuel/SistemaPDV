@@ -120,11 +120,15 @@
         <span class="stock-info" [class.stock-bajo]="!producto.activo">
           <i class="bi bi-boxes"></i>
           <!-- PONER EL STOCK DEL PRODUCTO -->
-          {{ producto.activo ? 'Disponible' : 'Sin stock' }}
+          {{ producto.activo ? 'Disponible' : 'No Disponible' }}
         </span>
         <div class="acciones-cell">
           <!-- MODIFICAR -->
-          <button class="btn-accion editar" title="Modificar">
+          <button
+            (click)="verFormulario(producto)"
+            class="btn-accion editar"
+            title="Modificar"
+          >
             <i class="bi bi-pencil-square"></i>
           </button>
           <!-- HABILITAR/DESHABILITAR -->
@@ -170,8 +174,9 @@
 
 <!-- MODAL AGREGAR PRODUCTO -->
 <app-producto-form
+  [producto]="productoSeleccionado"
   [visible]="modalFormularioProducto"
   (cerrar)="cerrarModal()"
-  (productoCreado)="onProductoCreado($event)"
+  (productoGuardado)="onProductoGuardado($event)"
 >
 </app-producto-form>

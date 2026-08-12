@@ -45,4 +45,14 @@ export class ProductoService {
   crearProducto(formData: FormData): Observable<ProductoResponse> {
     return this.http.post<ProductoResponse>(`${this.hostBase}`, formData);
   }
+
+  actualizarProducto(
+    idProducto: number,
+    formData: FormData,
+  ): Observable<ProductoResponse> {
+    return this.http.put<ProductoResponse>(
+      `${this.hostBase}${idProducto}`,
+      formData,
+    );
+  }
 }

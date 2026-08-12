@@ -23,6 +23,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
   styleUrl: './productos.css',
 })
 export class Productos implements OnInit {
+  // Estructuras utilizadas
   categorias: CategoriaResponse[] = [];
   productos: ProductoResponse[] = [];
   idCategoria: number | null = null;
@@ -44,12 +45,6 @@ export class Productos implements OnInit {
   modalFormularioProducto = false;
   productoSeleccionado: ProductoResponse | null = null;
 
-  get categoriaSeleccionada(): string {
-    return this.idCategoria === null
-      ? 'Todas las categorías'
-      : `Categoría ${this.idCategoria}`;
-  }
-
   constructor(
     private categoriaService: CategoriaService,
     private productoService: ProductoService,
@@ -59,7 +54,7 @@ export class Productos implements OnInit {
   ngOnInit(): void {
     this.cargarCategorias();
     this.cargarProductos();
-
+    // Importante para el filtrado de los productos
     this.busquedaControl.valueChanges
       .pipe(debounceTime(500), distinctUntilChanged())
       .subscribe(() => {
@@ -135,10 +130,25 @@ export class Productos implements OnInit {
     });
   }
 
-  onProductoCreado(producto: ProductoResponse) {
-    this.modalVisible = false;
+  onProductoGuardado(event: {
+    producto: ProductoResponse;
+    accion: 'crear' | 'editar';
+  }): void {
+    this.modalFormularioProducto = false;
+
     this.cargarProductos();
-    this.toastr.success('Producto creado correctamente', 'Producto creado');
+
+    if (event.accion === 'crear') {
+      this.toastr.success(
+        'El producto se creó correctamente',
+        'Producto creado',
+      );
+    } else {
+      this.toastr.success(
+        'Los cambios del producto se guardaron correctamente',
+        'Producto actualizado',
+      );
+    }
   }
 
   getCategoriaStyle(

@@ -129,8 +129,11 @@ public class ProductoService {
         if(productoRepository.existsByNombreIgnoreCase(request.getNombre()))
             throw new IllegalArgumentException("Ya existe un producto con el nombre ingresado");
 
-        // Sube imagen a Cloudinary y retorna la URL
-        String imagenUrl = cloudinaryService.uploadImage(request.getImagen());
+        // Sube imagen a Cloudinary si se proporciona
+        String imagenUrl = null;
+        if(request.getImagen() != null && !request.getImagen().isEmpty()) {
+            imagenUrl = cloudinaryService.uploadImage(request.getImagen());
+        }
 
         Producto nuevoProducto = productoMapper.toProducto(request, categoria, imagenUrl);
 
@@ -179,7 +182,7 @@ public class ProductoService {
         // Buscar el producto
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(()->
-                        new ResourceNotFoundException("Producto con id " + id + " no encontrado"));
+                        new ResourceNotFoundException("Producto con ID " + id + " no encontrado"));
 
         // Buscar la categoría
         Categoria categoria = categoriaRepository.findById(request.getIdCategoria())
@@ -189,6 +192,7 @@ public class ProductoService {
         // Validar que NO exista otro producto con el mismo nombre
         Optional<Producto> productoExistente =
                 productoRepository.findByNombreIgnoreCase(request.getNombre());
+
         if(productoExistente.isPresent() &&
             !productoExistente.get().getIdProducto().equals(id)){
             throw new ResourceDuplicatedException("Ya existe un producto con ese nombre");
@@ -197,13 +201,18 @@ public class ProductoService {
         // Validar precios
         if (request.getPrecioMayorista()
                 .compareTo(request.getPrecioMinorista()) > 0) {
-            throw new IllegalArgumentException("El precio mayorista no puede ser mayor al precio minorista.");
+            throw new IllegalArgumentException("El precio mayorista no puede ser mayor al precio minorista");
         }
 
         // Actualizar datos
         producto.setNombre(request.getNombre().trim());
-        String imagenUrl = cloudinaryService.uploadImage(request.getImagen());
-        producto.setImagen(imagenUrl);
+        
+        // Actualizar imagen solo si se proporciona una nueva
+        if(request.getImagen() != null && !request.getImagen().isEmpty()) {
+            String imagenUrl = cloudinaryService.uploadImage(request.getImagen());
+            producto.setImagen(imagenUrl);
+        }
+        
         producto.setPrecioMinorista(request.getPrecioMinorista());
         producto.setPrecioMayorista(request.getPrecioMayorista());
         producto.setMinimoMayorista(request.getMinimoMayorista());

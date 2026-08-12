@@ -1,6 +1,8 @@
 import {
   Component,
   OnInit,
+  OnChanges,
+  SimpleChanges,
   EventEmitter,
   Input,
   Output,
@@ -27,11 +29,14 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './producto-form.html',
   styleUrl: './producto-form.css',
 })
-export class ProductoForm implements OnInit {
+export class ProductoForm implements OnInit, OnChanges {
   @Input() producto: ProductoResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
-  @Output() productoCreado = new EventEmitter<ProductoResponse>();
+  @Output() productoGuardado = new EventEmitter<{
+    producto: ProductoResponse;
+    accion: 'crear' | 'editar';
+  }>();
   @ViewChild('inputImagen')
   inputImagen!: ElementRef<HTMLInputElement>;
   // Estructuras
@@ -40,6 +45,8 @@ export class ProductoForm implements OnInit {
   nuevoProducto: ProductoRequest | null = null;
   imagenSeleccionada: File | null = null;
   previewImagen: string | null = null;
+  imagenOriginal: string | null = null;
+  modo: 'crear' | 'editar' = 'crear';
 
   constructor(
     private fb: FormBuilder,
@@ -54,6 +61,56 @@ export class ProductoForm implements OnInit {
     this.cargarCategorias();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['producto']) {
+      if (this.producto) {
+        this.cargarDatosProducto();
+      } else {
+        this.prepararFormularioCrear();
+      }
+    }
+  }
+
+  private cargarDatosProducto(): void {
+    if (!this.producto) {
+      return;
+    }
+
+    this.modo = 'editar';
+
+    this.formProducto.patchValue({
+      nombre: this.producto.nombre,
+      categoria: this.producto.categoria.idCategoria,
+      imagen: this.producto.imagen,
+      precioMinorista: this.producto.precioMinorista,
+      precioMayorista: this.producto.precioMayorista,
+      minimoMayorista: this.producto.minimoMayorista,
+    });
+
+    // Guardamos la imagen actual del producto
+    this.imagenOriginal = this.producto.imagen;
+
+    // La mostramos inicialmente
+    this.previewImagen = this.producto.imagen;
+
+    // Todavía no se seleccionó una nueva imagen
+    this.imagenSeleccionada = null;
+  }
+
+  private prepararFormularioCrear(): void {
+    this.modo = 'crear';
+
+    this.formProducto.reset();
+
+    this.imagenSeleccionada = null;
+    this.previewImagen = null;
+
+    this.formProducto.get('imagen')?.setValue(null);
+
+    this.formProducto.markAsPristine();
+    this.formProducto.markAsUntouched();
+  }
+
   private getControlesFormulario() {
     return {
       nombre: new FormControl<string>('', {
@@ -65,10 +122,9 @@ export class ProductoForm implements OnInit {
         validators: [Validators.required],
       }),
 
-      imagen: new FormControl<string | null>(null, {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
+      // La imagen solo será obligatoria al crear
+      // Al editar, el formulario no debería de exigirla
+      imagen: new FormControl<string | null>(null),
 
       precioMinorista: new FormControl<number | null>(null, {
         validators: [Validators.required, Validators.min(0.01)],
@@ -88,7 +144,7 @@ export class ProductoForm implements OnInit {
     };
   }
 
-  procesarFormulario() {
+  procesarFormulario(): void {
     // Si acción es == registrar
 
     if (this.formProducto.invalid) {
@@ -96,32 +152,60 @@ export class ProductoForm implements OnInit {
       return;
     }
 
-    if (!this.imagenSeleccionada) {
+    // La imagen solamente es obligatoria al crear
+    if (this.modo === 'crear' && !this.imagenSeleccionada) {
       this.formProducto.get('imagen')?.markAsTouched();
       return;
     }
 
     const formData = this.crearFormData();
 
-    formData.forEach((valor, clave) => {
-      console.log(clave, valor);
+    // Mostrar contenido de FormData para depuración
+    const formDataDebug: { [key: string]: any } = {};
+    formData.forEach((value, key) => {
+      formDataDebug[key] = value instanceof File ? value.name : value;
     });
+    console.log('FormData contenido:', formDataDebug);
 
+    if (this.modo === 'crear') {
+      this.crearProducto(formData);
+    } else {
+      this.actualizarProducto(formData);
+    }
+  }
+
+  crearProducto(formData: FormData): void {
     this.productoService.crearProducto(formData).subscribe({
       next: (response) => {
-        //console.log('Producto creado:', response);
-        this.productoCreado.emit(response);
+        this.productoGuardado.emit({ producto: response, accion: 'crear' });
         this.cerrarModal();
       },
       error: (error) => {
-        //console.error('Error al crear el producto', error);
         this.toastr.error(error.error.mensaje, 'Error');
       },
     });
   }
 
-  crearProducto(formData: FormData): void {
-    this.productoService;
+  private actualizarProducto(formData: FormData): void {
+    if (!this.producto) {
+      return;
+    }
+
+    this.productoService
+      .actualizarProducto(this.producto.idProducto, formData)
+      .subscribe({
+        next: (response) => {
+          this.productoGuardado.emit({
+            producto: response,
+            accion: 'editar',
+          });
+          this.cerrarModal();
+        },
+
+        error: (error) => {
+          this.toastr.error(error.error.mensaje, 'Error');
+        },
+      });
   }
 
   crearFormData(): FormData {
@@ -132,7 +216,7 @@ export class ProductoForm implements OnInit {
     formData.append('precioMayorista', this.formProducto.value.precioMayorista);
     formData.append('minimoMayorista', this.formProducto.value.minimoMayorista);
     formData.append('idCategoria', this.formProducto.value.categoria);
-
+    // Solamente enviar la imagen si el usuario seleccionó una nueva
     if (this.imagenSeleccionada) {
       formData.append('imagen', this.imagenSeleccionada);
     }
@@ -161,19 +245,27 @@ export class ProductoForm implements OnInit {
     const archivo = input.files[0];
 
     if (!['image/jpeg', 'image/png'].includes(archivo.type)) {
+      this.toastr.warning(
+        'La imagen debe estar en formato JPG, JPEG o PNG',
+        'Imagen no válida',
+      );
+
       return;
     }
 
     // Controla que el archivo no supere 2MB
     if (archivo.size > 2 * 1024 * 1024) {
+      this.toastr.warning(
+        'La imagen no puede superar los 2 MB',
+        'Imagen demasiado grande',
+      );
+
       return;
     }
 
     this.imagenSeleccionada = archivo;
 
     this.formProducto.get('imagen')?.setValue(archivo.name);
-    this.formProducto.get('imagen')?.markAsTouched();
-    this.formProducto.get('imagen')?.updateValueAndValidity();
 
     const reader = new FileReader();
 
@@ -187,14 +279,19 @@ export class ProductoForm implements OnInit {
   quitarImagen(event: Event): void {
     event.stopPropagation();
 
+    // Cancelar la nueva imagen seleccionada
     this.imagenSeleccionada = null;
-    this.previewImagen = null;
 
-    this.formProducto.get('imagen')?.setValue(null);
+    // Volver a mostrar la imagen original
+    this.previewImagen = this.imagenOriginal;
 
-    this.formProducto.get('imagen')?.markAsTouched();
+    // Restaurar el valor original del formulario
+    this.formProducto.get('imagen')?.setValue(this.imagenOriginal);
 
-    this.formProducto.get('imagen')?.updateValueAndValidity();
+    // Limpiar el input file
+    if (this.inputImagen) {
+      this.inputImagen.nativeElement.value = '';
+    }
   }
 
   cerrarModal(): void {
@@ -205,6 +302,13 @@ export class ProductoForm implements OnInit {
 
     this.imagenSeleccionada = null;
     this.previewImagen = null;
+    this.imagenOriginal = null;
+
+    if (this.inputImagen) {
+      this.inputImagen.nativeElement.value = '';
+    }
+
+    this.modo = 'crear';
 
     this.cerrar.emit();
   }
