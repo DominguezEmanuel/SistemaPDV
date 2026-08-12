@@ -1,16 +1,15 @@
 import {
   ApplicationConfig,
+  importProvidersFrom,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-
 import { provideToastr } from 'ngx-toastr';
-
 import { routes } from './app.routes';
-
 import { authInterceptor } from './core/interceptors/auth-interceptor';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 export const appConfig: ApplicationConfig = {
   providers: [

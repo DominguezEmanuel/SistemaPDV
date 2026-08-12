@@ -17,11 +17,13 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { ProductoRequest, ProductoResponse } from '../../../models/Producto';
 import { CategoriaResponse } from '../../../models/Categoria';
 import { CategoriaService } from '../../../core/services/categoria-service';
 import { ProductoService } from '../../../core/services/producto-service';
 import { ToastrService } from 'ngx-toastr';
+//import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-producto-form',
@@ -47,6 +49,7 @@ export class ProductoForm implements OnInit, OnChanges {
   previewImagen: string | null = null;
   imagenOriginal: string | null = null;
   modo: 'crear' | 'editar' = 'crear';
+  guardando = false;
 
   constructor(
     private fb: FormBuilder,
@@ -62,6 +65,10 @@ export class ProductoForm implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['visible'] && !changes['visible'].currentValue) {
+      this.resetFormulario();
+    }
+
     if (changes['producto']) {
       if (this.producto) {
         this.cargarDatosProducto();
@@ -98,17 +105,32 @@ export class ProductoForm implements OnInit, OnChanges {
   }
 
   private prepararFormularioCrear(): void {
-    this.modo = 'crear';
+    this.resetFormulario();
+  }
 
-    this.formProducto.reset();
-
-    this.imagenSeleccionada = null;
-    this.previewImagen = null;
-
-    this.formProducto.get('imagen')?.setValue(null);
+  private resetFormulario(): void {
+    this.formProducto.reset({
+      nombre: '',
+      categoria: null,
+      imagen: null,
+      precioMinorista: null,
+      precioMayorista: null,
+      minimoMayorista: null,
+    });
 
     this.formProducto.markAsPristine();
     this.formProducto.markAsUntouched();
+
+    this.imagenSeleccionada = null;
+    this.previewImagen = null;
+    this.imagenOriginal = null;
+    this.nuevoProducto = null;
+    this.guardando = false;
+    this.modo = 'crear';
+
+    if (this.inputImagen) {
+      this.inputImagen.nativeElement.value = '';
+    }
   }
 
   private getControlesFormulario() {
@@ -158,14 +180,17 @@ export class ProductoForm implements OnInit, OnChanges {
       return;
     }
 
+    this.guardando = true;
+    //this.spinner.show();
+
     const formData = this.crearFormData();
 
-    // Mostrar contenido de FormData para depuración
+    /* Mostrar contenido de FormData para depuración
     const formDataDebug: { [key: string]: any } = {};
     formData.forEach((value, key) => {
       formDataDebug[key] = value instanceof File ? value.name : value;
     });
-    console.log('FormData contenido:', formDataDebug);
+    console.log('FormData contenido:', formDataDebug);*/
 
     if (this.modo === 'crear') {
       this.crearProducto(formData);
@@ -175,15 +200,23 @@ export class ProductoForm implements OnInit, OnChanges {
   }
 
   crearProducto(formData: FormData): void {
-    this.productoService.crearProducto(formData).subscribe({
-      next: (response) => {
-        this.productoGuardado.emit({ producto: response, accion: 'crear' });
-        this.cerrarModal();
-      },
-      error: (error) => {
-        this.toastr.error(error.error.mensaje, 'Error');
-      },
-    });
+    this.productoService
+      .crearProducto(formData)
+      .pipe(
+        finalize(() => {
+          this.guardando = false;
+          //this.spinner.hide();
+        }),
+      )
+      .subscribe({
+        next: (response) => {
+          this.productoGuardado.emit({ producto: response, accion: 'crear' });
+          this.cerrarModal();
+        },
+        error: (error) => {
+          this.toastr.error(error.error.mensaje, 'Error');
+        },
+      });
   }
 
   private actualizarProducto(formData: FormData): void {
@@ -193,6 +226,12 @@ export class ProductoForm implements OnInit, OnChanges {
 
     this.productoService
       .actualizarProducto(this.producto.idProducto, formData)
+      .pipe(
+        finalize(() => {
+          this.guardando = false;
+          //this.spinner.hide();
+        }),
+      )
       .subscribe({
         next: (response) => {
           this.productoGuardado.emit({
@@ -295,21 +334,7 @@ export class ProductoForm implements OnInit, OnChanges {
   }
 
   cerrarModal(): void {
-    this.formProducto.reset();
-
-    this.formProducto.markAsPristine();
-    this.formProducto.markAsUntouched();
-
-    this.imagenSeleccionada = null;
-    this.previewImagen = null;
-    this.imagenOriginal = null;
-
-    if (this.inputImagen) {
-      this.inputImagen.nativeElement.value = '';
-    }
-
-    this.modo = 'crear';
-
+    this.resetFormulario();
     this.cerrar.emit();
   }
 

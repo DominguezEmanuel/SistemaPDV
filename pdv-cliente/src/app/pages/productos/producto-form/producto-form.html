@@ -243,12 +243,12 @@ b
         </div>
         <!-- BOTÓN GUARDAR -->
         <button
-          [disabled]="formProducto.invalid"
+          [disabled]="formProducto.invalid || guardando"
           type="submit"
           class="nu-btn-guardar"
         >
           <i class="bi bi-floppy-fill"></i>
-          Guardar producto
+          {{ guardando ? 'Guardando...' : 'Guardar producto' }}
         </button>
       </form>
     </div>
