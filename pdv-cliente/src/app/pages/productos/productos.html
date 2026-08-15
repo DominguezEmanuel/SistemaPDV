@@ -176,9 +176,9 @@
 >
 </app-product-view-modal>
 
-<!-- MODAL AGREGAR PRODUCTO -->
+<!-- MODAL AGREGAR/EDITAR PRODUCTO -->
 <app-producto-form
-  [producto]="productoSeleccionado"
+  [productoForm]="productoSeleccionadoForm"
   [visible]="modalFormularioProducto"
   (cerrar)="cerrarModal()"
   (productoGuardado)="onProductoGuardado($event)"

@@ -10,13 +10,16 @@ import { CommonModule } from '@angular/common';
 
 import { ProductoResponse } from '../../../models/Producto';
 import { CanalResponse } from '../../../models/CanalResponse';
-import { VarianteResponse } from '../../../models/VarianteResponse';
+import { VarianteResponse } from '../../../models/Variante';
 import { StockResponse } from '../../../models/StockResponse';
 
 import { VarianteService } from '../../../core/services/variante-service';
 import { CanalService } from '../../../core/services/canal-service';
 import { StockService } from '../../../core/services/stock-service';
 import { ProductoCanalService } from '../../../core/services/producto-canal-service';
+import { ToastrService } from 'ngx-toastr';
+
+import { VarianteForm } from '../../variantes/variante-form/variante-form';
 
 interface ConfiguracionCanal {
   idCanal: number;
@@ -28,7 +31,7 @@ type TabId = 'informacion' | 'variantes' | 'stock' | 'comercial';
 
 @Component({
   selector: 'app-product-view-modal',
-  imports: [CommonModule],
+  imports: [CommonModule, VarianteForm],
   templateUrl: './product-view-modal.component.html',
   styleUrls: ['./product-view-modal.component.css'],
 })
@@ -39,6 +42,8 @@ export class ProductViewModalComponent implements OnChanges {
   @Output() cerrar = new EventEmitter<void>();
   variantesCargadas = false;
   canalesCargados = false;
+  modalFormularioVariante = false;
+  varianteSeleccionada: VarianteResponse | null = null;
   // Estructura para las secciones de la vista
   tabs: { id: TabId; label: string; icon: string }[] = [
     {
@@ -75,12 +80,14 @@ export class ProductViewModalComponent implements OnChanges {
     private canalService: CanalService,
     private stockService: StockService,
     private productoCanalService: ProductoCanalService,
+    private toastr: ToastrService,
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['producto'] && this.producto) {
       this.resetearStock();
       this.cargarVariantes();
+      //console.log('HOLA MUNDOOO');
       if (this.tabActiva === 'stock' || this.tabActiva === 'comercial') {
         this.cargarCanales();
       }
@@ -97,6 +104,8 @@ export class ProductViewModalComponent implements OnChanges {
       .subscribe({
         next: (response) => {
           this.variantes = response;
+          //console.log('Variantes: ', this.variantes);
+          // Asignación del primer ID y nombre
           this.varianteSeleccionadaId = response[0]?.idVariante ?? null;
           this.varianteSeleccionadaNombre = response[0]?.nombre ?? null;
 
@@ -114,6 +123,36 @@ export class ProductViewModalComponent implements OnChanges {
           console.error('Error al cargar variantes:', error);
         },
       });
+  }
+
+  verFormulario(variante?: VarianteResponse): void {
+    if (variante) {
+      this.varianteSeleccionada = variante;
+    } else {
+      this.varianteSeleccionada = null;
+    }
+    this.modalFormularioVariante = true;
+  }
+
+  onVarianteGuardada(event: {
+    variante: VarianteResponse;
+    accion: 'crear' | 'editar';
+  }): void {
+    this.modalFormularioVariante = false;
+
+    this.cargarVariantes();
+
+    if (event.accion === 'crear') {
+      this.toastr.success(
+        'La variante se creó correctamente',
+        'Variante creada',
+      );
+    } else {
+      this.toastr.success(
+        'Los cambios de la variante se guardaron correctamente',
+        'Variante actualizada',
+      );
+    }
   }
 
   cargarCanales() {
@@ -328,8 +367,12 @@ export class ProductViewModalComponent implements OnChanges {
   }
 
   cerrarModal(): void {
-    this.limpiarDatos();
-    this.cerrar.emit();
+    if (this.modalFormularioVariante) {
+      this.modalFormularioVariante = false;
+    } else {
+      this.limpiarDatos();
+      this.cerrar.emit();
+    }
   }
 
   detenerPropagacion(evento: MouseEvent): void {

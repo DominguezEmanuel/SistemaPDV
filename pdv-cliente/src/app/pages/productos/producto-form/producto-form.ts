@@ -10,11 +10,12 @@ import {
   ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, FormControl } from '@angular/forms';
 import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
+  FormsModule,
+  FormControl,
   Validators,
 } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -31,7 +32,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrl: './producto-form.css',
 })
 export class ProductoForm implements OnInit, OnChanges {
-  @Input() producto: ProductoResponse | null = null;
+  @Input() productoForm: ProductoResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
   @Output() productoGuardado = new EventEmitter<{
@@ -83,53 +84,49 @@ export class ProductoForm implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && !changes['visible'].currentValue) {
-      this.resetFormulario();
+      this.resetearFormulario();
     }
 
-    if (changes['producto']) {
-      if (this.producto) {
+    if (changes['productoForm']) {
+      if (this.productoForm) {
         this.cargarDatosProducto();
       } else {
-        this.prepararFormularioCrear();
+        this.resetearFormulario();
       }
     }
   }
 
   private cargarDatosProducto(): void {
-    if (!this.producto) {
+    if (!this.productoForm) {
       return;
     }
 
     this.modo = 'editar';
 
     this.formProducto.patchValue({
-      nombre: this.producto.nombre,
-      categoria: this.producto.categoria.idCategoria,
-      imagen: this.producto.imagen,
-      precioMinorista: this.producto.precioMinorista,
-      precioMayorista: this.producto.precioMayorista,
-      minimoMayorista: this.producto.minimoMayorista,
-      tieneVariantes: this.producto.tieneVariantes,
+      nombre: this.productoForm.nombre,
+      categoria: this.productoForm.categoria.idCategoria,
+      imagen: this.productoForm.imagen,
+      precioMinorista: this.productoForm.precioMinorista,
+      precioMayorista: this.productoForm.precioMayorista,
+      minimoMayorista: this.productoForm.minimoMayorista,
+      tieneVariantes: this.productoForm.tieneVariantes,
     });
 
     // Deshabilitar el campo tieneVariantes en modo edición
     this.formProducto.get('tieneVariantes')?.disable();
 
     // Guardamos la imagen actual del producto
-    this.imagenOriginal = this.producto.imagen;
+    this.imagenOriginal = this.productoForm.imagen;
 
     // La mostramos inicialmente
-    this.previewImagen = this.producto.imagen;
+    this.previewImagen = this.productoForm.imagen;
 
     // Todavía no se seleccionó una nueva imagen
     this.imagenSeleccionada = null;
   }
 
-  private prepararFormularioCrear(): void {
-    this.resetFormulario();
-  }
-
-  private resetFormulario(): void {
+  private resetearFormulario(): void {
     this.formProducto.reset({
       nombre: '',
       categoria: null,
@@ -248,12 +245,12 @@ export class ProductoForm implements OnInit, OnChanges {
   }
 
   private actualizarProducto(formData: FormData): void {
-    if (!this.producto) {
+    if (!this.productoForm) {
       return;
     }
 
     this.productoService
-      .actualizarProducto(this.producto.idProducto, formData)
+      .actualizarProducto(this.productoForm.idProducto, formData)
       .pipe(
         finalize(() => {
           this.guardando = false;
@@ -366,7 +363,7 @@ export class ProductoForm implements OnInit, OnChanges {
   }
 
   cerrarModal(): void {
-    this.resetFormulario();
+    this.resetearFormulario();
     this.cerrar.emit();
   }
 

@@ -108,7 +108,7 @@ public class ProductoService {
     public List<VarianteProductoResponseDTO> getVariantsByProduct(Integer idProducto){
         // Verificar que el ID de Producto existe
         if(!productoRepository.existsById(idProducto))
-            throw new ResourceNotFoundException("Producto con id " + idProducto + " no encontrado");
+            throw new ResourceNotFoundException("Producto con ID " + idProducto + " no encontrado");
         // Buscar las variantes del producto
         List<VarianteProducto> variantes = varianteRepository.findByProductoId(idProducto);
 
@@ -140,7 +140,7 @@ public class ProductoService {
         }
 
         if (Boolean.TRUE.equals(request.getTieneVariantes())
-                && request.getCodigoBarras() != null) {
+                && !request.getCodigoBarras().isEmpty()) {
             throw new IllegalArgumentException(
                     "El código de barras debe registrarse individualmente en cada variante"
             );

@@ -142,27 +142,32 @@
           type="button"
           class="mv-btn-primary"
           [disabled]="!producto.tieneVariantes"
+          title="Agregar variante"
+          (click)="verFormulario()"
         >
           <i class="bi bi-plus-lg"></i>
           Agregar variante
         </button>
       </div>
 
-      <table class="mv-table" *ngIf="variantes.length; else sinVariantes">
+      <table
+        class="mv-table"
+        *ngIf="variantes.length && producto.tieneVariantes; else sinVariantes"
+      >
         <thead>
           <tr>
-            <th>ID Variante</th>
+            <th>Nombre</th>
+            <th>Código interno</th>
             <th>Código de barras</th>
-            <th>Nombre de la variante</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let variante of variantes">
-            <td>{{ variante.idVariante }}</td>
-            <td>{{ variante.codigoBarras }}</td>
             <td>{{ variante.nombre }}</td>
+            <td>{{ variante.codigoInterno }}</td>
+            <td>{{ variante.codigoBarras }}</td>
             <td>
               <span
                 class="mv-badge"
@@ -175,7 +180,12 @@
             </td>
             <td>
               <div class="mv-actions">
-                <button type="button" class="mv-action-btn" title="Actualizar">
+                <button
+                  type="button"
+                  class="mv-action-btn"
+                  title="Modificar"
+                  (click)="verFormulario(variante)"
+                >
                   <i class="bi bi-pencil-square"></i>
                 </button>
                 <button
@@ -349,3 +359,13 @@
     </div>
   </div>
 </div>
+
+<!-- MODAL DE AGREGAR/EDITAR VARIANTE  -->
+<app-variante-form
+  [producto]="producto"
+  [variante]="varianteSeleccionada"
+  [visible]="modalFormularioVariante"
+  (cerrar)="cerrarModal()"
+  (varianteGuardada)="onVarianteGuardada($event)"
+>
+</app-variante-form>

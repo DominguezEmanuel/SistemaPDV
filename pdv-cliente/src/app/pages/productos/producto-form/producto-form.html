@@ -1,4 +1,3 @@
-b
 <div class="mv-overlay" *ngIf="visible" (click)="cerrarModal()">
   <div class="mv-modal" (click)="detenerPropagacion($event)">
     <!-- HEADER -->
@@ -6,7 +5,7 @@ b
       <div class="mv-header-info">
         <h3 class="mv-title">
           <i class="bi bi-plus-circle"></i>
-          Nuevo producto
+          {{ modo === 'crear' ? "Nuevo producto" : "Editar producto" }}
         </h3>
       </div>
       <button

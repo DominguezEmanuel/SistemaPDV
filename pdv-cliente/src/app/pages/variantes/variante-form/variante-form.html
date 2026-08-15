@@ -1,0 +1,111 @@
+<div class="mv-overlay" *ngIf="visible" (click)="cerrarModal()">
+  <div class="mv-modal" (click)="detenerPropagacion($event)">
+    <!-- HEADER -->
+    <div class="mv-header">
+      <div class="mv-header-info">
+        <h3 class="mv-title">
+          <i class="bi bi-plus-circle"></i>
+          {{ modo === 'crear' ? "Nueva variante" : "Editar variante" }}
+        </h3>
+      </div>
+      <button
+        type="button"
+        class="mv-close-btn"
+        (click)="cerrarModal()"
+        aria-label="Cerrar"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <!-- CONTENIDO -->
+    <div class="mv-body">
+      <form [formGroup]="formVariante" (ngSubmit)="procesarFormulario()">
+        <!-- Datos generales -->
+        <div class="nu-section-title">
+          <i class="bi bi-square"></i>
+          Datos generales
+        </div>
+        <div class="nu-row">
+          <!-- NOMBRE DE LA VARIANTE -->
+          <div class="nu-field">
+            <label class="nu-label" for="nombre"
+              >Nombre de la variante<span class="req">*</span></label
+            >
+            <input
+              type="text"
+              id="nombre"
+              class="nu-input"
+              placeholder="Ej: Rojo, 500ml, 20mm, etc."
+              formControlName="nombre"
+            />
+            <div
+              *ngIf="formVariante.get('nombre')?.touched && formVariante.get('nombre')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="formVariante.get('nombre')?.errors?.['required']">
+                El nombre es obligatorio.
+              </div>
+              <div *ngIf="formVariante.get('nombre')?.errors?.['minlength']">
+                El nombre debe tener al menos 3 caracteres.
+              </div>
+              <div *ngIf="formVariante.get('nombre')?.errors?.['maxlength']">
+                El nombre no debe superar los 150 caracteres.
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- CÓDIGO DE BARRAS -->
+        <div class="nu-section-title">
+          <i class="bi bi-upc"></i>
+          Código de Barras
+        </div>
+        <div class="nu-row">
+          <div class="nu-field">
+            <label class="nu-label" for="codigoBarras"
+              >Código de Barras<span class="req">*</span></label
+            >
+            <input
+              type="text"
+              id="codigoBarras"
+              class="nu-input"
+              placeholder="Ej: 779456123789"
+              formControlName="codigoBarras"
+            />
+            <div
+              *ngIf="formVariante.get('codigoBarras')?.touched && formVariante.get('codigoBarras')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div
+                *ngIf="formVariante.get('codigoBarras')?.errors?.['required']"
+              >
+                El código de barras es obligatorio.
+              </div>
+              <div
+                *ngIf="formVariante.get('codigoBarras')?.errors?.['maxlength']"
+              >
+                El código no debe superar los 150 caracteres.
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- BOTÓN GUARDAR -->
+        <button
+          [disabled]="formVariante.invalid || guardando"
+          type="submit"
+          class="nu-btn-guardar"
+        >
+          <i class="bi bi-floppy-fill"></i>
+          {{ guardando ? 'Guardando...' : 'Guardar variante' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="mv-footer">
+      <button type="button" class="mv-btn-cancelar" (click)="cerrarModal()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

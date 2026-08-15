@@ -16,7 +16,6 @@ public class VarianteProductoRequestDTO {
     //@NotBlank(message = "El código de barras es obligatorio")
     @Size(max = 50, message = "El código de barras no puede superar los 50 caracteres")
     private String codigoBarras;
-    // private String codigoInterno; Ej. SED500
     @NotNull(message = "Debe seleccionar un producto")
     private Integer idProducto;
 }

@@ -45,6 +45,7 @@ export class Productos implements OnInit {
   modalVisible = false;
   modalFormularioProducto = false;
   productoSeleccionado: ProductoResponse | null = null;
+  productoSeleccionadoForm: ProductoResponse | null = null;
 
   constructor(
     private categoriaService: CategoriaService,
@@ -91,9 +92,9 @@ export class Productos implements OnInit {
 
   verFormulario(producto?: ProductoResponse): void {
     if (producto) {
-      this.productoSeleccionado = producto;
+      this.productoSeleccionadoForm = producto;
     } else {
-      this.productoSeleccionado = null;
+      this.productoSeleccionadoForm = null;
     }
     this.modalFormularioProducto = true;
   }

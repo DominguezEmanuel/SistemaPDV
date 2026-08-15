@@ -30,8 +30,8 @@ export class UsuarioService {
     );
   }
 
-  createUser(usuario: UsuarioRequest | null): Observable<UsuarioResponse> {
-    return this.http.post<UsuarioResponse>(`${this.hostBase}`, usuario);
+  createUser(request: UsuarioRequest | null): Observable<UsuarioResponse> {
+    return this.http.post<UsuarioResponse>(`${this.hostBase}`, request);
   }
 
   updateUser(
