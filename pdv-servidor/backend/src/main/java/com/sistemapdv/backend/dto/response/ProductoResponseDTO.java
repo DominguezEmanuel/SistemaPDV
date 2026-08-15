@@ -18,5 +18,6 @@ public class ProductoResponseDTO {
     private BigDecimal precioMayorista;
     private Integer minimoMayorista;
     private Boolean activo;
+    private Boolean tieneVariantes;
     private CategoriaDTO categoria;
 }

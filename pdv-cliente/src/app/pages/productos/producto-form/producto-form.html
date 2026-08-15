@@ -218,7 +218,7 @@ b
               formControlName="minimoMayorista"
             />
             <div class="nu-hint">
-              Unidades mínimas para acceder al precio mayorista.
+              Unidades mínimas para acceder al precio mayorista
             </div>
             <div
               *ngIf="formProducto.get('minimoMayorista')?.touched && formProducto.get('minimoMayorista')?.invalid"
@@ -240,6 +240,86 @@ b
               </div>
             </div>
           </div>
+        </div>
+        <!-- Variantes del Producto -->
+        <div class="nu-section-title">
+          <i class="bi bi-box"></i>
+          Variantes del Producto
+        </div>
+        <div class="nu-row">
+          <!-- TIENE VARIANTES -->
+          <div class="nu-field">
+            <label class="nu-label"
+              >¿El producto tiene variantes?<span class="req">*</span></label
+            >
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input
+                  type="radio"
+                  [value]="true"
+                  formControlName="tieneVariantes"
+                />
+                <span class="checkbox-text">Si tiene</span>
+              </label>
+              <label class="checkbox-label">
+                <input
+                  type="radio"
+                  [value]="false"
+                  formControlName="tieneVariantes"
+                />
+                <span class="checkbox-text">No tiene</span>
+              </label>
+            </div>
+            <div
+              *ngIf="formProducto.get('tieneVariantes')?.touched && formProducto.get('tieneVariantes')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div
+                *ngIf="formProducto.get('tieneVariantes')?.errors?.['required']"
+              >
+                Indicá si el producto tiene variantes
+              </div>
+            </div>
+            <div class="nu-hint" *ngIf="modo === 'editar'">
+              Este campo no se puede modificar una vez creado el producto
+            </div>
+            <div class="nu-hint" *ngIf="modo === 'crear'">
+              <i class="bi bi-exclamation-circle"></i>
+              Esta configuración no podrá modificarse posteriormente
+            </div>
+          </div>
+          <!-- CÓDIGO DE BARRAS -->
+          @if (formProducto.get('tieneVariantes')?.value === false && modo ===
+          'crear'){
+          <div class="nu-field">
+            <label class="nu-label" for="codigoBarras">
+              ¿El producto tiene código de barras?<span class="req">*</span>
+            </label>
+            <input
+              type="text"
+              id="codigoBarras"
+              class="nu-input"
+              placeholder="Ej: 779456123789"
+              formControlName="codigoBarras"
+            />
+            <div
+              *ngIf="formProducto.get('codigoBarras')?.touched && formProducto.get('codigoBarras')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div
+                *ngIf="formProducto.get('codigoBarras')?.errors?.['maxlength']"
+              >
+                El código de barras no puede superar los 50 caracteres
+              </div>
+            </div>
+            <div class="nu-hint">
+              <i class="bi bi-exclamation-circle"></i>
+              Solamente es necesario si el producto posee código de barras
+            </div>
+          </div>
+          }
         </div>
         <!-- BOTÓN GUARDAR -->
         <button

@@ -12,7 +12,7 @@ export class VarianteService {
     this.hostBase = environment.apiUrl + '/productos/';
   }
 
-  getVariantesByProductoId(idProducto: number) {
+  obtenerVariantesPorProducto(idProducto: number) {
     return this.http.get<VarianteResponse[]>(
       `${this.hostBase}${idProducto}/variantes`,
     );

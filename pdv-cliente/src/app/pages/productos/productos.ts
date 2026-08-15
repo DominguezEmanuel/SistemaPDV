@@ -74,7 +74,7 @@ export class Productos implements OnInit {
           this.productos = response;
         },
         error: (error) => {
-          console.error('Error al filtrar productos: ', error);
+          this.toastr.error(error.error.mensaje, 'Error');
         },
       });
   }
@@ -118,7 +118,7 @@ export class Productos implements OnInit {
         this.categorias = response;
       },
       error: (error) => {
-        console.error('Error al obtener categorías:', error);
+        this.toastr.error('Error al cargar las categorías', 'Error');
       },
     });
   }
@@ -129,7 +129,7 @@ export class Productos implements OnInit {
         this.productos = response;
       },
       error: (error) => {
-        console.error('Error al obtener productos:', error);
+        this.toastr.error('Error al cargar los productos', 'Error');
       },
     });
   }

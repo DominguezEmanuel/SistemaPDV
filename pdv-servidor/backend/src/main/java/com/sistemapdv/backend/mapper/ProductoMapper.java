@@ -15,9 +15,9 @@ public class ProductoMapper {
         this.categoriaMapper = categoriaMapper;
     }
 
-    public Producto toProducto(ProductoRequestDTO dto, Categoria categoria,
+    public Producto toProducto(ProductoRequestDTO dto,
+                               Categoria categoria,
                                String imagen){
-
         Producto producto = Producto.builder()
                 .nombre(dto.getNombre().trim())
                 .imagen(imagen)
@@ -25,6 +25,7 @@ public class ProductoMapper {
                 .precioMayorista(dto.getPrecioMayorista())
                 .minimoMayorista(dto.getMinimoMayorista())
                 .activo(true)
+                .tieneVariantes(dto.getTieneVariantes())
                 .categoria(categoria)
                 .build();
 
@@ -40,6 +41,7 @@ public class ProductoMapper {
                 .precioMayorista(producto.getPrecioMayorista())
                 .minimoMayorista(producto.getMinimoMayorista())
                 .activo(producto.getActivo())
+                .tieneVariantes(producto.getTieneVariantes())
                 .categoria(categoriaMapper.toCategoriaDTO(producto.getCategoria()))
                 .build();
         return dto;

@@ -35,9 +35,16 @@ public class VarianteController {
         return variantes;
     }
 
-    @GetMapping("/codigo/{codigo}")
-    public ResponseEntity<VarianteProductoResponseDTO> getVariantByBarCode(@PathVariable String codigo){
-        VarianteProductoResponseDTO varianteEncontrada = varianteService.findByBarCode(codigo);
+    @GetMapping("/codigo-barras/{codigoBarras}")
+    public ResponseEntity<VarianteProductoResponseDTO> getVariantByBarCode(@PathVariable String codigoBarras){
+        VarianteProductoResponseDTO varianteEncontrada = varianteService.findByBarCode(codigoBarras);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(varianteEncontrada);
+    }
+
+    @GetMapping("/codigo-interno/{codigoInterno}")
+    public ResponseEntity<VarianteProductoResponseDTO> getVariantByInternCode(@PathVariable String codigoInterno){
+        VarianteProductoResponseDTO varianteEncontrada = varianteService.findByInternCode(codigoInterno);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(varianteEncontrada);
     }

@@ -6,7 +6,7 @@
       <div class="mv-header-info">
         <h2 class="mv-title">{{ producto.nombre }}</h2>
         <div class="mv-header-sub">
-          <span class="mv-id-chip">ID-0{{ producto.idProducto }}</span>
+          <span class="mv-id-chip">ID-{{ producto.idProducto }}</span>
           <span>{{ producto.categoria.nombre }}</span>
         </div>
       </div>
@@ -54,8 +54,30 @@
               />
             </div>
           </div>
+          <div class="mv-field">
+            <label>¿Posee variantes?</label>
+            <div class="mv-value">
+              {{
+                producto.tieneVariantes
+                  ? "Producto con variantes"
+                  : "Producto sin variantes"
+              }}
+            </div>
+          </div>
+          <div class="mv-field">
+            <label>Estado</label>
+            <div class="mv-value">
+              <span
+                class="mv-badge"
+                [class.activo]="producto.activo == true"
+                [class.inactivo]="producto.activo == false"
+              >
+                <span class="dot"></span>
+                {{ producto.activo === true ? "Activo" : "Inactivo" }}
+              </span>
+            </div>
+          </div>
         </div>
-
         <div class="mv-details-column">
           <div class="mv-field">
             <label>ID</label>
@@ -85,19 +107,6 @@
             <label>Cantidad mínima mayorista</label>
             <div class="mv-value">{{ producto.minimoMayorista }} unidades</div>
           </div>
-          <div class="mv-field">
-            <label>Estado</label>
-            <div class="mv-value">
-              <span
-                class="mv-badge"
-                [class.activo]="producto.activo == true"
-                [class.inactivo]="producto.activo == false"
-              >
-                <span class="dot"></span>
-                {{ producto.activo === true ? "Activo" : "Inactivo" }}
-              </span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -107,11 +116,33 @@
       <div class="mv-variants-header">
         <div>
           <h3 class="mv-section-title">Variantes del producto</h3>
-          <p class="mv-section-text">
-            Gestioná los distintos registros de variantes del producto
+          <p
+            class="mv-section-text"
+            *ngIf="producto.tieneVariantes; else sinVariantesTexto"
+          >
+            <span
+              >Gestioná los distintos registros de variantes del producto</span
+            >
+            <span
+              >Podés administrar cada presentación y su estado de forma
+              individual</span
+            >
           </p>
+          <ng-template #sinVariantesTexto>
+            <p class="mv-section-text">
+              <span
+                >Este producto fue configurado como un producto sin
+                variantes</span
+              >
+              <span>Su inventario se gestiona como una única presentación</span>
+            </p>
+          </ng-template>
         </div>
-        <button type="button" class="mv-btn-primary">
+        <button
+          type="button"
+          class="mv-btn-primary"
+          [disabled]="!producto.tieneVariantes"
+        >
           <i class="bi bi-plus-lg"></i>
           Agregar variante
         </button>
@@ -169,7 +200,14 @@
       <ng-template #sinVariantes>
         <div class="mv-empty-state">
           <i class="bi bi-boxes"></i>
-          <div>No hay variantes cargadas para este producto</div>
+          <p class="mv-section-text" *ngIf="producto.tieneVariantes">
+            <span>Este producto posee variantes</span>
+            <span>Todavía no registraste ninguna variante</span>
+          </p>
+          <p class="mv-section-text" *ngIf="!producto.tieneVariantes">
+            <span>Producto sin variantes</span>
+            <span>No es necesario registrar variantes adicionales</span>
+          </p>
         </div>
       </ng-template>
     </div>

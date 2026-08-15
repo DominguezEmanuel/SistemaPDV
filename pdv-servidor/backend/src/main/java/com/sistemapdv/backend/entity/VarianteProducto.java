@@ -23,6 +23,9 @@ public class VarianteProducto {
     @Column(name = "codigo_barras", unique = true, length = 50)
     private String codigoBarras;
 
+    @Column(name = "codigo_interno", unique = true, length = 50, nullable = false)
+    private String codigoInterno;
+
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 

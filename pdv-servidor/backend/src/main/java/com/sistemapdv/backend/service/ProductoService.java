@@ -1,6 +1,7 @@
 package com.sistemapdv.backend.service;
 
 import com.sistemapdv.backend.dto.request.ProductoRequestDTO;
+import com.sistemapdv.backend.dto.request.VarianteProductoRequestDTO;
 import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
 import com.sistemapdv.backend.dto.response.VarianteProductoResponseDTO;
 import com.sistemapdv.backend.entity.Categoria;
@@ -28,14 +29,16 @@ import java.util.Optional;
 public class ProductoService {
 
     private final CloudinaryService cloudinaryService;
+    private final VarianteProductoService varianteService;
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
     private final VarianteProductoRepository varianteRepository;
     private final ProductoMapper productoMapper;
     private final VarianteProductoMapper varianteMapper;
 
-    public ProductoService(CloudinaryService cloudinaryService, ProductoRepository productoRepository, CategoriaRepository categoriaRepository, VarianteProductoRepository varianteRepository, ProductoMapper productoMapper, VarianteProductoMapper varianteMapper) {
+    public ProductoService(CloudinaryService cloudinaryService, VarianteProductoService varianteService, ProductoRepository productoRepository, CategoriaRepository categoriaRepository, VarianteProductoRepository varianteRepository, ProductoMapper productoMapper, VarianteProductoMapper varianteMapper) {
         this.cloudinaryService = cloudinaryService;
+        this.varianteService = varianteService;
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
         this.varianteRepository = varianteRepository;
@@ -47,7 +50,7 @@ public class ProductoService {
     public ProductoResponseDTO findById(Integer id){
         Producto producto = productoRepository.findByIdWithCategoria(id)
                 .orElseThrow( ()->
-                        new ResourceNotFoundException("Producto con id " + id + " no encontrado"));
+                        new ResourceNotFoundException("Producto con ID " + id + " no encontrado"));
         return productoMapper.toResponseDTO(producto);
     }
 
@@ -100,6 +103,7 @@ public class ProductoService {
                 .toList();
     }
 
+    // Mejorar
     @Transactional(readOnly = true)
     public List<VarianteProductoResponseDTO> getVariantsByProduct(Integer idProducto){
         // Verificar que el ID de Producto existe
@@ -116,6 +120,7 @@ public class ProductoService {
 
     @Transactional
     public ProductoResponseDTO createProduct(ProductoRequestDTO request){
+        // Validar Categoria
         Categoria categoria = categoriaRepository.findById(request.getIdCategoria())
                 .orElseThrow(()-> new ResourceNotFoundException(
                         "Categoria con ID " + request.getIdCategoria()
@@ -129,17 +134,46 @@ public class ProductoService {
         if(productoRepository.existsByNombreIgnoreCase(request.getNombre()))
             throw new IllegalArgumentException("Ya existe un producto con el nombre ingresado");
 
-        // Sube imagen a Cloudinary si se proporciona
-        String imagenUrl = null;
-        if(request.getImagen() != null && !request.getImagen().isEmpty()) {
-            imagenUrl = cloudinaryService.uploadImage(request.getImagen());
+        // Para la creación, la imagen es obligatoria
+        if(request.getImagen() == null || request.getImagen().isEmpty()) {
+            throw new IllegalArgumentException("La imagen es obligatoria para crear el producto");
         }
+
+        if (Boolean.TRUE.equals(request.getTieneVariantes())
+                && request.getCodigoBarras() != null) {
+            throw new IllegalArgumentException(
+                    "El código de barras debe registrarse individualmente en cada variante"
+            );
+        }
+
+        String imagenUrl = cloudinaryService.uploadImage(request.getImagen());
 
         Producto nuevoProducto = productoMapper.toProducto(request, categoria, imagenUrl);
 
         productoRepository.save(nuevoProducto);
 
+        // Crear variante 'UNICA'
+        if(Boolean.FALSE.equals(nuevoProducto.getTieneVariantes())){
+            crearVarianteUnica(nuevoProducto, request.getCodigoBarras());
+        }
+
         return productoMapper.toResponseDTO(nuevoProducto);
+    }
+
+    private void crearVarianteUnica(Producto producto, String codigoBarras){
+        VarianteProducto varianteUnica = VarianteProducto.builder()
+                .nombre("Unica")
+                .codigoBarras(codigoBarras.isEmpty() || codigoBarras == null ? null : codigoBarras)
+                .codigoInterno(" ")
+                .activo(true)
+                .producto(producto)
+                .build();
+
+        varianteUnica = varianteRepository.save(varianteUnica);
+
+        varianteUnica.setCodigoInterno(varianteService.generarCodigoInterno(varianteUnica.getIdVariante()));
+
+        varianteRepository.save(varianteUnica);
     }
 
     @Transactional
@@ -149,6 +183,7 @@ public class ProductoService {
                         new ResourceNotFoundException(
                                 "Producto con id " + idProducto + " no encontrado"
                         ));
+
         String imagenUrl = cloudinaryService.uploadImage(imagen);
 
         producto.setImagen(imagenUrl);
@@ -201,10 +236,19 @@ public class ProductoService {
         // Validar precios
         if (request.getPrecioMayorista()
                 .compareTo(request.getPrecioMinorista()) > 0) {
-            throw new IllegalArgumentException("El precio mayorista no puede ser mayor al precio minorista");
+            throw new IllegalArgumentException(
+                    "El precio mayorista no puede ser mayor al precio minorista"
+            );
         }
 
-        // Actualizar datos
+        if (!producto.getTieneVariantes()
+                .equals(request.getTieneVariantes())) {
+            throw new IllegalArgumentException(
+                    "No se puede modificar si un producto posee variantes después de su creación"
+            );
+        }
+
+        // Actualizar datos editables
         producto.setNombre(request.getNombre().trim());
         
         // Actualizar imagen solo si se proporciona una nueva

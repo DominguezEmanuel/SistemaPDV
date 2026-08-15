@@ -8,7 +8,9 @@ export interface ProductoResponse {
   precioMayorista: number;
   minimoMayorista: number;
   activo: boolean;
+  tieneVariantes: boolean;
   categoria: CategoriaResponse;
+  codigoBarras: string;
 }
 
 export interface ProductoRequest {
@@ -17,5 +19,6 @@ export interface ProductoRequest {
   precioMinorista: number;
   precioMayorista: number;
   minimoMayorista: number;
+  tieneVariantes: boolean;
   idCategoria: number;
 }

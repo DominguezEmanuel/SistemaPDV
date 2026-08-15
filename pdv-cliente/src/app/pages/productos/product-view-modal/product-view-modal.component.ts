@@ -88,10 +88,12 @@ export class ProductViewModalComponent implements OnChanges {
   }
 
   cargarVariantes(): void {
-    if (!this.producto) return;
+    if (!this.producto) {
+      return;
+    }
 
     this.varianteService
-      .getVariantesByProductoId(this.producto.idProducto)
+      .obtenerVariantesPorProducto(this.producto.idProducto)
       .subscribe({
         next: (response) => {
           this.variantes = response;
@@ -115,7 +117,7 @@ export class ProductViewModalComponent implements OnChanges {
   }
 
   cargarCanales() {
-    this.canalService.getAllCanales().subscribe({
+    this.canalService.obtenerCanales().subscribe({
       next: (response) => {
         this.canales = response;
 

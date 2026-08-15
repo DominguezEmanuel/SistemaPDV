@@ -113,10 +113,16 @@
       </div>
       <!-- STOCK Y ACCIONES -->
       <div class="producto-footer">
-        <span class="stock-info" [class.stock-bajo]="!producto.activo">
+        <span
+          class="variantes-info"
+          [class.sin-variantes]="!producto.tieneVariantes"
+        >
+          <!-- VARIANTES DEL PRODUCTO -->
+          @if (producto.tieneVariantes) {
           <i class="bi bi-boxes"></i>
-          <!-- PONER EL STOCK DEL PRODUCTO -->
-          {{ producto.activo ? 'Disponible' : 'No Disponible' }}
+          Tiene variantes } @else {
+          <i class="bi bi-box"></i>
+          No tiene variantes }
         </span>
         <div class="acciones-cell">
           <!-- MODIFICAR -->
@@ -156,7 +162,7 @@
     } @if (productos.length === 0) {
     <div class="sin-productos-mensaje">
       <i class="bi bi-exclamation-circle"></i>
-      No se encontraron productos para los filtros aplicados.
+      No se encontraron productos para los filtros aplicados
     </div>
     }
   </div>

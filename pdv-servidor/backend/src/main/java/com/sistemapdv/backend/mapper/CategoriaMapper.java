@@ -19,7 +19,7 @@ public class CategoriaMapper {
     public Categoria toCategoria(CategoriaDTO dto){
         Categoria categoria = new Categoria();
 
-        categoria.setNombre(dto.getNombre());
+        categoria.setNombre(dto.getNombre().trim());
 
         return categoria;
     }

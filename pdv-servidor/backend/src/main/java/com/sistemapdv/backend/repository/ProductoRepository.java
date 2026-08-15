@@ -13,11 +13,7 @@ import java.util.Optional;
 public interface ProductoRepository extends JpaRepository<Producto, Integer>,
                                             JpaSpecificationExecutor<Producto> {
 
-    List<Producto> findByActivoTrue();
-
     Optional<Producto> findByNombreIgnoreCase(String nombre);
-
-    List<Producto> findByNombreContainingIgnoreCase(String nombre);
 
     boolean existsByNombreIgnoreCase(String nombre);
 

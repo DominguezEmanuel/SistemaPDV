@@ -35,6 +35,8 @@ public interface VarianteProductoRepository extends JpaRepository<VarianteProduc
             """)
     Optional<VarianteProducto> findByCodigoBarras(@Param("codigoBarras") String codigoBarras);
 
+    Optional<VarianteProducto> findByCodigoInterno(String codigoInterno);
+
     @Query("""
             SELECT COUNT(vp) > 0
             FROM VarianteProducto vp

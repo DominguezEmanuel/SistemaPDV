@@ -16,8 +16,6 @@ public class ProductoRequestDTO {
     @Size(max = 150, message = "El nombre no puede superar los 150 caracteres")
     private String nombre;
 
-    //@NotBlank(message = "La imagen es obligatoria")
-    //@Size(max = 255, message = "La ruta de la imagen no puede superar los 255 caracteres")
     private MultipartFile imagen;
 
     @NotNull(message = "El precio minorista es obligatorio")
@@ -34,6 +32,13 @@ public class ProductoRequestDTO {
     @Min(value = 2, message = "La cantidad mínima mayorista debe ser al menos 2")
     private Integer minimoMayorista;
 
+    @NotNull(message = "Debe indicar si el producto tiene variantes o no")
+    private Boolean tieneVariantes;
+
     @NotNull(message = "Debe seleccionar una categoría")
     private Integer idCategoria;
+
+    // Solamente lo utilizarán aquellos productos que NO tengan variantes pero SÍ tienen código de barras
+    // para ser consultados
+    private String codigoBarras;
 }

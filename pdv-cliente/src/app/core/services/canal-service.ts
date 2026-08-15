@@ -13,7 +13,7 @@ export class CanalService {
     this.hostBase = environment.apiUrl + '/canales/';
   }
 
-  getAllCanales() {
+  obtenerCanales() {
     return this.http.get<CanalResponse[]>(`${this.hostBase}`);
   }
 }

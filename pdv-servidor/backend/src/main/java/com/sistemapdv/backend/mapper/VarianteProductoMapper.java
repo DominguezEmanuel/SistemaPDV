@@ -13,6 +13,7 @@ public class VarianteProductoMapper {
         VarianteProducto variante = VarianteProducto.builder()
                 .nombre(dto.getNombre())
                 .codigoBarras(dto.getCodigoBarras())
+                .codigoInterno(" ")
                 .activo(true)
                 .producto(producto)
                 .build();
@@ -24,9 +25,12 @@ public class VarianteProductoMapper {
                 .idVariante(variante.getIdVariante())
                 .nombre(variante.getNombre())
                 .codigoBarras(variante.getCodigoBarras())
+                .codigoInterno(variante.getCodigoInterno())
                 .activo(variante.getActivo())
                 .idProducto(variante.getProducto().getIdProducto())
                 .nombreProducto(variante.getProducto().getNombre())
+                .precioMinorista(variante.getProducto().getPrecioMinorista())
+                .precioMayorista(variante.getProducto().getPrecioMayorista())
                 .build();
     }
 }

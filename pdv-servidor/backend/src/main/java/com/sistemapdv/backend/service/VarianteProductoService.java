@@ -47,7 +47,10 @@ public class VarianteProductoService {
     public VarianteProductoResponseDTO createVariant(VarianteProductoRequestDTO request){
         Producto producto = productoRepository.findById(request.getIdProducto())
                 .orElseThrow(()-> new ResourceNotFoundException(
-                        "Producto con id " + request.getIdProducto() + " no encontrado"));
+                        "Producto con ID " + request.getIdProducto() + " no encontrado"));
+
+        if(!producto.getTieneVariantes())
+            throw new IllegalArgumentException("Este producto está configurado para no aceptar variantes");
 
         if(request.getCodigoBarras() != null)
             if(varianteProductoRepository.existsByCodigoBarras(request.getCodigoBarras()))
@@ -59,7 +62,13 @@ public class VarianteProductoService {
 
         varianteProductoRepository.save(variante);
 
+        variante.setCodigoInterno(generarCodigoInterno(variante.getIdVariante()));
+
         return varianteMapper.toResponseDTO(variante);
+    }
+
+    public String generarCodigoInterno(Integer idVariante){
+        return String.format("VAR-%06d", idVariante);
     }
 
     @Transactional
@@ -70,6 +79,11 @@ public class VarianteProductoService {
                 .orElseThrow(()->
                         new ResourceNotFoundException("Variante con ID " + idVariante +
                                 " no encontrada"));
+
+        if(!productoRepository.existsById(request.getIdProducto()))
+            throw new ResourceNotFoundException("Producto con ID " +
+                    request.getIdProducto() + " no encontrado");
+
         // Verificar que la variante le sigue perteneciendo al mismo producto
         if(!variante.getProducto().getIdProducto().equals(request.getIdProducto()))
             throw new IllegalArgumentException("No es posible cambiar el producto asociado a la variante");
@@ -105,6 +119,14 @@ public class VarianteProductoService {
         VarianteProducto variante = varianteProductoRepository.findByCodigoBarras(codigoBarras)
                 .orElseThrow(()-> new ResourceNotFoundException("Variante con código "
                 + codigoBarras + " no encontrada"));
+        return varianteMapper.toResponseDTO(variante);
+    }
+
+    @Transactional(readOnly = true)
+    public VarianteProductoResponseDTO findByInternCode(String codigoInterno){
+        VarianteProducto variante = varianteProductoRepository.findByCodigoInterno(codigoInterno)
+                .orElseThrow(()-> new ResourceNotFoundException("Variante con código "
+                + codigoInterno + " no encontrada"));
         return varianteMapper.toResponseDTO(variante);
     }
 }

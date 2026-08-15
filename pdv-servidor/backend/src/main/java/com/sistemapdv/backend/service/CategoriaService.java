@@ -23,25 +23,27 @@ public class CategoriaService {
         this.categoriaMapper = categoriaMapper;
     }
 
+    @Transactional(readOnly = true)
     public List<CategoriaDTO> findAllCategories(){
         List<Categoria> categorias = categoriaRepository.findAll();
-        List<CategoriaDTO> listadoCategorias = new ArrayList<CategoriaDTO>();
-        for (Categoria c: categorias){
-            listadoCategorias.add(categoriaMapper.toCategoriaDTO(c));
-        }
-        return listadoCategorias;
+        return categorias.stream()
+                .map(categoriaMapper::toCategoriaDTO)
+                .toList();
     }
 
+    @Transactional(readOnly = true)
     public CategoriaDTO findById(Integer id){
         Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Categoria no encontrada"));
+                .orElseThrow(()-> new ResourceNotFoundException("Categoria con ID " +
+                        id + " no encontrada"));
         return categoriaMapper.toCategoriaDTO(categoria);
     }
 
     @Transactional
-    public CategoriaDTO addCategory(CategoriaDTO request){
-        if(categoriaRepository.existsByNombre(request.getNombre()))
-            throw new ResourceDuplicatedException("El nombre de categoria ya existe");
+    public CategoriaDTO createCategory(CategoriaDTO request){
+        if(categoriaRepository.existsByNombreIgnoreCase(request.getNombre()))
+            throw new ResourceDuplicatedException("El nombre " + request.getNombre() +
+                    " ya se encuentra registrado");
 
         Categoria categoria = categoriaMapper.toCategoria(request);
 

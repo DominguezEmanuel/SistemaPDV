@@ -36,6 +36,9 @@ public class Producto {
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 
+    @Column(name = "tiene_variantes", nullable = false)
+    private Boolean tieneVariantes;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_categoria", nullable = false)
     private Categoria categoria;

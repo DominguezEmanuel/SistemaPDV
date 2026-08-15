@@ -23,7 +23,6 @@ import { CategoriaResponse } from '../../../models/Categoria';
 import { CategoriaService } from '../../../core/services/categoria-service';
 import { ProductoService } from '../../../core/services/producto-service';
 import { ToastrService } from 'ngx-toastr';
-//import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-producto-form',
@@ -62,6 +61,24 @@ export class ProductoForm implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.cargarCategorias();
+    this.limpiarCodigoBarras();
+  }
+
+  limpiarCodigoBarras(): void {
+    this.formProducto
+      .get('tieneVariantes')
+      ?.valueChanges.subscribe((tieneVariantes) => {
+        const codigoBarras = this.formProducto.get('codigoBarras');
+
+        if (tieneVariantes === false) {
+          // Producto sin variantes
+          codigoBarras?.enable();
+        } else if (tieneVariantes === true) {
+          // Producto con variantes
+          codigoBarras?.reset();
+          codigoBarras?.disable();
+        }
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -92,7 +109,11 @@ export class ProductoForm implements OnInit, OnChanges {
       precioMinorista: this.producto.precioMinorista,
       precioMayorista: this.producto.precioMayorista,
       minimoMayorista: this.producto.minimoMayorista,
+      tieneVariantes: this.producto.tieneVariantes,
     });
+
+    // Deshabilitar el campo tieneVariantes en modo edición
+    this.formProducto.get('tieneVariantes')?.disable();
 
     // Guardamos la imagen actual del producto
     this.imagenOriginal = this.producto.imagen;
@@ -116,7 +137,11 @@ export class ProductoForm implements OnInit, OnChanges {
       precioMinorista: null,
       precioMayorista: null,
       minimoMayorista: null,
+      tieneVariantes: false,
     });
+
+    // Re-habilitar el campo tieneVariantes para modo crear
+    this.formProducto.get('tieneVariantes')?.enable();
 
     this.formProducto.markAsPristine();
     this.formProducto.markAsUntouched();
@@ -163,12 +188,17 @@ export class ProductoForm implements OnInit, OnChanges {
           Validators.pattern(/^[0-9]+$/),
         ],
       }),
+      tieneVariantes: new FormControl<boolean>(false, {
+        validators: [Validators.required],
+      }),
+      codigoBarras: new FormControl<string>('', {
+        nonNullable: true,
+        validators: [Validators.maxLength(50)],
+      }),
     };
   }
 
   procesarFormulario(): void {
-    // Si acción es == registrar
-
     if (this.formProducto.invalid) {
       this.formProducto.markAllAsTouched();
       return;
@@ -181,16 +211,15 @@ export class ProductoForm implements OnInit, OnChanges {
     }
 
     this.guardando = true;
-    //this.spinner.show();
 
     const formData = this.crearFormData();
 
-    /* Mostrar contenido de FormData para depuración
+    /* Mostrar contenido de FormData para depuración */
     const formDataDebug: { [key: string]: any } = {};
     formData.forEach((value, key) => {
       formDataDebug[key] = value instanceof File ? value.name : value;
     });
-    console.log('FormData contenido:', formDataDebug);*/
+    console.log('FormData contenido:', formDataDebug);
 
     if (this.modo === 'crear') {
       this.crearProducto(formData);
@@ -205,7 +234,6 @@ export class ProductoForm implements OnInit, OnChanges {
       .pipe(
         finalize(() => {
           this.guardando = false;
-          //this.spinner.hide();
         }),
       )
       .subscribe({
@@ -229,7 +257,6 @@ export class ProductoForm implements OnInit, OnChanges {
       .pipe(
         finalize(() => {
           this.guardando = false;
-          //this.spinner.hide();
         }),
       )
       .subscribe({
@@ -250,11 +277,16 @@ export class ProductoForm implements OnInit, OnChanges {
   crearFormData(): FormData {
     const formData = new FormData();
 
-    formData.append('nombre', this.formProducto.value.nombre);
-    formData.append('precioMinorista', this.formProducto.value.precioMinorista);
-    formData.append('precioMayorista', this.formProducto.value.precioMayorista);
-    formData.append('minimoMayorista', this.formProducto.value.minimoMayorista);
-    formData.append('idCategoria', this.formProducto.value.categoria);
+    // Usar getRawValue() para incluir controles deshabilitados (como tieneVariantes en edición)
+    const formValues = this.formProducto.getRawValue();
+
+    formData.append('nombre', formValues.nombre);
+    formData.append('precioMinorista', formValues.precioMinorista);
+    formData.append('precioMayorista', formValues.precioMayorista);
+    formData.append('minimoMayorista', formValues.minimoMayorista);
+    formData.append('idCategoria', formValues.categoria);
+    formData.append('tieneVariantes', formValues.tieneVariantes);
+    formData.append('codigoBarras', formValues.codigoBarras);
     // Solamente enviar la imagen si el usuario seleccionó una nueva
     if (this.imagenSeleccionada) {
       formData.append('imagen', this.imagenSeleccionada);

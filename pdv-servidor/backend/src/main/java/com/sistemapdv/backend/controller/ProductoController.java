@@ -5,9 +5,6 @@ import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
 import com.sistemapdv.backend.dto.response.VarianteProductoResponseDTO;
 import com.sistemapdv.backend.service.ProductoService;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +17,6 @@ import java.util.List;
 @RequestMapping("/api/productos")
 public class ProductoController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductoController.class);
     private final ProductoService productoService;
 
     public ProductoController(ProductoService productoService) {
