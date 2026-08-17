@@ -9,11 +9,13 @@ import com.sistemapdv.backend.exception.ResourceNotFoundException;
 import com.sistemapdv.backend.mapper.VarianteProductoMapper;
 import com.sistemapdv.backend.repository.ProductoRepository;
 import com.sistemapdv.backend.repository.VarianteProductoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class VarianteProductoService {
 
@@ -83,6 +85,13 @@ public class VarianteProductoService {
         if(!productoRepository.existsById(request.getIdProducto()))
             throw new ResourceNotFoundException("Producto con ID " +
                     request.getIdProducto() + " no encontrado");
+
+
+        log.info("Actualizando variante ID: {}", idVariante);
+        log.info("Producto asociado actualmente a la variante: {}",
+                variante.getProducto().getIdProducto());
+        log.info("Producto recibido en la request: {}",
+                request.getIdProducto());
 
         // Verificar que la variante le sigue perteneciendo al mismo producto
         if(!variante.getProducto().getIdProducto().equals(request.getIdProducto()))

@@ -211,12 +211,12 @@ export class ProductoForm implements OnInit, OnChanges {
 
     const formData = this.crearFormData();
 
-    /* Mostrar contenido de FormData para depuración */
+    /* Mostrar contenido de FormData para depuración
     const formDataDebug: { [key: string]: any } = {};
     formData.forEach((value, key) => {
       formDataDebug[key] = value instanceof File ? value.name : value;
     });
-    console.log('FormData contenido:', formDataDebug);
+    console.log('FormData contenido:', formDataDebug);*/
 
     if (this.modo === 'crear') {
       this.crearProducto(formData);

@@ -54,29 +54,6 @@
               />
             </div>
           </div>
-          <div class="mv-field">
-            <label>¿Posee variantes?</label>
-            <div class="mv-value">
-              {{
-                producto.tieneVariantes
-                  ? "Producto con variantes"
-                  : "Producto sin variantes"
-              }}
-            </div>
-          </div>
-          <div class="mv-field">
-            <label>Estado</label>
-            <div class="mv-value">
-              <span
-                class="mv-badge"
-                [class.activo]="producto.activo == true"
-                [class.inactivo]="producto.activo == false"
-              >
-                <span class="dot"></span>
-                {{ producto.activo === true ? "Activo" : "Inactivo" }}
-              </span>
-            </div>
-          </div>
         </div>
         <div class="mv-details-column">
           <div class="mv-field">
@@ -106,6 +83,19 @@
           <div class="mv-field">
             <label>Cantidad mínima mayorista</label>
             <div class="mv-value">{{ producto.minimoMayorista }} unidades</div>
+          </div>
+          <div class="mv-field">
+            <label>Estado</label>
+            <div class="mv-value">
+              <span
+                class="mv-badge"
+                [class.activo]="producto.activo == true"
+                [class.inactivo]="producto.activo == false"
+              >
+                <span class="dot"></span>
+                {{ producto.activo === true ? "Activo" : "Inactivo" }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -196,9 +186,9 @@
                   [title]="variante.activo ? 'Deshabilitar' : 'Habilitar'"
                 >
                   @if (variante.activo) {
-                    <i class="bi bi-ban"></i>
+                  <i class="bi bi-ban"></i>
                   } @else {
-                    <i class="bi bi-check2-circle"></i>
+                  <i class="bi bi-check2-circle"></i>
                   }
                 </button>
               </div>
@@ -230,9 +220,7 @@
           <div class="mv-stock-label">Variantes cargadas</div>
         </div>
         <div class="mv-stock-box">
-          <div class="mv-stock-num">
-            {{ canales.length }}
-          </div>
+          <div class="mv-stock-num">{{ canales.length }}</div>
           <div class="mv-stock-label">Canales de venta</div>
         </div>
       </div>

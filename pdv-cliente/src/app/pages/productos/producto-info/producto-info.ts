@@ -32,8 +32,8 @@ type TabId = 'informacion' | 'variantes' | 'stock' | 'comercial';
 @Component({
   selector: 'app-product-view-modal',
   imports: [CommonModule, VarianteForm],
-  templateUrl: './product-view-modal.component.html',
-  styleUrls: ['./product-view-modal.component.css'],
+  templateUrl: './producto-info.html',
+  styleUrls: ['./producto-info.css'],
 })
 export class ProductViewModalComponent implements OnChanges {
   // Estructuras utilizadas
@@ -87,7 +87,6 @@ export class ProductViewModalComponent implements OnChanges {
     if (changes['producto'] && this.producto) {
       this.resetearStock();
       this.cargarVariantes();
-      //console.log('HOLA MUNDOOO');
       if (this.tabActiva === 'stock' || this.tabActiva === 'comercial') {
         this.cargarCanales();
       }
@@ -138,7 +137,7 @@ export class ProductViewModalComponent implements OnChanges {
     variante: VarianteResponse;
     accion: 'crear' | 'editar';
   }): void {
-    this.modalFormularioVariante = false;
+    //this.modalFormularioVariante = false;
 
     this.cargarVariantes();
 
@@ -379,6 +378,7 @@ export class ProductViewModalComponent implements OnChanges {
     evento.stopPropagation();
   }
 
+  // Limpia todas las variables/estructuras utilizadas en este componente
   limpiarDatos(): void {
     this.variantes = [];
     this.varianteSeleccionadaId = null;

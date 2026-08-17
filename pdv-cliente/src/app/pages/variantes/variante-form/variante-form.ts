@@ -38,7 +38,7 @@ export class VarianteForm implements OnChanges {
   }>();
 
   formVariante!: FormGroup;
-  nuevaVariante: VarianteRequest | null = null;
+  varianteForm: VarianteRequest | null = null;
   modo: 'crear' | 'editar' = 'crear';
   guardando = false;
 
@@ -52,6 +52,7 @@ export class VarianteForm implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && !changes['visible'].currentValue) {
+      this.resetearFormulario();
     }
 
     if (changes['variante']) {
@@ -103,16 +104,41 @@ export class VarianteForm implements OnChanges {
 
     this.asignarValores();
 
-    console.log('Variante: ', this.nuevaVariante);
+    console.log('Variante: ', this.varianteForm);
 
     if (this.modo === 'crear') {
       this.crearVariante();
+    } else {
+      this.actualizarVariante();
     }
   }
 
   crearVariante(): void {
     this.varianteService
-      .crearVariante(this.nuevaVariante)
+      .crearVariante(this.varianteForm)
+      .pipe(
+        finalize(() => {
+          this.guardando = false;
+        }),
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Variante guardada: ', response);
+          this.varianteGuardada.emit({ variante: response, accion: 'crear' });
+          this.cerrarModal();
+        },
+        error: (error) => {
+          this.toastr.error(error.error.mensaje, 'Error');
+        },
+      });
+  }
+
+  actualizarVariante(): void {
+    this.varianteService
+      .actualizarProducto(
+        this.variante?.idVariante ? this.variante.idVariante : 0,
+        this.varianteForm,
+      )
       .pipe(
         finalize(() => {
           this.guardando = false;
@@ -133,7 +159,7 @@ export class VarianteForm implements OnChanges {
   asignarValores(): void {
     const valores = this.formVariante.getRawValue();
 
-    this.nuevaVariante = {
+    this.varianteForm = {
       nombre: valores.nombre,
       codigoBarras: valores.codigoBarras,
       idProducto: this.producto?.idProducto ? this.producto.idProducto : 0,
@@ -145,6 +171,7 @@ export class VarianteForm implements OnChanges {
     this.cerrar.emit();
   }
 
+  // Limpia el formulario de variante
   private resetearFormulario(): void {
     this.formVariante.reset({
       nombre: '',
@@ -153,7 +180,7 @@ export class VarianteForm implements OnChanges {
 
     this.formVariante.markAsPristine();
     this.formVariante.markAsUntouched();
-    this.nuevaVariante = null;
+    this.varianteForm = null;
     this.guardando = false;
     this.modo = 'crear';
   }

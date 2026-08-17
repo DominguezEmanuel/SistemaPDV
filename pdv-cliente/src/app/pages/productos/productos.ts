@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AlertService } from '../../core/services/alert-service';
 import { CategoriaResponse } from '../../models/Categoria';
 import { ProductoResponse } from '../../models/Producto';
-import { ProductViewModalComponent } from './product-view-modal/product-view-modal.component';
+import { ProductViewModalComponent } from './producto-info/producto-info';
 import { ProductoForm } from './producto-form/producto-form';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 

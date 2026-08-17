@@ -10,18 +10,25 @@ export class VarianteService {
   private hostBase!: string;
 
   constructor(private http: HttpClient) {
-    this.hostBase = environment.apiUrl + '/productos/';
+    this.hostBase = environment.apiUrl + '/variantes/';
   }
 
   obtenerVariantesPorProducto(idProducto: number) {
     return this.http.get<VarianteResponse[]>(
-      `${this.hostBase}${idProducto}/variantes`,
+      `${environment.apiUrl}/productos/${idProducto}/variantes`,
     );
   }
 
   crearVariante(request: VarianteRequest | null): Observable<VarianteResponse> {
-    return this.http.post<VarianteResponse>(
-      `${environment.apiUrl}/variantes/`,
+    return this.http.post<VarianteResponse>(`${this.hostBase}`, request);
+  }
+
+  actualizarProducto(
+    idVariante: number,
+    request: VarianteRequest | null,
+  ): Observable<VarianteResponse> {
+    return this.http.put<VarianteResponse>(
+      `${this.hostBase}${idVariante}`,
       request,
     );
   }
