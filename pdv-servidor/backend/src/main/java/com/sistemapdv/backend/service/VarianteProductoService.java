@@ -75,14 +75,14 @@ public class VarianteProductoService {
 
     @Transactional
     public VarianteProductoResponseDTO updateVariant(Integer idVariante,
-                                                     VarianteProductoRequestDTO request){
+                                                     VarianteProductoRequestDTO request) {
         // Validar que exista el ID de variante
         VarianteProducto variante = varianteProductoRepository.findById(idVariante)
-                .orElseThrow(()->
+                .orElseThrow(() ->
                         new ResourceNotFoundException("Variante con ID " + idVariante +
                                 " no encontrada"));
 
-        if(!productoRepository.existsById(request.getIdProducto()))
+        if (!productoRepository.existsById(request.getIdProducto()))
             throw new ResourceNotFoundException("Producto con ID " +
                     request.getIdProducto() + " no encontrado");
 
@@ -94,14 +94,19 @@ public class VarianteProductoService {
                 request.getIdProducto());
 
         // Verificar que la variante le sigue perteneciendo al mismo producto
-        if(!variante.getProducto().getIdProducto().equals(request.getIdProducto()))
+        if (!variante.getProducto().getIdProducto().equals(request.getIdProducto()))
             throw new IllegalArgumentException("No es posible cambiar el producto asociado a la variante");
 
+        log.info("Código de barras nuevo {}", request.getCodigoBarras());
+        log.info("Código de barras actual {}", variante.getCodigoBarras());
+
         // Verificar que el código de barras no se encuentre registrado
-        if(request.getCodigoBarras() != null)
-            if(varianteProductoRepository.existsByCodigoBarras(request.getCodigoBarras()))
+        if (request.getCodigoBarras() != null)
+            if (varianteProductoRepository.existsByCodigoBarras(request.getCodigoBarras())
+                    && !variante.getCodigoBarras().equals(request.getCodigoBarras())) {
                 throw new ResourceDuplicatedException("El código de barras " +
                         request.getCodigoBarras() + " ya se encuentra registrado");
+            }
 
         variante.setNombre(request.getNombre().trim());
         variante.setCodigoBarras(request.getCodigoBarras());

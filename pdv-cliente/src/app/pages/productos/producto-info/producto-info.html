@@ -184,6 +184,7 @@
                   [class.mv-positivo]="!variante.activo"
                   [class.mv-negativo]="variante.activo"
                   [title]="variante.activo ? 'Deshabilitar' : 'Habilitar'"
+                  (click)="cambiarEstadoVariante(variante.idVariante, variante.nombre, !variante.activo)"
                 >
                   @if (variante.activo) {
                   <i class="bi bi-ban"></i>

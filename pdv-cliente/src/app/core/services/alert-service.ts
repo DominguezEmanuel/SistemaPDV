@@ -46,4 +46,26 @@ export class AlertService {
       },
     });
   }
+
+  confirmarCambioEstadoVariante(
+    nombre: string,
+    nuevoEstado: boolean,
+  ): Promise<any> {
+    this.texto = nuevoEstado
+      ? `La variante "${nombre}" estará habilitada para nuevas ventas`
+      : `La variante "${nombre}" dejará de estar disponible para nuevas ventas`;
+
+    return Swal.fire({
+      title: `${nuevoEstado ? '¿Habilitar Variante?' : '¿Deshabilitar Variante?'}`,
+      text: this.texto,
+      icon: nuevoEstado ? 'info' : 'warning',
+      showCancelButton: true,
+      confirmButtonText: `Sí, ${nuevoEstado ? 'habilitar' : 'deshabilitar'}`,
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: `btn btn-${nuevoEstado ? 'info' : 'warning'}`,
+        cancelButton: 'btn btn-danger',
+      },
+    });
+  }
 }

@@ -23,13 +23,26 @@ export class VarianteService {
     return this.http.post<VarianteResponse>(`${this.hostBase}`, request);
   }
 
-  actualizarProducto(
+  actualizarVariante(
     idVariante: number,
     request: VarianteRequest | null,
   ): Observable<VarianteResponse> {
     return this.http.put<VarianteResponse>(
       `${this.hostBase}${idVariante}`,
       request,
+    );
+  }
+
+  cambiarEstadoVariante(
+    idVariante: number,
+    activo: boolean,
+  ): Observable<VarianteResponse> {
+    const params = { activo: activo };
+
+    return this.http.patch<VarianteResponse>(
+      `${this.hostBase}${idVariante}`,
+      {},
+      { params },
     );
   }
 }

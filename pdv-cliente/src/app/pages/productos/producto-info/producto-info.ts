@@ -18,6 +18,7 @@ import { CanalService } from '../../../core/services/canal-service';
 import { StockService } from '../../../core/services/stock-service';
 import { ProductoCanalService } from '../../../core/services/producto-canal-service';
 import { ToastrService } from 'ngx-toastr';
+import { AlertService } from '../../../core/services/alert-service';
 
 import { VarianteForm } from '../../variantes/variante-form/variante-form';
 
@@ -81,6 +82,7 @@ export class ProductViewModalComponent implements OnChanges {
     private stockService: StockService,
     private productoCanalService: ProductoCanalService,
     private toastr: ToastrService,
+    private alertService: AlertService,
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -137,8 +139,6 @@ export class ProductViewModalComponent implements OnChanges {
     variante: VarianteResponse;
     accion: 'crear' | 'editar';
   }): void {
-    //this.modalFormularioVariante = false;
-
     this.cargarVariantes();
 
     if (event.accion === 'crear') {
@@ -347,6 +347,33 @@ export class ProductViewModalComponent implements OnChanges {
       this.cargarCanales();
       this.cargarProductosCanales();
     }
+  }
+
+  cambiarEstadoVariante(
+    idVariante: number,
+    nombre: string,
+    activo: boolean,
+  ): void {
+    this.alertService
+      .confirmarCambioEstadoVariante(nombre, activo)
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.varianteService
+            .cambiarEstadoVariante(idVariante, activo)
+            .subscribe({
+              next: (response) => {
+                this.toastr.success(
+                  'Estado de la variante actualizado correctamente',
+                  'Éxito',
+                );
+                this.cargarVariantes();
+              },
+              error: (error) => {
+                this.toastr.error(error.error.mensaje, 'Error');
+              },
+            });
+        }
+      });
   }
 
   private actualizarStockTotalSiEsNecesario(): void {

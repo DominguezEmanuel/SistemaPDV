@@ -42,6 +42,11 @@ export class VarianteForm implements OnChanges {
   modo: 'crear' | 'editar' = 'crear';
   guardando = false;
 
+  private valoresIniciales: {
+    nombre: string;
+    codigoBarras: string | null;
+  } | null = null;
+
   constructor(
     private fb: FormBuilder,
     private varianteService: VarianteService,
@@ -88,10 +93,16 @@ export class VarianteForm implements OnChanges {
 
     this.modo = 'editar';
 
-    this.formVariante.patchValue({
+    const datosVariante = {
       nombre: this.variante.nombre,
       codigoBarras: this.variante.codigoBarras,
-    });
+    };
+
+    this.formVariante.patchValue(datosVariante);
+
+    this.valoresIniciales = { ...datosVariante };
+
+    this.formVariante.markAsPristine();
   }
 
   procesarFormulario(): void {
@@ -100,11 +111,17 @@ export class VarianteForm implements OnChanges {
       return;
     }
 
+    if (this.modo === 'editar' && !this.cambiosEnFormulario()) {
+      this.toastr.info(
+        'No se realizaron cambios en la variante',
+        'Sin cambios',
+      );
+      return;
+    }
+
     this.guardando = true;
 
     this.asignarValores();
-
-    console.log('Variante: ', this.varianteForm);
 
     if (this.modo === 'crear') {
       this.crearVariante();
@@ -135,7 +152,7 @@ export class VarianteForm implements OnChanges {
 
   actualizarVariante(): void {
     this.varianteService
-      .actualizarProducto(
+      .actualizarVariante(
         this.variante?.idVariante ? this.variante.idVariante : 0,
         this.varianteForm,
       )
@@ -146,8 +163,7 @@ export class VarianteForm implements OnChanges {
       )
       .subscribe({
         next: (response) => {
-          console.log('Variante guardada: ', response);
-          this.varianteGuardada.emit({ variante: response, accion: 'crear' });
+          this.varianteGuardada.emit({ variante: response, accion: 'editar' });
           this.cerrarModal();
         },
         error: (error) => {
@@ -164,6 +180,19 @@ export class VarianteForm implements OnChanges {
       codigoBarras: valores.codigoBarras,
       idProducto: this.producto?.idProducto ? this.producto.idProducto : 0,
     };
+  }
+
+  private cambiosEnFormulario(): boolean {
+    if (!this.valoresIniciales) {
+      return false;
+    }
+
+    const valoresActuales = this.formVariante.getRawValue();
+
+    return (
+      valoresActuales.nombre !== this.valoresIniciales.nombre ||
+      valoresActuales.codigoBarras !== this.valoresIniciales.codigoBarras
+    );
   }
 
   cerrarModal(): void {
