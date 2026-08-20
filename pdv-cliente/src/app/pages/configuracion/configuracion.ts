@@ -3,33 +3,41 @@ import { CommonModule } from '@angular/common';
 
 import { UsuarioService } from '../../core/services/usuario-service';
 import { Auth } from '../../core/services/auth';
+import { CanalService } from '../../core/services/canal-service';
 
 import { UsuarioResponse } from '../../models/Usuario';
+import { CanalResponse } from '../../models/Canal';
 import { UsuarioForm } from '../usuarios/usuario-form/usuario-form';
+import { CanalForm } from '../canales/canal-form/canal-form';
 
 import { ToastrService } from 'ngx-toastr';
 import { AlertService } from '../../core/services/alert-service';
 
 @Component({
   selector: 'app-configuracion',
-  imports: [CommonModule, UsuarioForm],
+  imports: [CommonModule, UsuarioForm, CanalForm],
   templateUrl: './configuracion.html',
   styleUrl: './configuracion.css',
 })
 export class Configuracion implements OnInit {
   usuarios: UsuarioResponse[] = [];
+  canales: CanalResponse[] = [];
   usuarioLogueado!: UsuarioResponse;
   usuarioSeleccionado: UsuarioResponse | null = null;
+  canalSeleccionado: CanalResponse | null = null;
   modalVisible = false;
+  formularioCanal = false;
   constructor(
     private usuarioService: UsuarioService,
     private authService: Auth,
+    private canalService: CanalService,
     private toastr: ToastrService,
     private alertService: AlertService,
   ) {}
 
   ngOnInit() {
     this.cargarUsuarios();
+    this.cargarCanalesVentas();
   }
 
   abrirModal(usuario?: UsuarioResponse): void {
@@ -41,19 +49,46 @@ export class Configuracion implements OnInit {
     this.modalVisible = true;
   }
 
+  verFormularioCanal(canal?: CanalResponse): void {
+    if (canal) {
+      this.canalSeleccionado = canal;
+    } else {
+      this.canalSeleccionado = null;
+    }
+    this.formularioCanal = true;
+  }
+
   cerrarModal(): void {
-    this.modalVisible = false;
-    this.usuarioSeleccionado = null;
+    if (this.modalVisible) {
+      this.modalVisible = false;
+      this.usuarioSeleccionado = null;
+    } else {
+      this.formularioCanal = false;
+      this.canalSeleccionado = null;
+    }
   }
 
   cargarUsuarios(): void {
     this.usuarioService.getAllUsers().subscribe({
       next: (response) => {
-        //console.log('Usuarios obtenidos:', response);
+        console.log('Usuarios obtenidos:', response);
         this.usuarios = response;
       },
       error: (error) => {
-        this.toastr.error('Error al obtener usuarios');
+        console.log('Error', error);
+        this.toastr.error(error.message, 'Error');
+      },
+    });
+  }
+
+  cargarCanalesVentas(): void {
+    this.canalService.obtenerCanales().subscribe({
+      next: (response) => {
+        console.log('Canales obtenidos: ', response);
+        this.canales = response;
+      },
+      error: (error) => {
+        this.toastr.error(error.message, 'Error');
       },
     });
   }
@@ -80,6 +115,22 @@ export class Configuracion implements OnInit {
     this.modalVisible = false;
     this.cargarUsuarios();
     this.toastr.success('Usuario creado correctamente', 'Usuario creado');
+  }
+
+  onCanalGuardado(event: {
+    canal: CanalResponse;
+    accion: 'crear' | 'editar';
+  }): void {
+    this.cargarCanalesVentas();
+
+    if (event.accion === 'crear') {
+      this.toastr.success('El canal se creó correctamente', 'Canal creado');
+    } else {
+      this.toastr.success(
+        'Los cambios del canal se guardaron correctamente',
+        'Canal actualizado',
+      );
+    }
   }
 
   cambiarEstadoUsuario(username: string, activo: boolean): void {

@@ -74,14 +74,14 @@
     Usuarios del sistema
   </div>
 
-  <div class="usuarios-card">
-    <div class="usuarios-toolbar">
+  <div class="section-card">
+    <div class="section-toolbar">
       <div class="search-box">
         <i class="bi bi-search"></i>
         <input type="text" placeholder="Buscar usuario..." />
       </div>
       <button
-        class="btn-nuevo-usuario"
+        class="btn-nuevo-registro"
         (click)="abrirModal()"
         type="button"
         title="Agregar usuario"
@@ -92,7 +92,7 @@
     </div>
 
     <div style="overflow-x: auto">
-      <table class="tabla-usuarios">
+      <table class="tabla-registros">
         <thead>
           <tr>
             <th class="text-center">ID</th>
@@ -106,12 +106,14 @@
         <tbody>
           <tr *ngFor="let usuario of usuarios">
             <td class="id-cell text-center"># {{ usuario.idUsuario }}</td>
-            <td>{{usuario.username}}</td>
-            <td>
+            <td class="text-center u-username">{{usuario.username}}</td>
+            <td class="text-center">
               <div class="user-cell">
+                <!-- Avatar Usuario -->
                 <div class="mini-avatar">
                   {{ getInitials(usuario.nombre, usuario.apellido) }}
                 </div>
+                <!-- Nombre de Usuario -->
                 <div>
                   <div class="u-nombre">
                     {{usuario.nombre}} {{usuario.apellido}}
@@ -168,27 +170,64 @@
                   <i class="bi bi-check2-circle"></i>
                   }
                 </button>
-                <!--<button
-                  *ngIf="usuario.activo == true"
-                  class="btn-accion deshabilitar"
-                  title="Deshabilitar"
-                  (click)="changeUserStatus(usuario.username, false)"
-                >
-                  <i class="bi bi-ban"></i>
-                </button>-->
-                <!-- HABILITAR -->
-                <!--<button
-                  *ngIf="usuario.activo == false"
-                  class="btn-accion habilitar"
-                  title="Habilitar"
-                  (click)="changeUserStatus(usuario.username, true)"
-                >
-                  <i class="bi bi-check2-circle"></i>
-                </button>-->
               </div>
             </td>
-            <td *ngIf="usuario.username === userLogged()">
+            <td class="text-center" *ngIf="usuario.username === userLogged()">
               <span class="badge-pill activo">En línea</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== 3. CANALES DE VENTA ===== -->
+  <div class="section-label">
+    <span class="step-num">3</span>
+    Canales de Venta
+  </div>
+
+  <div class="section-card">
+    <div class="section-toolbar">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Buscar canal..." />
+      </div>
+      <button
+        class="btn-nuevo-registro"
+        type="button"
+        title="Agregar canal"
+        (click)="verFormularioCanal()"
+      >
+        <i class="bi bi-house-add-fill"></i>
+        Nuevo canal
+      </button>
+    </div>
+
+    <div style="overflow-x: auto">
+      <table class="tabla-registros">
+        <thead>
+          <tr>
+            <th class="text-center">ID</th>
+            <th class="text-center">Nombre del Canal</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let canal of canales">
+            <td class="id-cell text-center"># {{ canal.idCanalVenta }}</td>
+            <td class="text-center canal-nombre">{{ canal.nombre }}</td>
+            <td class="text-center">
+              <div class="acciones-cell">
+                <button
+                  class="btn-accion editar"
+                  title="Modificar"
+                  type="button"
+                  (click)="verFormularioCanal(canal)"
+                >
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -204,3 +243,10 @@
   (usuarioCreado)="onUsuarioCreado($event)"
 >
 </app-usuario-form>
+
+<app-canal-form
+  [canal]="canalSeleccionado"
+  [visible]="formularioCanal"
+  (cerrar)="cerrarModal()"
+  (canalGuardado)="onCanalGuardado($event)"
+></app-canal-form>

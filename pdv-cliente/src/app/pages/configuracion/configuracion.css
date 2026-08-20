@@ -177,14 +177,14 @@
 }
 
 /* ===== TABLA USUARIOS ===== */
-.usuarios-card {
+.section-card {
   background: #ffffff;
   border: 1px solid #e4edf3;
   border-radius: 20px;
   padding: 26px 28px 12px;
   box-shadow: 0 10px 30px -18px rgba(28, 90, 133, 0.2);
 }
-.usuarios-toolbar {
+.section-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -222,7 +222,7 @@
   background: #ffffff;
   box-shadow: 0 0 0 4px #dceef8;
 }
-.btn-nuevo-usuario {
+.btn-nuevo-registro {
   border: none;
   color: #ffffff;
   font-weight: 600;
@@ -239,18 +239,18 @@
     transform 0.15s ease,
     filter 0.15s ease;
 }
-.btn-nuevo-usuario:hover {
+.btn-nuevo-registro:hover {
   transform: translateY(-1px);
   filter: brightness(1.05);
   color: #ffffff;
 }
 
-.tabla-usuarios {
+.tabla-registros {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
 }
-.tabla-usuarios thead th {
+.tabla-registros thead th {
   text-align: left;
   font-size: 0.68rem;
   letter-spacing: 0.5px;
@@ -261,17 +261,17 @@
   border-bottom: 2px solid #e4edf3;
   white-space: nowrap;
 }
-.tabla-usuarios tbody td {
+.tabla-registros tbody td {
   padding: 14px;
   font-size: 0.87rem;
   color: #14181c;
   border-bottom: 1px solid #e4edf3;
   vertical-align: middle;
 }
-.tabla-usuarios tbody tr:hover {
+.tabla-registros tbody tr:hover {
   background: #f5fafd;
 }
-.tabla-usuarios tbody tr:last-child td {
+.tabla-registros tbody tr:last-child td {
   border-bottom: none;
 }
 
@@ -302,9 +302,14 @@
   font-weight: 600;
   font-size: 0.87rem;
 }
-.user-cell .u-username {
+.u-username {
   font-size: 0.74rem;
   color: #5b6670;
+}
+
+.canal-nombre {
+  font-weight: 600;
+  font-size: 0.87rem;
 }
 
 .badge-pill {
@@ -337,9 +342,11 @@
 
 .acciones-cell {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 6px;
 }
+
 .btn-accion {
   width: 32px;
   height: 32px;
@@ -370,11 +377,6 @@
   background: #e7f7ed;
   color: #2e9e5b;
   border-color: #2e9e5b;
-}
-.btn-accion.eliminar:hover {
-  background: #fbeaea;
-  color: #c13b3b;
-  border-color: #c13b3b;
 }
 
 @media (max-width: 576px) {
