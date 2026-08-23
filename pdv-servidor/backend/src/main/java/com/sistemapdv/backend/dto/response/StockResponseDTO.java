@@ -9,18 +9,19 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StockResponseDTO {
-
     private Integer idStock;
 
     private Integer cantidadDisponible;
-
     private Integer stockMinimo;
 
-    private Integer idVariante;
+    private Integer idProducto;
+    private String nombreProducto;
 
+    private Integer idVariante;
     private String nombreVariante;
+    private String codigoBarras;
+    private String codigoInterno;
 
     private Integer idCanalVenta;
-
-    private String canalVenta;
+    private String nombreCanalVenta;
 }

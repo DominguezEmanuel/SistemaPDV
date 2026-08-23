@@ -91,27 +91,27 @@
 }
 
 .btn-limpiar-filtros {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.65rem 1rem;
-  border-radius: 0.75rem;
-  border: 1px solid #3e93c7;
-  background-color: #fff;
-  color: #3e93c7;
+  gap: 7px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #e4edf3;
+  background: #ffffff;
+  color: #5b6670;
   font-weight: 600;
-  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
-.btn-limpiar-filtros:hover,
-.btn-limpiar-filtros:focus {
-  background-color: #3e93c7;
-  color: #fff;
+.btn-limpiar-filtros:hover {
+  background: #fbeaea;
+  color: #c13b3b;
+  border-color: #c13b3b;
 }
 
 .btn-nuevo-producto {

@@ -74,47 +74,54 @@ public class StockService {
 
     @Transactional(readOnly = true)
     public StockResponseDTO getStockByChannelAndVariant(Integer idCanal, Integer idVariante) {
-        // Verificar que exista el canal
-        if (!canalVentaRepository.existsById(idCanal))
-            throw new ResourceNotFoundException("Canal con ID " +
-                    idCanal + " no encontrado");
-        // Verificar que exista la variante
-        if (!varianteRepository.existsById(idVariante))
-            throw new ResourceNotFoundException("Variante con ID " +
-                    idVariante + " no encontrada");
+        // Verificar que exista la Variante
+        VarianteProducto variante = varianteRepository.findById(idVariante)
+                .orElseThrow(()-> new ResourceNotFoundException("Canal con ID " +
+                    idCanal + " no encontrado"));
+        // Verificar que exista la Canal
+        CanalVenta canal = canalVentaRepository.findById(idCanal)
+                .orElseThrow(()-> new ResourceNotFoundException("Variante con ID " +
+                    idVariante + " no encontrada"));
 
         Stock stock = stockRepository.findByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
                         idVariante, idCanal)
-                .orElseThrow(() -> new ResourceNotFoundException("Stock no encontrado para " +
-                        "idVariante " + idVariante + " idCanal " + idCanal));
+                .orElseThrow(() -> new ResourceNotFoundException("Registro no encontrado para " +
+                        "variante " + variante.getNombre() + " y canal " + canal.getNombre()));
 
         return stockMapper.toResponseDTO(stock);
     }
 
     @Transactional
-    public StockResponseDTO addStock(StockRequestDTO request){
-        if(stockRepository.existsByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
-                request.getIdVariante(), request.getIdCanalVenta()))
-            throw new ResourceDuplicatedException("Ya existe un stock para esa variante y canal de venta");
+    public StockResponseDTO createStock(StockRequestDTO request){
 
         VarianteProducto variante = varianteRepository.findById(request.getIdVariante())
-                .orElseThrow(() -> new ResourceNotFoundException("Variante no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Variante con ID "
+                        + request.getIdVariante() + " no encontrada"));
 
         CanalVenta canal = canalVentaRepository.findById(request.getIdCanalVenta())
-                .orElseThrow(() -> new ResourceNotFoundException("Canal no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Canal con ID "
+                        + request.getIdCanalVenta() + " no encontrado"));
 
-        Stock nuevoStock = Stock.builder()
-                .cantidadDisponible(request.getCantidadDisponible())
-                .stockMinimo(request.getStockMinimo())
-                .varianteProducto(variante)
-                .canalVenta(canal)
-                .build();
+        /*if(request.getCantidadDisponible() < 1)
+            throw new IllegalArgumentException("La cantidad mínima disponible debe ser mayor o igual 1");
+
+        if(request.getStockMinimo() < 3)
+            throw new IllegalArgumentException("El stock mínimo no puede ser menor a 3");*/
+
+        // Validar que no exista la combinación Variante + Canal
+        if(stockRepository.existsByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
+                request.getIdVariante(), request.getIdCanalVenta()))
+            throw new ResourceDuplicatedException("Ya existe un stock para esta combinacion " +
+                    "de variante y canal de venta");
+
+        Stock nuevoStock = stockMapper.toStock(request, variante, canal);
 
         stockRepository.save(nuevoStock);
 
         return stockMapper.toResponseDTO(nuevoStock);
     }
 
+    /* De esto se encargará MovimientoStock
     @Transactional
     public StockResponseDTO editCantidadDisponible(Integer idStock, Integer nuevaCantidad){
         Stock stock = stockRepository.findById(idStock)
@@ -127,16 +134,16 @@ public class StockService {
         stock.setCantidadDisponible(nuevaCantidad);
 
         return stockMapper.toResponseDTO(stock);
-    }
+    }*/
 
     @Transactional
     public StockResponseDTO editStockMinimo(Integer idStock, Integer nuevoStockMinimo){
         Stock stock = stockRepository.findById(idStock)
-                .orElseThrow(()-> new ResourceNotFoundException("Stock con ID " +
+                .orElseThrow(()-> new ResourceNotFoundException("Registro de stock con ID " +
                         idStock + " no encontrado"));
 
-        if(nuevoStockMinimo < 0)
-            throw new IllegalArgumentException("El stock mínimo no puede ser menor a 0");
+        if(nuevoStockMinimo < 3)
+            throw new IllegalArgumentException("El stock mínimo no puede ser menor a 3");
 
         stock.setStockMinimo(nuevoStockMinimo);
 

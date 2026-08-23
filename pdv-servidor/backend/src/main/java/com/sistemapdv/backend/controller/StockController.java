@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/stocks")
+@RequestMapping("/api/stock")
 public class StockController {
 
     private final StockService stockService;
@@ -44,7 +44,6 @@ public class StockController {
         return stockService.getStocksByIdChannel(idCanal);
     }
 
-    // Posible cambio: usar @RequestParam para recibir ambos IDs
     @GetMapping("/canal/{idCanal}/variante/{idVariante}")
     public ResponseEntity<StockResponseDTO> getStockByChannelAndVariant(@PathVariable Integer idCanal,
                                                                         @PathVariable Integer idVariante){
@@ -53,18 +52,19 @@ public class StockController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<StockResponseDTO> addStock(
+    public ResponseEntity<StockResponseDTO> createStock(
             @Valid @RequestBody StockRequestDTO request){
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(stockService.addStock(request));
+                .body(stockService.createStock(request));
     }
 
+    /* De esto se encargará MovimientoStock
     @PatchMapping("/cantidad/{id}")
     public ResponseEntity<StockResponseDTO> editCantidadDisponible(@PathVariable Integer id,
                                             @RequestParam Integer nuevaCantidad){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(stockService.editCantidadDisponible(id, nuevaCantidad));
-    }
+    }*/
 
     @PatchMapping("/stock-minimo/{id}")
     public ResponseEntity<StockResponseDTO> editStockMinimo(@PathVariable Integer id,
