@@ -1,0 +1,206 @@
+<div class="rs-overlay" *ngIf="visible" (click)="cerrarModal()">
+  <div class="rs-modal" (click)="detenerPropagacion($event)">
+    <div class="rs-header">
+      <h2>
+        <i class="bi bi-plus-circle"></i>
+        Nuevo registro de stock
+      </h2>
+      <button
+        type="button"
+        class="rs-close-btn"
+        (click)="cerrarModal()"
+        aria-label="Cerrar"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <!-- CUERPO DEL FORMULARIO -->
+    <div class="rs-body">
+      <form [formGroup]="formStock" (ngSubmit)="procesarFormulario()">
+        <!-- PRODUCTO -->
+        <div class="rs-row">
+          <div class="rs-field-form">
+            <label class="rs-label" for="producto"
+              >Producto<span class="req">*</span></label
+            >
+            <input
+              id="producto"
+              type="text"
+              class="rs-input"
+              placeholder="Buscar producto..."
+              [formControl]="busquedaControl"
+              autocomplete="off"
+            />
+          </div>
+          <div class="rs-field-form">
+            <div *ngIf="productos.length > 0">
+              <!-- Listado de Productos -->
+              <label class="rs-label" for="slproducto"
+                >Productos filtrados<span class="req">*</span></label
+              >
+              <select
+                id="slproducto"
+                class="rs-select"
+                [formControl]="productoControl"
+              >
+                <option [ngValue]="null" disabled>
+                  Seleccioná un producto
+                </option>
+
+                <option *ngFor="let producto of productos" [ngValue]="producto">
+                  {{ producto.nombre }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="rs-row">
+          <!-- VARIANTE -->
+          <div class="rs-field-form">
+            <label class="rs-label" for="variante"
+              >Variante<span class="req">*</span></label
+            >
+            <select id="variante" class="rs-select" formControlName="variante">
+              <!-- Sin producto seleccionado -->
+              <option [ngValue]="null" disabled>
+                {{ !productoSeleccionado ? 'Primero seleccioná un producto' :
+                'Seleccioná una variante'}}
+              </option>
+              <!-- Variantes -->
+              <option
+                *ngFor="let variante of variantes"
+                [ngValue]="variante.idVariante"
+              >
+                {{ variante.nombre }}
+              </option>
+            </select>
+            <!-- Error de validación -->
+            <div
+              *ngIf="formStock.get('variante')?.touched && formStock.get('variante')?.invalid"
+              class="rs-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+
+              <div *ngIf="formStock.get('variante')?.errors?.['required']">
+                Seleccioná una variante.
+              </div>
+            </div>
+
+            <!-- Producto sin variantes -->
+            <div
+              *ngIf="productoSeleccionado && !productoSeleccionado.tieneVariantes"
+              class="rs-hint"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              Este producto no posee variantes. Se utilizará su variante única.
+            </div>
+          </div>
+
+          <!-- CANAL DE VENTA -->
+          <div class="rs-field-form">
+            <label class="rs-label" for="canal"
+              >Canal de venta<span class="req">*</span></label
+            >
+            <select id="canal" class="rs-select" formControlName="canal">
+              <option [ngValue]="null" disabled>Seleccioná un canal</option>
+              <option
+                *ngFor="let canal of canales"
+                [ngValue]="canal.idCanalVenta"
+              >
+                {{ canal.nombre }}
+              </option>
+            </select>
+            <div
+              *ngIf="formStock.get('canal')?.touched && formStock.get('canal')?.invalid"
+              class="rs-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="formStock.get('canal')?.errors?.['required']">
+                Seleccioná un canal de venta.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rs-row">
+          <!-- CANTIDAD DISPONIBLE -->
+          <div class="rs-field-form">
+            <label class="rs-label" for="disponible"
+              >Disponible<span class="req">*</span></label
+            >
+            <input
+              type="number"
+              id="disponible"
+              class="rs-input"
+              placeholder="Ej: 20"
+              formControlName="disponible"
+              min="1"
+            />
+            <div
+              *ngIf="formStock.get('disponible')?.touched && formStock.get('disponible')?.invalid"
+              class="rs-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="formStock.get('disponible')?.errors?.['required']">
+                La cantidad disponible es obligatoria.
+              </div>
+              <div *ngIf="formStock.get('disponible')?.errors?.['min']">
+                La cantidad disponible debe ser mayor o igual a 1.
+              </div>
+              <div *ngIf="formStock.get('disponible')?.errors?.['pattern']">
+                Ingresá un número entero válido
+              </div>
+            </div>
+          </div>
+
+          <!-- STOCK MINIMO -->
+          <div class="rs-field-form">
+            <label class="rs-label" for="minimo"
+              >Mínimo<span class="req">*</span></label
+            >
+            <input
+              type="number"
+              id="minimo"
+              class="rs-input"
+              placeholder="Ej: 3"
+              formControlName="minimo"
+              min="3"
+            />
+            <div
+              *ngIf="formStock.get('minimo')?.touched && formStock.get('minimo')?.invalid"
+              class="rs-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="formStock.get('minimo')?.errors?.['required']">
+                La cantidad mínima es obligatoria.
+              </div>
+              <div *ngIf="formStock.get('minimo')?.errors?.['min']">
+                La cantidad mínima debe ser mayor o igual a 3.
+              </div>
+              <div *ngIf="formStock.get('minimo')?.errors?.['pattern']">
+                Ingresá un número entero válido
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- BOTÓN GUARDAR REGISTRO -->
+        <button
+          type="submit"
+          [disabled]="formStock.invalid || guardando"
+          class="rs-btn-guardar"
+        >
+          <i class="bi bi-floppy-fill"></i>
+          {{ guardando ? 'Guardando...' : 'Guardar registro' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="rs-footer">
+      <button type="button" class="rs-btn-cancelar" (click)="cerrarModal()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

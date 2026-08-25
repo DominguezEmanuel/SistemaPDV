@@ -39,10 +39,15 @@
   color: #ffffff;
   font-family: "Playfair Display", serif;
   font-style: italic;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: 600;
   margin: 0 0 4px;
 }
+
+.mv-title i {
+  margin-right: 5px;
+}
+
 .mv-header-sub {
   color: #dceef8;
   font-size: 0.76rem;

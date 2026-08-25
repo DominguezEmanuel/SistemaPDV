@@ -9,7 +9,11 @@
       </p>
     </div>
     <!-- BTN NUEVO REGISTRO DE STOCK -->
-    <button class="btn-nuevo-stock" type="button">
+    <button
+      class="btn-nuevo-stock"
+      type="button"
+      (click)="verFormularioStock()"
+    >
       <i class="bi bi-plus-circle"></i>
       Nuevo registro de stock
     </button>
@@ -155,9 +159,19 @@
   </div>
 </div>
 
+<!-- MODAL DE INFORMACIÓN DEL REGISTRO DE STOCK -->
 <app-stock-info
   [stock]="registroStockSeleccionado"
   [visible]="modalStockVisible"
   (cerrar)="cerrarModalStock()"
 >
 </app-stock-info>
+
+<!-- FORMULARIO PARA REGISTRO DE STOCK -->
+<app-stock-form
+  [stockForm]="registroStockForm"
+  [visible]="formStockVisible"
+  (cerrar)="cerrarFormularioStock()"
+  (stockGuardado)="onStockGuardado($event)"
+>
+</app-stock-form>

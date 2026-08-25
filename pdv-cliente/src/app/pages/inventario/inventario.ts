@@ -9,10 +9,17 @@ import { ToastrService } from 'ngx-toastr';
 import { StockResponse } from '../../models/Stock';
 import { CanalResponse } from '../../models/Canal';
 import { StockInfo } from './stock-info/stock-info';
+import { StockForm } from './stock-form/stock-form';
 
 @Component({
   selector: 'app-inventario',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StockInfo],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    StockInfo,
+    StockForm,
+  ],
   templateUrl: './inventario.html',
   styleUrl: './inventario.css',
 })
@@ -26,6 +33,8 @@ export class Inventario implements OnInit {
   // Variables que controlan la vista
   modalStockVisible = false;
   registroStockSeleccionado: StockResponse | null = null;
+  formStockVisible = false;
+  registroStockForm: StockResponse | null = null;
 
   constructor(
     private stockService: StockService,
@@ -35,6 +44,10 @@ export class Inventario implements OnInit {
 
   ngOnInit(): void {
     this.obtenerCanales();
+    this.obtenerStocks();
+  }
+
+  obtenerStocks(): void {
     this.stockService.obtenerStocks().subscribe({
       next: (response) => {
         console.log('Stocks: ', response);
@@ -67,6 +80,15 @@ export class Inventario implements OnInit {
     this.modalStockVisible = true;
   }
 
+  verFormularioStock(stock?: StockResponse): void {
+    if (stock) {
+      this.registroStockForm = stock;
+    } else {
+      this.registroStockForm = null;
+    }
+    this.formStockVisible = true;
+  }
+
   aplicarFiltros(): void {
     console.log('Canal: ', this.idCanal);
     console.log('Estado: ', this.estado);
@@ -75,6 +97,25 @@ export class Inventario implements OnInit {
   cerrarModalStock(): void {
     this.modalStockVisible = false;
     this.registroStockSeleccionado = null;
+  }
+
+  cerrarFormularioStock(): void {
+    this.formStockVisible = false;
+    this.registroStockForm = null;
+  }
+
+  onStockGuardado(event: {
+    stock: StockResponse | null;
+    accion: 'crear' | 'editar';
+  }): void {
+    this.obtenerStocks();
+
+    if (event.accion === 'crear') {
+      this.toastr.success(
+        'El registro se creó correctamente',
+        'Registro creado',
+      );
+    }
   }
 
   asignarEstadoStock(cantidadDisponible: number, stockMinimo: number): string {

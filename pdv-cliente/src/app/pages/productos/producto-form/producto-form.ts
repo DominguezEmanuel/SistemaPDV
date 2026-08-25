@@ -65,23 +65,6 @@ export class ProductoForm implements OnInit, OnChanges {
     this.limpiarCodigoBarras();
   }
 
-  limpiarCodigoBarras(): void {
-    this.formProducto
-      .get('tieneVariantes')
-      ?.valueChanges.subscribe((tieneVariantes) => {
-        const codigoBarras = this.formProducto.get('codigoBarras');
-
-        if (tieneVariantes === false) {
-          // Producto sin variantes
-          codigoBarras?.enable();
-        } else if (tieneVariantes === true) {
-          // Producto con variantes
-          codigoBarras?.reset();
-          codigoBarras?.disable();
-        }
-      });
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible'] && !changes['visible'].currentValue) {
       this.resetearFormulario();
@@ -244,7 +227,7 @@ export class ProductoForm implements OnInit, OnChanges {
       });
   }
 
-  private actualizarProducto(formData: FormData): void {
+  actualizarProducto(formData: FormData): void {
     if (!this.productoForm) {
       return;
     }
@@ -271,7 +254,7 @@ export class ProductoForm implements OnInit, OnChanges {
       });
   }
 
-  crearFormData(): FormData {
+  private crearFormData(): FormData {
     const formData = new FormData();
 
     // Usar getRawValue() para incluir controles deshabilitados (como tieneVariantes en edición)
@@ -301,6 +284,23 @@ export class ProductoForm implements OnInit, OnChanges {
         console.error('Error al obtener categorías:', error);
       },
     });
+  }
+
+  limpiarCodigoBarras(): void {
+    this.formProducto
+      .get('tieneVariantes')
+      ?.valueChanges.subscribe((tieneVariantes) => {
+        const codigoBarras = this.formProducto.get('codigoBarras');
+
+        if (tieneVariantes === false) {
+          // Producto sin variantes
+          codigoBarras?.enable();
+        } else if (tieneVariantes === true) {
+          // Producto con variantes
+          codigoBarras?.reset();
+          codigoBarras?.disable();
+        }
+      });
   }
 
   handleImagenChange(event: Event): void {

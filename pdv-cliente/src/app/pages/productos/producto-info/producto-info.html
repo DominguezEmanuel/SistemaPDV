@@ -4,11 +4,14 @@
     <!-- Header -->
     <div class="mv-header">
       <div class="mv-header-info">
-        <h2 class="mv-title">{{ producto.nombre }}</h2>
-        <div class="mv-header-sub">
+        <h2 class="mv-title">
+          <i class="bi bi-box-seam"></i>
+          {{ producto.nombre }}
+        </h2>
+        <!--<div class="mv-header-sub">
           <span class="mv-id-chip">ID-{{ producto.idProducto }}</span>
           <span>{{ producto.categoria.nombre }}</span>
-        </div>
+        </div>-->
       </div>
       <button
         class="mv-close-btn"
