@@ -54,37 +54,37 @@
     <!-- BÚSQUEDA -->
     <div class="search-box">
       <i class="bi bi-search"></i>
-      <input
-        type="text"
-        id="fStockBuscar"
-        placeholder="Buscar producto o variante..."
-      />
+      <input type="text" placeholder="Buscar producto o variante..." />
     </div>
     <!-- POR CANAL -->
-    <select class="filtro-select" id="fStockCanal">
-      <option value="">Todos los canales</option>
-      <option value="tienda">Tienda Física</option>
-      <option value="tiktok">TikTok Live</option>
-      <option value="instagram">Instagram</option>
-      <option value="whatsapp">WhatsApp</option>
-      <option value="meli">Mercado Libre</option>
+    <select
+      class="filtro-select"
+      [(ngModel)]="idCanal"
+      (ngModelChange)="aplicarFiltros()"
+    >
+      <option [ngValue]="null">Todos los canales</option>
+      @for (canal of canales; track canal.idCanalVenta){
+      <option [value]="canal.idCanalVenta">{{ canal.nombre }}</option>
+      }
     </select>
     <!-- POR ESTADO -->
-    <select class="filtro-select" id="fStockEstado">
-      <option value="">Todos los estados</option>
-      <option value="disponible">Disponible</option>
-      <option value="bajo">Stock bajo</option>
-      <option value="sin">Sin stock</option>
+    <select
+      class="filtro-select"
+      [(ngModel)]="estado"
+      (ngModelChange)="aplicarFiltros()"
+    >
+      <option [ngValue]="null">Todos los estados</option>
+      <option [ngValue]="'disponible'">Disponible</option>
+      <option [ngValue]="'bajo'">Stock bajo</option>
+      <option [ngValue]="'sin'">Sin stock</option>
     </select>
     <!-- BTN LIMPIAR FILTROS -->
-    <button
-      class="btn-limpiar-filtros"
-      type="button"
-      id="btnLimpiarFiltrosStock"
-    >
+    @if(idCanal != null || estado != null){
+    <button class="btn-limpiar-filtros" type="button">
       <i class="bi bi-trash3-fill"></i>
       Limpiar filtros
     </button>
+    }
   </div>
 
   <!-- TABLA DE REGISTROS DE STOCK -->
@@ -102,425 +102,47 @@
         </tr>
       </thead>
       <tbody>
-        <tr data-canal="tienda" data-estado="disponible">
+        <tr *ngFor="let stock of stocks">
           <td class="prod-cell">
-            <b>Labial Mate Larga Duración</b><span>#P-0031</span>
+            <b>{{ stock.nombreProducto }}</b
+            ><span>{{ formatearIdRegistro(stock.idProducto) }}</span>
           </td>
-          <td>Tono Rojo</td>
-          <td><span class="canal-badge tienda">Tienda Física</span></td>
-          <td class="disponible-num">20</td>
-          <td class="minimo-num">8</td>
-          <td>
-            <span class="estado-badge disponible"
-              ><span class="dot"></span>Disponible</span
+          <td class="text-center">{{ stock.nombreVariante }}</td>
+          <td class="text-center">
+            <span
+              class="canal-badge"
+              [class.local]="stock.nombreCanalVenta === 'Local Fisico'"
+              [class.tiktok]="stock.nombreCanalVenta === 'Lives Tik Tok'"
+              >{{ stock.nombreCanalVenta }}</span
+            >
+          </td>
+          <td class="text-center disponible-num">
+            {{ stock.cantidadDisponible }} uds
+          </td>
+          <td class="text-center minimo-num">{{ stock.stockMinimo }} uds</td>
+          <td class="text-center">
+            <span
+              class="estado-badge"
+              [ngClass]="obtenerClaseEstado(stock.cantidadDisponible, stock.stockMinimo)"
+              ><span class="dot"></span>{{
+              asignarEstadoStock(stock.cantidadDisponible, stock.stockMinimo)
+              }}</span
             >
           </td>
           <td>
             <div class="acciones-cell">
-              <button class="btn-accion editar" title="Modificar">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                  ></path>
-                  <path
-                    d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                  ></path>
-                </svg>
+              <!--<button class="btn-accion editar" title="Modificar">
+                <i class="bi bi-pencil-square"></i>
               </button>
               <button class="btn-accion ajustar" title="Ajustar stock">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-
-        <tr data-canal="tiktok" data-estado="bajo">
-          <td class="prod-cell">
-            <b>Labial Mate Larga Duración</b><span>#P-0031</span>
-          </td>
-          <td>Tono Rojo</td>
-          <td><span class="canal-badge tiktok">TikTok Live</span></td>
-          <td class="disponible-num">10</td>
-          <td class="minimo-num">10</td>
-          <td>
-            <span class="estado-badge bajo"
-              ><span class="dot"></span>Stock bajo</span
-            >
-          </td>
-          <td>
-            <div class="acciones-cell">
-              <button class="btn-accion editar" title="Modificar">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                  ></path>
-                  <path
-                    d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                  ></path>
-                </svg>
-              </button>
-              <button class="btn-accion ajustar" title="Ajustar stock">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-
-        <tr data-canal="instagram" data-estado="disponible">
-          <td class="prod-cell">
-            <b>Labial Mate Larga Duración</b><span>#P-0031</span>
-          </td>
-          <td>Tono Nude</td>
-          <td><span class="canal-badge instagram">Instagram</span></td>
-          <td class="disponible-num">15</td>
-          <td class="minimo-num">6</td>
-          <td>
-            <span class="estado-badge disponible"
-              ><span class="dot"></span>Disponible</span
-            >
-          </td>
-          <td>
-            <div class="acciones-cell">
-              <button class="btn-accion editar" title="Modificar">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                  ></path>
-                  <path
-                    d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                  ></path>
-                </svg>
-              </button>
-              <button class="btn-accion ajustar" title="Ajustar stock">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-
-        <tr data-canal="tienda" data-estado="sin">
-          <td class="prod-cell">
-            <b>Base Líquida Cobertura Media</b><span>#P-0032</span>
-          </td>
-          <td>Tono Claro</td>
-          <td><span class="canal-badge tienda">Tienda Física</span></td>
-          <td class="disponible-num">0</td>
-          <td class="minimo-num">5</td>
-          <td>
-            <span class="estado-badge sin"
-              ><span class="dot"></span>Sin stock</span
-            >
-          </td>
-          <td>
-            <div class="acciones-cell">
-              <button class="btn-accion editar" title="Modificar">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                  ></path>
-                  <path
-                    d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                  ></path>
-                </svg>
-              </button>
-              <button class="btn-accion ajustar" title="Ajustar stock">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-
-        <tr data-canal="meli" data-estado="disponible">
-          <td class="prod-cell">
-            <b>Base Líquida Cobertura Media</b><span>#P-0032</span>
-          </td>
-          <td>Tono Medio</td>
-          <td><span class="canal-badge meli">Mercado Libre</span></td>
-          <td class="disponible-num">18</td>
-          <td class="minimo-num">6</td>
-          <td>
-            <span class="estado-badge disponible"
-              ><span class="dot"></span>Disponible</span
-            >
-          </td>
-          <td>
-            <div class="acciones-cell">
-              <button class="btn-accion editar" title="Modificar">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                  ></path>
-                  <path
-                    d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                  ></path>
-                </svg>
-              </button>
-              <button class="btn-accion ajustar" title="Ajustar stock">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-
-        <tr data-canal="whatsapp" data-estado="bajo">
-          <td class="prod-cell">
-            <b>Shampoo Reparador sin Sal</b><span>#P-0018</span>
-          </td>
-          <td>400ml</td>
-          <td><span class="canal-badge whatsapp">WhatsApp</span></td>
-          <td class="disponible-num">9</td>
-          <td class="minimo-num">10</td>
-          <td>
-            <span class="estado-badge bajo"
-              ><span class="dot"></span>Stock bajo</span
-            >
-          </td>
-          <td>
-            <div class="acciones-cell">
-              <button class="btn-accion editar" title="Modificar">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                  ></path>
-                  <path
-                    d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                  ></path>
-                </svg>
-              </button>
-              <button class="btn-accion ajustar" title="Ajustar stock">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-
-        <tr data-canal="tienda" data-estado="disponible">
-          <td class="prod-cell">
-            <b>Shampoo Reparador sin Sal</b><span>#P-0018</span>
-          </td>
-          <td>400ml</td>
-          <td><span class="canal-badge tienda">Tienda Física</span></td>
-          <td class="disponible-num">42</td>
-          <td class="minimo-num">10</td>
-          <td>
-            <span class="estado-badge disponible"
-              ><span class="dot"></span>Disponible</span
-            >
-          </td>
-          <td>
-            <div class="acciones-cell">
-              <button class="btn-accion editar" title="Modificar">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                  ></path>
-                  <path
-                    d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                  ></path>
-                </svg>
-              </button>
-              <button class="btn-accion ajustar" title="Ajustar stock">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-
-        <tr data-canal="tiktok" data-estado="sin">
-          <td class="prod-cell">
-            <b>Perfume Floral Femenino 50ml</b><span>#P-0063</span>
-          </td>
-          <td>50ml</td>
-          <td><span class="canal-badge tiktok">TikTok Live</span></td>
-          <td class="disponible-num">0</td>
-          <td class="minimo-num">4</td>
-          <td>
-            <span class="estado-badge sin"
-              ><span class="dot"></span>Sin stock</span
-            >
-          </td>
-          <td>
-            <div class="acciones-cell">
-              <button class="btn-accion editar" title="Modificar">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                  ></path>
-                  <path
-                    d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"
-                  ></path>
-                </svg>
-              </button>
-              <button class="btn-accion ajustar" title="Ajustar stock">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
+                <i class="bi bi-plus-square"></i>
+              </button>-->
+              <button
+                class="btn-accion visualizar"
+                title="Visualizar"
+                (click)="verRegistroStock(stock)"
+              >
+                <i class="bi bi-eye"></i>
               </button>
             </div>
           </td>
@@ -528,8 +150,14 @@
       </tbody>
     </table>
   </div>
-
   <div class="tabla-footer">
     <span id="stockContador"></span>
   </div>
 </div>
+
+<app-stock-info
+  [stock]="registroStockSeleccionado"
+  [visible]="modalStockVisible"
+  (cerrar)="cerrarModalStock()"
+>
+</app-stock-info>

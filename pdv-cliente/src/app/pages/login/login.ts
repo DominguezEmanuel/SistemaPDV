@@ -45,8 +45,8 @@ export class Login {
         console.log('Login exitoso', response);
         this.saveUserSession(response);
         this.isLoading = false;
-        // Redirige hacia a la página principal del sistema
-        this.router.navigate(['/pdv']);
+        // Redirige hacia a la sección del Dashboard
+        this.router.navigate(['/pdv/dashboard']);
       },
       error: (error: HttpErrorResponse) => {
         this.errorMessage =

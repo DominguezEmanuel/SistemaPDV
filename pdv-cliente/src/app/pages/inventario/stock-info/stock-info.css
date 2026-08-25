@@ -1,0 +1,168 @@
+/* ===== OVERLAYS DE MODAL (propios, sin clases de Bootstrap) ===== */
+.rs-overlay {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(20, 24, 28, 0.55);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.rs-modal {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 30px 60px -20px rgba(28, 90, 133, 0.35);
+  font-family: "Outfit", sans-serif;
+  color: #14181c;
+}
+
+.rs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: linear-gradient(135deg, #3e93c7, #1c5a85);
+  padding: 22px 26px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.rs-header h2 {
+  color: #ffffff;
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rs-header h2 i {
+  opacity: 0.9;
+}
+.rs-close-btn {
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+.rs-close-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.rs-body {
+  padding: 26px;
+  background: #ffffff;
+}
+.rs-footer {
+  border-top: 1px solid #e4edf3;
+  padding: 16px 26px;
+  background: #f5fafd;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* --- Ver registro (solo lectura) --- */
+.rs-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px 20px;
+}
+.rs-field label {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #5b6670;
+  margin-bottom: 5px;
+}
+.rs-field .rs-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #14181c;
+  background: #fbfdfe;
+  border: 1.5px solid #e4edf3;
+  padding: 10px 14px;
+  border-radius: 10px;
+}
+
+.rs-field .rs-value .canal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 2px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.rs-field .rs-value .canal-badge.local {
+  background: #dceef8;
+  color: #1c5a85;
+}
+
+.rs-field .rs-value .canal-badge.tiktok {
+  background: #efe7fb;
+  color: #6b3fa0;
+}
+
+.estado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.estado-badge.disponible {
+  background: #e7f7ed;
+  color: #2e9e5b;
+}
+.estado-badge.stock-bajo {
+  background: #fff3de;
+  color: #a6710c;
+}
+.estado-badge.sin-stock {
+  background: #fbeaea;
+  color: #c13b3b;
+}
+
+.rs-field.full {
+  grid-column: 1 / -1;
+}
+
+.rs-btn-cerrar {
+  border: 1.5px solid #e4edf3;
+  color: #5b6670;
+  background: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.rs-btn-cerrar:hover {
+  background: #f5fafd;
+  color: #14181c;
+}

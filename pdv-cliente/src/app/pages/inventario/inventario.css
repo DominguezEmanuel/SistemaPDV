@@ -128,7 +128,7 @@
   min-width: 220px;
   max-width: 320px;
 }
-.search-box svg {
+.search-box i {
   position: absolute;
   left: 13px;
   top: 50%;
@@ -208,7 +208,7 @@
   min-width: 760px;
 }
 .tabla-stock thead th {
-  text-align: left;
+  text-align: center;
   font-size: 0.68rem;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -252,15 +252,12 @@
   border-radius: 20px;
   white-space: nowrap;
 }
-.canal-badge.tienda {
+.canal-badge.local {
   background: #dceef8;
   color: #1c5a85;
 }
+
 .canal-badge.tiktok {
-  background: #fbeaea;
-  color: #c13b3b;
-}
-.canal-badge.instagram {
   background: #efe7fb;
   color: #6b3fa0;
 }
@@ -271,6 +268,11 @@
 .canal-badge.meli {
   background: #fff3de;
   color: #a6710c;
+}
+
+.canal-badge.instagram {
+  background: #fbeaea;
+  color: #c13b3b;
 }
 
 .disponible-num {
@@ -295,11 +297,11 @@
   background: #e7f7ed;
   color: #2e9e5b;
 }
-.estado-badge.bajo {
+.estado-badge.stock-bajo {
   background: #fff3de;
   color: #a6710c;
 }
-.estado-badge.sin {
+.estado-badge.sin-stock {
   background: #fbeaea;
   color: #c13b3b;
 }
@@ -313,6 +315,7 @@
 .acciones-cell {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
 }
 .btn-accion {
@@ -340,6 +343,12 @@
   background: #e7f7ed;
   color: #2e9e5b;
   border-color: #2e9e5b;
+}
+
+.btn-accion.visualizar:hover {
+  background: #dceef8;
+  color: #1c5a85;
+  border-color: #3e93c7;
 }
 
 .tabla-footer {

@@ -1,18 +1,3 @@
-:root {
-  --azul-acuarela: #3e93c7;
-  --azul-profundo: #1c5a85;
-  --azul-lavado: #dceef8;
-  --tinta: #14181c;
-  --blanco: #ffffff;
-  --gris-texto: #5b6670;
-  --gris-borde: #e4edf3;
-  --fondo-app: #f5fafd;
-}
-
-* {
-  box-sizing: border-box;
-}
-
 /* ===== TOPBAR ===== */
 .topbar {
   position: sticky;

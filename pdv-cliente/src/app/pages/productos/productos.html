@@ -11,7 +11,6 @@
     <!-- BUSCAR PRODUCTOS -->
     <div class="search-box">
       <i class="bi bi-search"></i>
-
       <input
         type="text"
         placeholder="Buscar producto..."
@@ -46,7 +45,6 @@
       type="button"
       class="btn-limpiar-filtros"
       (click)="limpiarFiltros()"
-      title="Limpiar filtros"
     >
       <i class="bi bi-trash3-fill"></i>
       Limpiar filtros
@@ -111,7 +109,7 @@
           </div>
         </div>
       </div>
-      <!-- STOCK Y ACCIONES -->
+      <!-- ACCIONES -->
       <div class="producto-footer">
         <span
           class="variantes-info"
@@ -162,7 +160,7 @@
     } @if (productos.length === 0) {
     <div class="sin-productos-mensaje">
       <i class="bi bi-exclamation-circle"></i>
-      No se encontraron productos para los filtros aplicados
+      No se encontraron productos
     </div>
     }
   </div>

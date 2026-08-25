@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 import { ProductoResponse } from '../../../models/Producto';
 import { CanalResponse } from '../../../models/Canal';
 import { VarianteResponse } from '../../../models/Variante';
-import { StockResponse } from '../../../models/StockResponse';
+import { StockResponse } from '../../../models/Stock';
 
 import { VarianteService } from '../../../core/services/variante-service';
 import { CanalService } from '../../../core/services/canal-service';
