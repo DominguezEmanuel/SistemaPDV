@@ -86,19 +86,9 @@ public class VarianteProductoService {
             throw new ResourceNotFoundException("Producto con ID " +
                     request.getIdProducto() + " no encontrado");
 
-
-        log.info("Actualizando variante ID: {}", idVariante);
-        log.info("Producto asociado actualmente a la variante: {}",
-                variante.getProducto().getIdProducto());
-        log.info("Producto recibido en la request: {}",
-                request.getIdProducto());
-
         // Verificar que la variante le sigue perteneciendo al mismo producto
         if (!variante.getProducto().getIdProducto().equals(request.getIdProducto()))
             throw new IllegalArgumentException("No es posible cambiar el producto asociado a la variante");
-
-        log.info("Código de barras nuevo {}", request.getCodigoBarras());
-        log.info("Código de barras actual {}", variante.getCodigoBarras());
 
         // Verificar que el código de barras no se encuentre registrado
         if (request.getCodigoBarras() != null)

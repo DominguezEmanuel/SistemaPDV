@@ -7,19 +7,19 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+// Models
 import { ProductoResponse } from '../../../models/Producto';
 import { CanalResponse } from '../../../models/Canal';
 import { VarianteResponse } from '../../../models/Variante';
 import { StockResponse } from '../../../models/Stock';
-
+// Services
 import { VarianteService } from '../../../core/services/variante-service';
 import { CanalService } from '../../../core/services/canal-service';
 import { StockService } from '../../../core/services/stock-service';
 import { ProductoCanalService } from '../../../core/services/producto-canal-service';
 import { ToastrService } from 'ngx-toastr';
 import { AlertService } from '../../../core/services/alert-service';
-
+// Otros
 import { VarianteForm } from '../../variantes/variante-form/variante-form';
 
 interface ConfiguracionCanal {
@@ -105,7 +105,6 @@ export class ProductViewModalComponent implements OnChanges {
       .subscribe({
         next: (response) => {
           this.variantes = response;
-          //console.log('Variantes: ', this.variantes);
           // Asignación del primer ID y nombre
           this.varianteSeleccionadaId = response[0]?.idVariante ?? null;
           this.varianteSeleccionadaNombre = response[0]?.nombre ?? null;

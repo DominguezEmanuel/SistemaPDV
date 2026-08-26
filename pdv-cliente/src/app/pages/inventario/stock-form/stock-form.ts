@@ -72,19 +72,21 @@ export class StockForm implements OnInit {
 
   ngOnInit(): void {
     this.cargarCanales();
+    // FormControl para la búsqueda dinámica de productos
     this.busquedaControl.valueChanges
       .pipe(debounceTime(500), distinctUntilChanged())
       .subscribe((texto) => {
         const busqueda = texto?.trim() ?? '';
 
+        this.reiniciarCamposDependientes();
+
         if (busqueda.length < 2) {
-          this.productos = [];
           return;
         }
 
         this.buscarProductos(busqueda);
       });
-
+    // FormControl para la elección de la lista de productos filtrados
     this.productoControl.valueChanges.subscribe((producto) => {
       if (!producto) {
         return;
@@ -94,71 +96,13 @@ export class StockForm implements OnInit {
     });
   }
 
-  buscarProductos(nombre: string): void {
-    // Filtra los productos que contengan 'nombre' y estén activos
-    this.productoService.buscarPorFiltros(nombre, null, true).subscribe({
-      next: (response) => {
-        this.productos = response;
-      },
-      error: (error) => {
-        console.log('Error: ', error);
-        this.toastr.error('Error al buscar productos', 'Error');
-      },
-    });
-  }
-
-  seleccionarProducto(producto: ProductoResponse): void {
-    this.productoSeleccionado = producto;
-
-    // Asigna el nombre del producto a la búsqueda y no dispara el evento de búsqueda
-    this.busquedaControl.setValue(producto.nombre, { emitEvent: false });
-
-    this.cargarVariantesPorProducto(producto.idProducto);
-    //console.log('Cargando variantes: ', this.cargandoVariantes);
-    console.log('Producto seleccionado: ', this.productoSeleccionado);
-  }
-
-  cargarVariantesPorProducto(idProducto: number): void {
-    //this.cargandoVariantes = true;
-
+  private reiniciarCamposDependientes(): void {
+    this.productos = [];
+    this.productoControl.setValue(null);
+    this.variantes = [];
     this.formStock.get('variante')?.reset(null);
     this.formStock.get('variante')?.disable();
-    this.variantes = [];
-
-    this.varianteService
-      .obtenerVariantesPorProducto(idProducto)
-      .pipe(
-        finalize(() => {
-          //this.cargandoVariantes = false;
-        }),
-      )
-      .subscribe({
-        next: (response) => {
-          this.variantes = response;
-          this.controlarCampoVariante(this.variantes);
-        },
-        error: (error) => {
-          this.variantes = [];
-          this.formStock.get('variante')?.disable();
-          this.formStock.get('variante')?.reset(null);
-          this.formStock.get('variante')?.disable();
-          this.toastr.error(
-            'Error al cargar las variantes del productos',
-            'Error',
-          );
-        },
-      });
-  }
-
-  private controlarCampoVariante(variantes: VarianteResponse[]): void {
-    if (this.productoSeleccionado?.tieneVariantes == false) {
-      this.formStock.patchValue({ variante: variantes[0].idVariante });
-      this.formStock.get('variante')?.disable();
-      return;
-    }
-
-    this.formStock.get('variante')?.enable();
-    this.formStock.get('variante')?.setValue(null);
+    this.productoSeleccionado = null;
   }
 
   private getControlesFormulario() {
@@ -192,6 +136,70 @@ export class StockForm implements OnInit {
     };
   }
 
+  buscarProductos(nombre: string): void {
+    // Filtra los productos que contengan 'nombre' y estén activos
+    this.productoService.buscarPorFiltros(0, 10, nombre, null, true).subscribe({
+      next: (response) => {
+        this.productos = response.content;
+        if (this.productos.length === 0) {
+          this.toastr.info(
+            'Por favor, verifica que hayas escrito bien',
+            'Sin resultados',
+          );
+        }
+      },
+      error: (error) => {
+        this.toastr.error('Error al buscar productos', 'Error');
+      },
+    });
+  }
+
+  seleccionarProducto(producto: ProductoResponse): void {
+    this.productoSeleccionado = producto;
+
+    // Asigna el nombre del producto a la búsqueda y no dispara el evento de búsqueda
+    this.busquedaControl.setValue(producto.nombre, { emitEvent: false });
+
+    this.cargarVariantesPorProducto(producto.idProducto);
+  }
+
+  cargarVariantesPorProducto(idProducto: number): void {
+    this.formStock.get('variante')?.reset(null);
+    this.formStock.get('variante')?.disable();
+    this.variantes = [];
+
+    this.varianteService
+      .obtenerVariantesPorProducto(idProducto)
+      .pipe(finalize(() => {}))
+      .subscribe({
+        next: (response) => {
+          this.variantes = response;
+          this.controlarCampoVariante(this.variantes);
+        },
+        error: (error) => {
+          this.variantes = [];
+          this.formStock.get('variante')?.disable();
+          this.formStock.get('variante')?.reset(null);
+          this.formStock.get('variante')?.disable();
+          this.toastr.error(
+            'Error al cargar las variantes del productos',
+            'Error',
+          );
+        },
+      });
+  }
+
+  private controlarCampoVariante(variantes: VarianteResponse[]): void {
+    if (this.productoSeleccionado?.tieneVariantes == false) {
+      this.formStock.patchValue({ variante: variantes[0].idVariante });
+      this.formStock.get('variante')?.disable();
+      return;
+    }
+
+    this.formStock.get('variante')?.enable();
+    this.formStock.get('variante')?.setValue(null);
+  }
+
   procesarFormulario(): void {
     if (this.formStock.invalid) {
       this.formStock.markAllAsTouched();
@@ -203,17 +211,27 @@ export class StockForm implements OnInit {
     this.asignarValores();
 
     if (this.modo === 'crear') {
-      this.crearRegistroStock();
+      this.crearRegistroStock(this.nuevoRegistroStock);
     }
-    //this.toastr.success('Registro Guardado');
   }
 
-  crearRegistroStock(): void {
-    console.log('Nuevo registro: ', this.nuevoRegistroStock);
-    this.stockGuardado.emit({
-      stock: this.stock,
-      accion: 'crear',
-    });
+  crearRegistroStock(request: StockRequest | null): void {
+    this.stockService
+      .crearRegistroStock(request)
+      .pipe(
+        finalize(() => {
+          this.guardando = false;
+        }),
+      )
+      .subscribe({
+        next: (response) => {
+          this.stockGuardado.emit({ stock: response, accion: 'crear' });
+          this.cerrarModal();
+        },
+        error: (error) => {
+          this.toastr.error(error.error.mensaje, 'Registro duplicado');
+        },
+      });
   }
 
   cargarCanales(): void {
@@ -255,7 +273,6 @@ export class StockForm implements OnInit {
 
     this.nuevoRegistroStock = null;
     this.productoSeleccionado = null;
-    this.canales = [];
     this.productos = [];
     this.variantes = [];
     this.guardando = false;

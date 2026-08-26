@@ -13,7 +13,7 @@ export class CategoriaService {
     this.hostBase = environment.apiUrl + '/categorias/';
   }
 
-  getAllCategorias() {
+  obtenerCategorias() {
     return this.http.get<CategoriaResponse[]>(this.hostBase);
   }
 }

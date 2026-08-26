@@ -57,6 +57,11 @@
     </button>
   </div>
 
+  <p class="contador-resultados">
+    Mostrando <b>{{ totalProductos }}</b> productos encontrados
+  </p>
+
+  <!-- TARJETAS DE PRODUCTOS -->
   <div class="productos-grid">
     @for (producto of productos; track producto.idProducto) {
     <div class="producto-card" [class.inactivo]="!producto.activo">
@@ -65,7 +70,9 @@
         [style.background]="producto.activo ? 'linear-gradient(135deg, #fbe9f0, #f6d3e1)' : 
         'linear-gradient(135deg, #efe7fb, #dfcef5)'"
       >
-        <div class="producto-id-tag">ID-0{{ producto.idProducto }}</div>
+        <div class="producto-id-tag">
+          {{ formatearIdRegistro(producto.idProducto) }}
+        </div>
         <div
           class="producto-estado-tag"
           [class.activo]="producto.activo"
@@ -79,9 +86,9 @@
         <!-- CATEGORIA DEL PRODUCTO -->
         <span
           class="producto-cat-badge"
-          [ngStyle]="getCategoriaStyle(producto.categoria)"
+          [ngClass]="obtenerEstiloCategoria(producto.categoria.nombre)"
         >
-          {{ producto.categoria.nombre || 'Sin categoría' }}
+          {{ producto.categoria.nombre}}
         </span>
         <!-- NOMBRE DEL PRODUCTO -->
         <div class="producto-nombre">{{ producto.nombre }}</div>
@@ -158,6 +165,32 @@
       No se encontraron productos
     </div>
     }
+  </div>
+  <!-- Sección: Paginado -->
+  <div class="paginacion">
+    <button
+      type="button"
+      [disabled]="paginaActual === 0"
+      (click)="cambiarPagina(paginaActual - 1)"
+    >
+      Anterior
+    </button>
+
+    <button
+      *ngFor="let pagina of paginas"
+      [class.active]="pagina === paginaActual"
+      (click)="cambiarPagina(pagina)"
+    >
+      {{ pagina + 1 }}
+    </button>
+
+    <button
+      type="button"
+      [disabled]="paginaActual === totalPaginas - 1"
+      (click)="cambiarPagina(paginaActual + 1)"
+    >
+      Siguiente
+    </button>
   </div>
 </div>
 

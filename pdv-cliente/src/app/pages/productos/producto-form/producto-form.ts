@@ -276,7 +276,7 @@ export class ProductoForm implements OnInit, OnChanges {
   }
 
   cargarCategorias(): void {
-    this.categoriaService.getAllCategorias().subscribe({
+    this.categoriaService.obtenerCategorias().subscribe({
       next: (response) => {
         this.categorias = response;
       },

@@ -24,7 +24,9 @@
         </div>
         <div class="rs-field">
           <label>Variante</label>
-          <div class="rs-value">{{ stock.nombreVariante }}</div>
+          <div class="rs-value">
+            {{ stock.nombreVariante === 'Unica' ? '-' : stock.nombreVariante }}
+          </div>
         </div>
         <div class="rs-field">
           <label>Código interno</label>
@@ -32,7 +34,9 @@
         </div>
         <div class="rs-field">
           <label>Código de barras</label>
-          <div class="rs-value">{{ stock.codigoBarras }}</div>
+          <div class="rs-value">
+            {{ stock.codigoBarras ? stock.codigoBarras : '-' }}
+          </div>
         </div>
         <div class="rs-field full">
           <label>Canal</label>

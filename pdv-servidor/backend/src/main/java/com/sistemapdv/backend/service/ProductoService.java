@@ -15,6 +15,8 @@ import com.sistemapdv.backend.repository.CategoriaRepository;
 import com.sistemapdv.backend.repository.ProductoRepository;
 import com.sistemapdv.backend.repository.VarianteProductoRepository;
 import com.sistemapdv.backend.repository.specification.ProductoSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,9 +65,10 @@ public class ProductoService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductoResponseDTO> filterByFilters(String nombre,
+    public Page<ProductoResponseDTO> filterByFilters(String nombre,
                                                      Integer idCategoria,
-                                                     Boolean activo){
+                                                     Boolean activo,
+                                                     Pageable pageable){
         Specification<Producto> specification =
                 (root, query, criteriaBuilder) -> null;
 
@@ -88,19 +91,14 @@ public class ProductoService {
         }
 
         return productoRepository
-                .findAll(specification)
-                .stream()
-                .map(productoMapper::toResponseDTO)
-                .toList();
+                .findAll(specification, pageable)
+                .map(productoMapper::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
-    public List<ProductoResponseDTO> findAllProducts(){
-        List<Producto> productos = productoRepository.findAllWithCategoria();
-        return productos
-                .stream()
-                .map(productoMapper::toResponseDTO)
-                .toList();
+    public Page<ProductoResponseDTO> findAllProducts(Pageable pageable){
+        Page<Producto> productos = productoRepository.findAll(pageable);
+        return productos.map(productoMapper::toResponseDTO);
     }
 
     // Mejorar
@@ -120,7 +118,7 @@ public class ProductoService {
 
     @Transactional
     public ProductoResponseDTO createProduct(ProductoRequestDTO request){
-        // Validar Categoria
+        // Validar Categoria existente
         Categoria categoria = categoriaRepository.findById(request.getIdCategoria())
                 .orElseThrow(()-> new ResourceNotFoundException(
                         "Categoria con ID " + request.getIdCategoria()
@@ -168,6 +166,10 @@ public class ProductoService {
                 .activo(true)
                 .producto(producto)
                 .build();
+
+        if(varianteUnica.getCodigoBarras() != null)
+            if(varianteRepository.existsByCodigoBarras(varianteUnica.getCodigoBarras()))
+                throw new ResourceDuplicatedException("El código de barras ya se encuentra registrado");
 
         varianteUnica = varianteRepository.save(varianteUnica);
 

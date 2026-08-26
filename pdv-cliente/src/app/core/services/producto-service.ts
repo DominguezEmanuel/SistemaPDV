@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ProductoResponse } from '../../models/Producto';
+import { PageResponse } from '../../models/PageResponse';
 
 @Injectable({
   providedIn: 'root',
@@ -14,18 +15,27 @@ export class ProductoService {
     this.hostBase = environment.apiUrl + '/productos/';
   }
 
-  getAllProductos(): Observable<ProductoResponse[]> {
-    return this.http.get<ProductoResponse[]>(this.hostBase);
+  obtenerProductos(
+    page: number = 0,
+    size: number = 10,
+  ): Observable<PageResponse<ProductoResponse>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+
+    return this.http.get<PageResponse<ProductoResponse>>(this.hostBase, {
+      params,
+    });
   }
 
   buscarPorFiltros(
+    page: number = 0,
+    size: number = 0,
     nombre: string,
     idCategoria: number | null,
     activo: boolean | null,
-  ): Observable<ProductoResponse[]> {
-    let params = new HttpParams();
+  ): Observable<PageResponse<ProductoResponse>> {
+    let params = new HttpParams().set('page', page).set('size', size);
 
-    if (nombre.trim()) {
+    if (nombre?.trim()) {
       params = params.set('nombre', nombre.trim());
     }
 
@@ -37,9 +47,12 @@ export class ProductoService {
       params = params.set('activo', activo.toString());
     }
 
-    return this.http.get<ProductoResponse[]>(`${this.hostBase}buscar`, {
-      params,
-    });
+    return this.http.get<PageResponse<ProductoResponse>>(
+      `${this.hostBase}buscar`,
+      {
+        params,
+      },
+    );
   }
 
   crearProducto(formData: FormData): Observable<ProductoResponse> {

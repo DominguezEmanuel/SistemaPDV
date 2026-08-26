@@ -1,6 +1,7 @@
 package com.sistemapdv.backend.repository;
 
 import com.sistemapdv.backend.entity.Producto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;

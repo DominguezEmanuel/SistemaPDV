@@ -111,7 +111,7 @@ public class StockService {
         // Validar que no exista la combinación Variante + Canal
         if(stockRepository.existsByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
                 request.getIdVariante(), request.getIdCanalVenta()))
-            throw new ResourceDuplicatedException("Ya existe un stock para esta combinacion " +
+            throw new ResourceDuplicatedException("Ya existe un registro para esta combinacion " +
                     "de variante y canal de venta");
 
         Stock nuevoStock = stockMapper.toStock(request, variante, canal);

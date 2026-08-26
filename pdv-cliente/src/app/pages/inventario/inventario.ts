@@ -30,7 +30,7 @@ export class Inventario implements OnInit {
   idCanal: number | null = null;
   estado: string | null = null;
 
-  // Variables que controlan la vista
+  // Variables que controlan la vista de modal de info y formulario
   modalStockVisible = false;
   registroStockSeleccionado: StockResponse | null = null;
   formStockVisible = false;
@@ -50,12 +50,10 @@ export class Inventario implements OnInit {
   obtenerStocks(): void {
     this.stockService.obtenerStocks().subscribe({
       next: (response) => {
-        console.log('Stocks: ', response);
         this.stocks = response;
       },
       error: (error) => {
-        console.log(error);
-        this.toastr.error(error.message);
+        this.toastr.error('Error al cargar los registros', 'Error');
       },
     });
   }
@@ -66,7 +64,7 @@ export class Inventario implements OnInit {
         this.canales = response;
       },
       error: (error) => {
-        this.toastr.error('Error al obtener los canales de venta', 'Error');
+        this.toastr.error('Error al cargar los canales de venta', 'Error');
       },
     });
   }
@@ -108,6 +106,7 @@ export class Inventario implements OnInit {
     stock: StockResponse | null;
     accion: 'crear' | 'editar';
   }): void {
+    // Actualizar el listado de registros
     this.obtenerStocks();
 
     if (event.accion === 'crear') {

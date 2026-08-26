@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+// Services
 import { CategoriaService } from '../../core/services/categoria-service';
 import { ProductoService } from '../../core/services/producto-service';
 import { ToastrService } from 'ngx-toastr';
 import { AlertService } from '../../core/services/alert-service';
+// Models
 import { CategoriaResponse } from '../../models/Categoria';
 import { ProductoResponse } from '../../models/Producto';
+// Otros
 import { ProductViewModalComponent } from './producto-info/producto-info';
 import { ProductoForm } from './producto-form/producto-form';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -31,17 +34,13 @@ export class Productos implements OnInit {
   estado: boolean | null = null;
   busquedaControl = new FormControl('');
 
-  private readonly paletasCategorias = [
-    { bg: '#fbe9f0', color: '#c7638f' },
-    { bg: '#e7f5ff', color: '#2d77b5' },
-    { bg: '#f3ecff', color: '#7b61ff' },
-    { bg: '#e8f7ec', color: '#2e9e5b' },
-    { bg: '#fff4de', color: '#b06a00' },
-    { bg: '#ffeef3', color: '#c94b7f' },
-    { bg: '#eaf6f2', color: '#2f6f5b' },
-    { bg: '#fef2f2', color: '#c13b3b' },
-  ];
+  // Variables para paginación
+  paginaActual: number = 0;
+  tamanioPagina: number = 0;
+  totalProductos: number = 0;
+  totalPaginas: number = 0;
 
+  // Variables para visibilidad de Modal/Formulario
   modalVisible = false;
   modalFormularioProducto = false;
   productoSeleccionado: ProductoResponse | null = null;
@@ -57,7 +56,7 @@ export class Productos implements OnInit {
   ngOnInit(): void {
     this.cargarCategorias();
     this.cargarProductos();
-    // Importante para el filtrado de los productos
+    // Detecta cambios en el 'busquedaControl' para el filtrado de los productos
     this.busquedaControl.valueChanges
       .pipe(debounceTime(500), distinctUntilChanged())
       .subscribe(() => {
@@ -66,13 +65,23 @@ export class Productos implements OnInit {
   }
 
   aplicarFiltros(): void {
+    this.paginaActual = 0;
     const nombre = this.busquedaControl.value?.trim() ?? '';
 
     this.productoService
-      .buscarPorFiltros(nombre, this.idCategoria, this.estado)
+      .buscarPorFiltros(
+        this.paginaActual,
+        this.tamanioPagina,
+        nombre,
+        this.idCategoria,
+        this.estado,
+      )
       .subscribe({
         next: (response) => {
-          this.productos = response;
+          this.productos = response.content;
+          this.totalProductos = response.page.totalElements;
+          this.totalPaginas = response.page.totalPages;
+          this.paginaActual = response.page.number;
         },
         error: (error) => {
           this.toastr.error(error.error.mensaje, 'Error');
@@ -104,17 +113,8 @@ export class Productos implements OnInit {
     this.modalVisible = true;
   }
 
-  cerrarModal(): void {
-    if (this.modalVisible) {
-      this.modalVisible = false;
-    } else {
-      this.modalFormularioProducto = false;
-    }
-    this.productoSeleccionado = null;
-  }
-
   cargarCategorias(): void {
-    this.categoriaService.getAllCategorias().subscribe({
+    this.categoriaService.obtenerCategorias().subscribe({
       next: (response) => {
         this.categorias = response;
       },
@@ -125,9 +125,12 @@ export class Productos implements OnInit {
   }
 
   cargarProductos(): void {
-    this.productoService.getAllProductos().subscribe({
+    this.productoService.obtenerProductos().subscribe({
       next: (response) => {
-        this.productos = response;
+        this.totalProductos = response.page.totalElements;
+        this.totalPaginas = response.page.totalPages;
+        this.paginaActual = response.page.number;
+        this.productos = response.content;
       },
       error: (error) => {
         this.toastr.error('Error al cargar los productos', 'Error');
@@ -166,8 +169,6 @@ export class Productos implements OnInit {
     producto: ProductoResponse;
     accion: 'crear' | 'editar';
   }): void {
-    this.modalFormularioProducto = false;
-
     this.cargarProductos();
 
     if (event.accion === 'crear') {
@@ -183,23 +184,69 @@ export class Productos implements OnInit {
     }
   }
 
-  getCategoriaStyle(
-    categoria?: CategoriaResponse | null,
-  ): Record<string, string> {
-    const seed = categoria?.idCategoria ?? categoria?.nombre?.length ?? 0;
-    const palette =
-      this.paletasCategorias[seed % this.paletasCategorias.length];
-
-    return {
-      '--cat-bg': palette.bg,
-      '--cat-color': palette.color,
-    };
+  get paginas(): number[] {
+    return Array.from({ length: this.totalPaginas }, (_, i) => i);
   }
 
+  cambiarPagina(pagina: number): void {
+    if (pagina < 0 || pagina >= this.totalPaginas) {
+      return;
+    }
+
+    this.paginaActual = pagina;
+
+    console.log('Página actual: ', this.paginaActual);
+
+    this.cargarProductos();
+  }
+
+  cerrarModal(): void {
+    // Reestablece las variables usadas para el modal/formulario
+    if (this.modalVisible) {
+      // Modal de información de producto
+      this.modalVisible = false;
+      this.productoSeleccionado = null;
+    } else {
+      // Formulario de registro/edición de producto
+      this.modalFormularioProducto = false;
+      this.productoSeleccionadoForm = null;
+    }
+  }
+
+  // Devuelve el estilo CSS que debe tener la categoría
+  obtenerEstiloCategoria(nombre: string): string {
+    switch (nombre.toLowerCase()) {
+      case 'uñas':
+        return 'unias';
+      case 'pestañas':
+        return 'pestanias';
+      case 'maquillaje':
+        return 'maquillaje';
+      case 'skincare':
+        return 'skincare';
+      case 'depilacion':
+        return 'depilacion';
+      case 'peinados':
+        return 'peinados';
+      case 'perfumeria':
+        return 'perfumeria';
+      case 'pedicura':
+        return 'pedicura';
+      default:
+        return '';
+    }
+  }
+
+  // Formatea 'valor' a moneda ARS
   formatearMoneda(valor: number): string {
     return valor.toLocaleString('es-AR', {
       style: 'currency',
       currency: 'ARS',
     });
+  }
+
+  // Formatea el 'id' al siguiente formato 'ID-0001'
+  formatearIdRegistro(id: number): string {
+    return `ID-${id.toString().padStart(4, '0')}`;
   }
 }

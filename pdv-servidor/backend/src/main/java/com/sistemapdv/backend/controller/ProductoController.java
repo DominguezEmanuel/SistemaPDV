@@ -5,6 +5,11 @@ import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
 import com.sistemapdv.backend.dto.response.VarianteProductoResponseDTO;
 import com.sistemapdv.backend.service.ProductoService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,17 +44,21 @@ public class ProductoController {
 
     @GetMapping("/buscar")
     @ResponseBody
-    public List<ProductoResponseDTO> findByFilters(@RequestParam(required = false) String nombre,
+    public PagedModel<ProductoResponseDTO> findByFilters(@RequestParam(required = false) String nombre,
                                                    @RequestParam(required = false) Integer idCategoria,
-                                                   @RequestParam(required = false) Boolean activo){
-        return productoService.filterByFilters(nombre, idCategoria, activo);
+                                                   @RequestParam(required = false) Boolean activo,
+                                                   @PageableDefault(sort = "nombre", direction = Sort.Direction.ASC)
+                                                       Pageable pageable){
+        Page<ProductoResponseDTO> productosFiltrados = productoService.filterByFilters(nombre, idCategoria, activo, pageable);
+
+        return new PagedModel<>(productosFiltrados);
     }
 
     @GetMapping("/")
-    @ResponseBody
-    public List<ProductoResponseDTO> findAllProducts(){
-        List<ProductoResponseDTO> productos = productoService.findAllProducts();
-        return productos;
+    public PagedModel<ProductoResponseDTO> findAllProducts(@PageableDefault(sort = "nombre", direction = Sort.Direction.ASC)
+                                                         Pageable pageable){
+        Page<ProductoResponseDTO> productos = productoService.findAllProducts(pageable);
+        return new PagedModel<>(productos);
     }
 
     @GetMapping("{id}/variantes")

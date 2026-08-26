@@ -135,7 +135,6 @@
               class="rs-input"
               placeholder="Ej: 20"
               formControlName="disponible"
-              min="1"
             />
             <div
               *ngIf="formStock.get('disponible')?.touched && formStock.get('disponible')?.invalid"
@@ -165,7 +164,6 @@
               class="rs-input"
               placeholder="Ej: 3"
               formControlName="minimo"
-              min="3"
             />
             <div
               *ngIf="formStock.get('minimo')?.touched && formStock.get('minimo')?.invalid"

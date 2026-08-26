@@ -111,7 +111,9 @@
             <b>{{ stock.nombreProducto }}</b
             ><span>{{ formatearIdRegistro(stock.idProducto) }}</span>
           </td>
-          <td class="text-center">{{ stock.nombreVariante }}</td>
+          <td class="text-center">
+            {{ stock.nombreVariante === 'Unica' ? '-' : stock.nombreVariante }}
+          </td>
           <td class="text-center">
             <span
               class="canal-badge"

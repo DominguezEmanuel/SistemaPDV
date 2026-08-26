@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
-import { StockResponse } from '../../models/Stock';
+import { StockRequest, StockResponse } from '../../models/Stock';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -16,6 +16,10 @@ export class StockService {
 
   obtenerStocks(): Observable<StockResponse[]> {
     return this.http.get<StockResponse[]>(`${this.hostBase}`);
+  }
+
+  crearRegistroStock(request: StockRequest | null): Observable<StockResponse> {
+    return this.http.post<StockResponse>(`${this.hostBase}`, request);
   }
 
   getStockByCanalAndVariante(idCanal: number, idVariante: number) {
