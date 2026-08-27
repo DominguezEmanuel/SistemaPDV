@@ -43,7 +43,6 @@ public class ProductoController {
     }
 
     @GetMapping("/buscar")
-    @ResponseBody
     public PagedModel<ProductoResponseDTO> findByFilters(@RequestParam(required = false) String nombre,
                                                    @RequestParam(required = false) Integer idCategoria,
                                                    @RequestParam(required = false) Boolean activo,

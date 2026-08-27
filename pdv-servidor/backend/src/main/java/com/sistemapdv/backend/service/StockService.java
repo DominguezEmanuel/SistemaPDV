@@ -11,6 +11,10 @@ import com.sistemapdv.backend.mapper.StockMapper;
 import com.sistemapdv.backend.repository.CanalVentaRepository;
 import com.sistemapdv.backend.repository.StockRepository;
 import com.sistemapdv.backend.repository.VarianteProductoRepository;
+import com.sistemapdv.backend.repository.specification.StockSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,11 +45,9 @@ public class StockService {
     }
 
     @Transactional(readOnly = true)
-    public List<StockResponseDTO> getAllStocks(){
-        return stockRepository.findAll()
-                .stream()
-                .map(stockMapper::toResponseDTO)
-                .toList();
+    public Page<StockResponseDTO> getAllStocks(Pageable pageable){
+        Page<Stock> stocks = stockRepository.findAll(pageable);
+        return stocks.map(stockMapper::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
@@ -102,12 +104,6 @@ public class StockService {
                 .orElseThrow(() -> new ResourceNotFoundException("Canal con ID "
                         + request.getIdCanalVenta() + " no encontrado"));
 
-        /*if(request.getCantidadDisponible() < 1)
-            throw new IllegalArgumentException("La cantidad mínima disponible debe ser mayor o igual 1");
-
-        if(request.getStockMinimo() < 3)
-            throw new IllegalArgumentException("El stock mínimo no puede ser menor a 3");*/
-
         // Validar que no exista la combinación Variante + Canal
         if(stockRepository.existsByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
                 request.getIdVariante(), request.getIdCanalVenta()))
@@ -148,5 +144,26 @@ public class StockService {
         stock.setStockMinimo(nuevoStockMinimo);
 
         return stockMapper.toResponseDTO(stock);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<StockResponseDTO> getByFilters(String nombre, Integer idCanal, String estado, Pageable pageable){
+        Specification<Stock> specification = (root, query, cb) -> null;
+
+        if(nombre != null && !nombre.isBlank()){
+            specification = specification.and(StockSpecification.buscarPorTexto(nombre));
+        }
+
+        if(idCanal != null){
+            specification = specification.and(StockSpecification.porCanal(idCanal));
+        }
+
+        if(estado != null && !estado.isBlank()){
+            specification = specification.and(StockSpecification.porEstado(estado));
+        }
+
+        return stockRepository
+                .findAll(specification, pageable)
+                .map(stockMapper::toResponseDTO);
     }
 }

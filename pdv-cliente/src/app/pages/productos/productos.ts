@@ -9,7 +9,7 @@ import { AlertService } from '../../core/services/alert-service';
 // Models
 import { CategoriaResponse } from '../../models/Categoria';
 import { ProductoResponse } from '../../models/Producto';
-// Otros
+// Others
 import { ProductViewModalComponent } from './producto-info/producto-info';
 import { ProductoForm } from './producto-form/producto-form';
 import { debounceTime, distinctUntilChanged } from 'rxjs';

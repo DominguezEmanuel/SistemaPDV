@@ -4,6 +4,9 @@ import com.sistemapdv.backend.dto.request.StockRequestDTO;
 import com.sistemapdv.backend.dto.response.StockResponseDTO;
 import com.sistemapdv.backend.service.StockService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +30,11 @@ public class StockController {
     }
 
     @GetMapping("/")
-    @ResponseBody
-    public List<StockResponseDTO> getAllStocks() {
-        return stockService.getAllStocks();
+    public PagedModel<StockResponseDTO> getAllStocks(Pageable pageable) {
+
+        Page<StockResponseDTO> registros = stockService.getAllStocks(pageable);
+
+        return new PagedModel<>(registros);
     }
 
     @GetMapping("/variante/{idVariante}")
@@ -49,6 +54,16 @@ public class StockController {
                                                                         @PathVariable Integer idVariante){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(stockService.getStockByChannelAndVariant(idCanal, idVariante));
+    }
+
+    @GetMapping("/buscar")
+    public PagedModel<StockResponseDTO> getStockByFilters(@RequestParam (required = false) String nombre,
+                                                          @RequestParam (required = false) Integer idCanal,
+                                                          @RequestParam (required = false) String estado,
+                                                          Pageable pageable){
+        Page<StockResponseDTO> registrosFiltrados = stockService.getByFilters(nombre, idCanal, estado, pageable);
+
+        return new PagedModel<>(registrosFiltrados);
     }
 
     @PostMapping("/")

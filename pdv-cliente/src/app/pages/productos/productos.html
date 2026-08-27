@@ -24,7 +24,6 @@
       (ngModelChange)="aplicarFiltros()"
     >
       <option [ngValue]="null">Todas las categorías</option>
-
       @for (categoria of categorias; track categoria.idCategoria){
       <option [value]="categoria.idCategoria">{{ categoria.nombre }}</option>
       }

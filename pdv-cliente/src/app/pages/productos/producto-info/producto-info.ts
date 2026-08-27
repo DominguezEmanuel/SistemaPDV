@@ -221,7 +221,7 @@ export class ProductViewModalComponent implements OnChanges {
 
     this.canales.forEach((canal) => {
       this.stockService
-        .getStockByCanalAndVariante(canal.idCanalVenta, idVariante)
+        .obtenerStockPorCanalYVariante(canal.idCanalVenta, idVariante)
         .subscribe({
           next: (response) => {
             this.configuracionCanales.push({
@@ -269,7 +269,10 @@ export class ProductViewModalComponent implements OnChanges {
 
       this.variantes.forEach((variante) => {
         this.stockService
-          .getStockByCanalAndVariante(canal.idCanalVenta, variante.idVariante)
+          .obtenerStockPorCanalYVariante(
+            canal.idCanalVenta,
+            variante.idVariante,
+          )
           .subscribe({
             next: (response) => {
               if (requestId !== this.totalStockRequestId) {

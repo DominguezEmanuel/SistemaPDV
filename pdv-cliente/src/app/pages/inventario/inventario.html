@@ -27,7 +27,9 @@
         <i class="bi bi-layout-wtf"></i>
       </div>
       <div>
-        <div class="stock-stat-num">1.284</div>
+        <div class="stock-stat-num">
+          {{ unidadesTotales ? unidadesTotales : 0 }}
+        </div>
         <div class="stock-stat-label">Unidades totales</div>
       </div>
     </div>
@@ -37,7 +39,9 @@
         <i class="bi bi-exclamation-triangle"></i>
       </div>
       <div>
-        <div class="stock-stat-num">7</div>
+        <div class="stock-stat-num">
+          {{ registrosConStockBajo ? registrosConStockBajo : 0 }}
+        </div>
         <div class="stock-stat-label">Registros con stock bajo</div>
       </div>
     </div>
@@ -47,7 +51,9 @@
         <i class="bi bi-ban"></i>
       </div>
       <div>
-        <div class="stock-stat-num">3</div>
+        <div class="stock-stat-num">
+          {{ registrosSinStock ? registrosSinStock : 0 }}
+        </div>
         <div class="stock-stat-label">Registros sin stock</div>
       </div>
     </div>
@@ -58,7 +64,11 @@
     <!-- BÚSQUEDA -->
     <div class="search-box">
       <i class="bi bi-search"></i>
-      <input type="text" placeholder="Buscar producto o variante..." />
+      <input
+        type="text"
+        placeholder="Buscar por producto o variante..."
+        [formControl]="busquedaControl"
+      />
     </div>
     <!-- POR CANAL -->
     <select
@@ -83,8 +93,12 @@
       <option [ngValue]="'sin'">Sin stock</option>
     </select>
     <!-- BTN LIMPIAR FILTROS -->
-    @if(idCanal != null || estado != null){
-    <button class="btn-limpiar-filtros" type="button">
+    @if (busquedaControl.value || idCanal != null || estado != null){
+    <button
+      class="btn-limpiar-filtros"
+      type="button"
+      (click)="limpiarFiltros()"
+    >
       <i class="bi bi-trash3-fill"></i>
       Limpiar filtros
     </button>
@@ -92,7 +106,7 @@
   </div>
 
   <!-- TABLA DE REGISTROS DE STOCK -->
-  <div class="stock-tabla-card">
+  <div class="stock-tabla-card" *ngIf="stocks.length > 0">
     <table class="tabla-stock" id="tablaStock">
       <thead>
         <tr>
@@ -156,8 +170,9 @@
       </tbody>
     </table>
   </div>
-  <div class="tabla-footer">
-    <span id="stockContador"></span>
+  <div class="sin-stock-msg" *ngIf="stocks.length === 0">
+    <i class="bi bi-exclamation-circle"></i>
+    No se encontraron registros
   </div>
 </div>
 

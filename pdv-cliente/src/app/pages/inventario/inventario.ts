@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-// Servicios
+// Services
 import { StockService } from '../../core/services/stock-service';
 import { CanalService } from '../../core/services/canal-service';
 import { ToastrService } from 'ngx-toastr';
-// Modelos
+// Models
 import { StockResponse } from '../../models/Stock';
 import { CanalResponse } from '../../models/Canal';
+// Others
 import { StockInfo } from './stock-info/stock-info';
 import { StockForm } from './stock-form/stock-form';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-inventario',
@@ -29,12 +31,18 @@ export class Inventario implements OnInit {
   canales: CanalResponse[] = [];
   idCanal: number | null = null;
   estado: string | null = null;
+  busquedaControl = new FormControl('');
 
   // Variables que controlan la vista de modal de info y formulario
   modalStockVisible = false;
   registroStockSeleccionado: StockResponse | null = null;
   formStockVisible = false;
   registroStockForm: StockResponse | null = null;
+
+  // Variables para las tarjetas de resumen
+  unidadesTotales!: number;
+  registrosConStockBajo!: number;
+  registrosSinStock!: number;
 
   constructor(
     private stockService: StockService,
@@ -45,16 +53,40 @@ export class Inventario implements OnInit {
   ngOnInit(): void {
     this.obtenerCanales();
     this.obtenerStocks();
+    this.busquedaControl.valueChanges
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe(() => {
+        this.aplicarFiltros();
+      });
   }
 
   obtenerStocks(): void {
     this.stockService.obtenerStocks().subscribe({
       next: (response) => {
-        this.stocks = response;
+        this.stocks = response.content;
+        this.cargarTarjetasResumen();
       },
       error: (error) => {
         this.toastr.error('Error al cargar los registros', 'Error');
       },
+    });
+  }
+
+  private cargarTarjetasResumen(): void {
+    this.unidadesTotales = 0;
+    this.registrosConStockBajo = 0;
+    this.registrosSinStock = 0;
+
+    this.stocks.forEach((stock) => {
+      this.unidadesTotales = this.unidadesTotales + stock.cantidadDisponible;
+
+      if (this.tieneStockBajo(stock.cantidadDisponible, stock.stockMinimo)) {
+        this.registrosConStockBajo++;
+      }
+
+      if (this.noTieneStock(stock.cantidadDisponible)) {
+        this.registrosSinStock++;
+      }
     });
   }
 
@@ -67,6 +99,36 @@ export class Inventario implements OnInit {
         this.toastr.error('Error al cargar los canales de venta', 'Error');
       },
     });
+  }
+
+  aplicarFiltros(): void {
+    /*console.log('\nCanal: ', this.idCanal);
+    console.log('Estado: ', this.estado);
+    console.log('Busqueda: ', this.busquedaControl.value);*/
+
+    const nombre = this.busquedaControl.value?.trim() ?? '';
+
+    this.stockService
+      .filtrarStock(0, 0, nombre, this.idCanal, this.estado)
+      .subscribe({
+        next: (response) => {
+          this.stocks = response.content;
+          this.cargarTarjetasResumen();
+        },
+        error: (error) => {
+          this.toastr.error(error.error.mensaje, 'Error');
+        },
+      });
+  }
+
+  limpiarFiltros(): void {
+    this.busquedaControl.setValue('');
+
+    this.idCanal = null;
+
+    this.estado = null;
+
+    this.aplicarFiltros();
   }
 
   verRegistroStock(registro?: StockResponse): void {
@@ -85,11 +147,6 @@ export class Inventario implements OnInit {
       this.registroStockForm = null;
     }
     this.formStockVisible = true;
-  }
-
-  aplicarFiltros(): void {
-    console.log('Canal: ', this.idCanal);
-    console.log('Estado: ', this.estado);
   }
 
   cerrarModalStock(): void {
@@ -115,6 +172,14 @@ export class Inventario implements OnInit {
         'Registro creado',
       );
     }
+  }
+
+  private tieneStockBajo(cantidad: number, stock: number): boolean {
+    return cantidad > 0 && cantidad <= stock;
+  }
+
+  private noTieneStock(cantidad: number): boolean {
+    return cantidad === 0;
   }
 
   asignarEstadoStock(cantidadDisponible: number, stockMinimo: number): string {
