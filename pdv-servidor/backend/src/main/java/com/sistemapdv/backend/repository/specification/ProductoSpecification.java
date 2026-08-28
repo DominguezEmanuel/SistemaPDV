@@ -1,16 +1,51 @@
 package com.sistemapdv.backend.repository.specification;
 
 import com.sistemapdv.backend.entity.Producto;
+import com.sistemapdv.backend.entity.VarianteProducto;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ProductoSpecification {
 
-    public static Specification<Producto> nombreContiene(String nombre){
-        return (root, query, criteriaBuilder) ->
+    public static Specification<Producto> nombreContiene(String texto){
+        Specification<Producto> busqueda = (root, query, cb) -> {
+
+            if(texto == null || texto.trim().isEmpty()){
+                return cb.conjunction();
+            }
+
+            query.distinct(true);
+
+            Join<Producto, VarianteProducto> variante = root.join("variantes", JoinType.LEFT);
+
+            String valor = "%" + texto.toLowerCase() + "%";
+
+            return cb.or(
+                    cb.like(
+                            cb.lower(root.get("nombre")),
+                            valor
+                    ),
+
+                    cb.like(
+                            cb.lower(variante.get("nombre")),
+                            valor
+                    ),
+
+                    cb.like(
+                            cb.lower(variante.get("codigoBarras")),
+                            valor
+                    )
+            );
+        };
+
+        return busqueda;
+
+        /*return (root, query, criteriaBuilder) ->
                 criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("nombre")),
                         "%" + nombre.toLowerCase() + "%"
-                );
+                );*/
     }
 
     public static Specification<Producto> perteneceACategoria(Integer idCategoria) {

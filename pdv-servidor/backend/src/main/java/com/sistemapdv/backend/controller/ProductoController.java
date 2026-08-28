@@ -44,10 +44,10 @@ public class ProductoController {
 
     @GetMapping("/buscar")
     public PagedModel<ProductoResponseDTO> findByFilters(@RequestParam(required = false) String nombre,
-                                                   @RequestParam(required = false) Integer idCategoria,
-                                                   @RequestParam(required = false) Boolean activo,
-                                                   @PageableDefault(sort = "nombre", direction = Sort.Direction.ASC)
-                                                       Pageable pageable){
+                                                         @RequestParam(required = false) Integer idCategoria,
+                                                         @RequestParam(required = false) Boolean activo,
+                                                         @PageableDefault(sort = "nombre", direction = Sort.Direction.ASC)
+                                                             Pageable pageable){
         Page<ProductoResponseDTO> productosFiltrados = productoService.filterByFilters(nombre, idCategoria, activo, pageable);
 
         return new PagedModel<>(productosFiltrados);

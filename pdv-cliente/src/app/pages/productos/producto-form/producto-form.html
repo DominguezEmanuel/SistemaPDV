@@ -4,7 +4,10 @@
     <div class="mv-header">
       <div class="mv-header-info">
         <h3 class="mv-title">
-          <i class="bi bi-plus-circle"></i>
+          <i
+            class="bi"
+            [ngClass]="modo === 'editar' ? 'bi-pencil-square' : 'bi-plus-circle'"
+          ></i>
           {{ modo === 'crear' ? "Nuevo producto" : "Editar producto" }}
         </h3>
       </div>
