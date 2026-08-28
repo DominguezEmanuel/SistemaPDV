@@ -2,8 +2,11 @@
   <div class="rs-modal" (click)="detenerPropagacion($event)">
     <div class="rs-header">
       <h2>
-        <i class="bi bi-plus-circle"></i>
-        Nuevo registro de stock
+        <i
+          class="bi"
+          [ngClass]="modo === 'editar' ? 'bi-pencil-square' : 'bi-plus-circle'"
+        ></i>
+        {{ modo === 'crear' ? "Nuevo registro" : "Editar registro" }}
       </h2>
       <button
         type="button"
@@ -17,24 +20,32 @@
     <!-- CUERPO DEL FORMULARIO -->
     <div class="rs-body">
       <form [formGroup]="formStock" (ngSubmit)="procesarFormulario()">
-        <!-- PRODUCTO -->
         <div class="rs-row">
           <div class="rs-field-form">
+            <!-- PRODUCTO -->
+            <div class="rs-section-title">
+              <i class="bi bi-box-seam"></i>
+              Producto
+            </div>
             <label class="rs-label" for="producto"
-              >Producto<span class="req">*</span></label
+              >Nombre<span class="req">*</span></label
             >
             <input
               id="producto"
               type="text"
               class="rs-input"
-              placeholder="Buscar producto..."
+              placeholder="Buscar productos..."
               [formControl]="busquedaControl"
               autocomplete="off"
             />
           </div>
           <div class="rs-field-form">
+            <!-- Listado de Productos Filtrados -->
+            <div class="rs-section-title">
+              <i class="bi bi-filter"></i>
+              Productos filtrados
+            </div>
             <div *ngIf="productos.length > 0">
-              <!-- Listado de Productos -->
               <label class="rs-label" for="slproducto"
                 >Productos filtrados<span class="req">*</span></label
               >
@@ -56,18 +67,22 @@
         </div>
 
         <div class="rs-row">
-          <!-- VARIANTE -->
           <div class="rs-field-form">
+            <!-- VARIANTE -->
+            <div class="rs-section-title">
+              <i class="bi bi-boxes"></i>
+              Variante
+            </div>
             <label class="rs-label" for="variante"
-              >Variante<span class="req">*</span></label
+              >Nombre<span class="req">*</span></label
             >
             <select id="variante" class="rs-select" formControlName="variante">
               <!-- Sin producto seleccionado -->
               <option [ngValue]="null" disabled>
                 {{ !productoSeleccionado ? 'Primero seleccioná un producto' :
-                'Seleccioná una variante'}}
+                'Seleccioná una variante' }}
               </option>
-              <!-- Variantes -->
+              <!-- Variantes del producto -->
               <option
                 *ngFor="let variante of variantes"
                 [ngValue]="variante.idVariante"
@@ -75,13 +90,13 @@
                 {{ variante.nombre }}
               </option>
             </select>
+
             <!-- Error de validación -->
             <div
               *ngIf="formStock.get('variante')?.touched && formStock.get('variante')?.invalid"
               class="rs-error-msg"
             >
               <i class="bi bi-exclamation-circle"></i>
-
               <div *ngIf="formStock.get('variante')?.errors?.['required']">
                 Seleccioná una variante.
               </div>
@@ -93,14 +108,28 @@
               class="rs-hint"
             >
               <i class="bi bi-exclamation-circle"></i>
-              Este producto no posee variantes. Se utilizará su variante única.
+              Este producto no posee variantes.
+            </div>
+
+            <!-- Producto con variantes pero sin variantes registradas -->
+            <div
+              *ngIf="productoSeleccionado && productoSeleccionado.tieneVariantes && variantes.length === 0"
+              class="rs-hint"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              Este producto no tiene variantes registradas. Registre al menos
+              una variante.
             </div>
           </div>
 
-          <!-- CANAL DE VENTA -->
           <div class="rs-field-form">
+            <!-- CANAL DE VENTA -->
+            <div class="rs-section-title">
+              <i class="bi bi-house-add-fill"></i>
+              Canal de Venta
+            </div>
             <label class="rs-label" for="canal"
-              >Canal de venta<span class="req">*</span></label
+              >Nombre<span class="req">*</span></label
             >
             <select id="canal" class="rs-select" formControlName="canal">
               <option [ngValue]="null" disabled>Seleccioná un canal</option>
@@ -123,11 +152,15 @@
           </div>
         </div>
 
+        <div class="rs-section-title full">
+          <i class="bi bi-square"></i>
+          Otros datos
+        </div>
         <div class="rs-row">
           <!-- CANTIDAD DISPONIBLE -->
           <div class="rs-field-form">
             <label class="rs-label" for="disponible"
-              >Disponible<span class="req">*</span></label
+              >Cantidad disponible<span class="req">*</span></label
             >
             <input
               type="number"
@@ -156,7 +189,7 @@
           <!-- STOCK MINIMO -->
           <div class="rs-field-form">
             <label class="rs-label" for="minimo"
-              >Mínimo<span class="req">*</span></label
+              >Stock mínimo<span class="req">*</span></label
             >
             <input
               type="number"

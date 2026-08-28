@@ -151,12 +151,6 @@
           </td>
           <td>
             <div class="acciones-cell">
-              <!--<button class="btn-accion editar" title="Modificar">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn-accion ajustar" title="Ajustar stock">
-                <i class="bi bi-plus-square"></i>
-              </button>-->
               <button
                 class="btn-accion visualizar"
                 title="Visualizar"
@@ -164,6 +158,13 @@
               >
                 <i class="bi bi-eye"></i>
               </button>
+              <!--<button
+                class="btn-accion ajustar"
+                title="Editar registro"
+                (click)="verFormularioStock(stock)"
+              >
+                <i class="bi bi-pencil-square"></i>
+              </button>-->
             </div>
           </td>
         </tr>
@@ -184,7 +185,7 @@
 >
 </app-stock-info>
 
-<!-- FORMULARIO PARA REGISTRO DE STOCK -->
+<!-- FORMULARIO PARA REGISTRO/EDICION DE STOCK -->
 <app-stock-form
   [stockForm]="registroStockForm"
   [visible]="formStockVisible"

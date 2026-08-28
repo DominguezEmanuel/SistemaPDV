@@ -37,7 +37,7 @@ import { finalize } from 'rxjs';
   templateUrl: './stock-form.html',
   styleUrl: './stock-form.css',
 })
-export class StockForm implements OnInit {
+export class StockForm implements OnInit, OnChanges {
   @Input() stockForm: StockResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
@@ -96,6 +96,27 @@ export class StockForm implements OnInit {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['visible'] && !changes['visible'].currentValue) {
+    }
+
+    if (changes['stockForm']) {
+      if (this.stockForm) {
+      } else {
+      }
+    }
+  }
+
+  private cargarDatosRegistro(): void {
+    if (!this.stockForm) {
+      return;
+    }
+
+    this.modo = 'editar';
+
+    this.formStock.patchValue({});
+  }
+
   private reiniciarCamposDependientes(): void {
     this.productos = [];
     this.productoControl.setValue(null);
@@ -138,12 +159,12 @@ export class StockForm implements OnInit {
 
   buscarProductos(nombre: string): void {
     // Filtra los productos que contengan 'nombre' y estén activos
-    this.productoService.buscarPorFiltros(0, 10, nombre, null, true).subscribe({
+    this.productoService.buscarPorFiltros(0, 0, nombre, null, true).subscribe({
       next: (response) => {
         this.productos = response.content;
         if (this.productos.length === 0) {
           this.toastr.info(
-            'Por favor, verifica que hayas escrito bien',
+            'Verifica que hayas escrito bien el nombre del producto',
             'Sin resultados',
           );
         }
@@ -157,7 +178,7 @@ export class StockForm implements OnInit {
   seleccionarProducto(producto: ProductoResponse): void {
     this.productoSeleccionado = producto;
 
-    // Asigna el nombre del producto a la búsqueda y no dispara el evento de búsqueda
+    // Asigna el nombre del producto al campo de búsqueda y no dispara el evento
     this.busquedaControl.setValue(producto.nombre, { emitEvent: false });
 
     this.cargarVariantesPorProducto(producto.idProducto);
@@ -168,25 +189,21 @@ export class StockForm implements OnInit {
     this.formStock.get('variante')?.disable();
     this.variantes = [];
 
-    this.varianteService
-      .obtenerVariantesPorProducto(idProducto)
-      .pipe(finalize(() => {}))
-      .subscribe({
-        next: (response) => {
-          this.variantes = response;
-          this.controlarCampoVariante(this.variantes);
-        },
-        error: (error) => {
-          this.variantes = [];
-          this.formStock.get('variante')?.disable();
-          this.formStock.get('variante')?.reset(null);
-          this.formStock.get('variante')?.disable();
-          this.toastr.error(
-            'Error al cargar las variantes del productos',
-            'Error',
-          );
-        },
-      });
+    this.varianteService.obtenerVariantesPorProducto(idProducto).subscribe({
+      next: (response) => {
+        this.variantes = response;
+        this.controlarCampoVariante(this.variantes);
+      },
+      error: (error) => {
+        /*this.variantes = [];
+        this.formStock.get('variante')?.disable();
+        this.formStock.get('variante')?.reset(null);*/
+        this.toastr.error(
+          'Error al cargar las variantes del productos',
+          'Error',
+        );
+      },
+    });
   }
 
   private controlarCampoVariante(variantes: VarianteResponse[]): void {

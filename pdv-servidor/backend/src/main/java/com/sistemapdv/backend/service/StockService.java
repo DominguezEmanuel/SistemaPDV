@@ -100,6 +100,10 @@ public class StockService {
                 .orElseThrow(() -> new ResourceNotFoundException("Variante con ID "
                         + request.getIdVariante() + " no encontrada"));
 
+        if(!variante.getActivo()){
+            throw new IllegalArgumentException("La variante seleccionada se encuentra inactiva");
+        }
+
         CanalVenta canal = canalVentaRepository.findById(request.getIdCanalVenta())
                 .orElseThrow(() -> new ResourceNotFoundException("Canal con ID "
                         + request.getIdCanalVenta() + " no encontrado"));

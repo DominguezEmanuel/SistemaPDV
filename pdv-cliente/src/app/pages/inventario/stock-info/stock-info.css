@@ -151,6 +151,27 @@
   grid-column: 1 / -1;
 }
 
+.rs-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #1c5a85;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.rs-section-title:first-of-type {
+  margin-top: 0;
+}
+.rs-section-title i {
+  color: #3e93c7;
+}
+
+.rs-section-title.full {
+  grid-column: 1 / -1;
+}
+
 .rs-btn-cerrar {
   border: 1.5px solid #e4edf3;
   color: #5b6670;

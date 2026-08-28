@@ -38,6 +38,7 @@
               class="nu-input"
               placeholder="Ej: Labial Mate Larga Duración"
               formControlName="nombre"
+              autocomplete="off"
             />
             <div
               *ngIf="formProducto.get('nombre')?.touched && formProducto.get('nombre')?.invalid"
