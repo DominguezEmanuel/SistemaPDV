@@ -36,7 +36,7 @@ export class Productos implements OnInit {
 
   // Variables para paginación
   paginaActual: number = 0;
-  tamanioPagina: number = 0;
+  tamanioPagina: number = 12;
   totalProductos: number = 0;
   totalPaginas: number = 0;
 
@@ -125,17 +125,20 @@ export class Productos implements OnInit {
   }
 
   cargarProductos(): void {
-    this.productoService.obtenerProductos().subscribe({
-      next: (response) => {
-        this.totalProductos = response.page.totalElements;
-        this.totalPaginas = response.page.totalPages;
-        this.paginaActual = response.page.number;
-        this.productos = response.content;
-      },
-      error: (error) => {
-        this.toastr.error('Error al cargar los productos', 'Error');
-      },
-    });
+    this.productoService
+      .obtenerProductos(this.paginaActual, this.tamanioPagina)
+      .subscribe({
+        next: (response) => {
+          //console.log('Page Response: ', response);
+          this.totalProductos = response.page.totalElements;
+          this.totalPaginas = response.page.totalPages;
+          this.paginaActual = response.page.number;
+          this.productos = response.content;
+        },
+        error: (error) => {
+          this.toastr.error('Error al cargar los productos', 'Error');
+        },
+      });
   }
 
   cambiarEstadoProducto(
@@ -194,8 +197,6 @@ export class Productos implements OnInit {
     }
 
     this.paginaActual = pagina;
-
-    console.log('Página actual: ', this.paginaActual);
 
     this.cargarProductos();
   }

@@ -307,6 +307,7 @@
               class="nu-input"
               placeholder="Ej: 779456123789"
               formControlName="codigoBarras"
+              autocomplete="off"
             />
             <div
               *ngIf="formProducto.get('codigoBarras')?.touched && formProducto.get('codigoBarras')?.invalid"

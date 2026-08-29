@@ -17,7 +17,7 @@ export class StockService {
 
   obtenerStocks(
     page: number = 0,
-    size: number = 0,
+    size: number = 10,
   ): Observable<PageResponse<StockResponse>> {
     const params = new HttpParams().set('page', page).set('size', size);
 

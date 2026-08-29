@@ -15,6 +15,8 @@ export class ProductoService {
     this.hostBase = environment.apiUrl + '/productos/';
   }
 
+  // page: indica cuál página de resultados se desea obtener - page 0: primer página
+  // size: cantidad máxima de registros que se desea obtener por cada página
   obtenerProductos(
     page: number = 0,
     size: number = 10,

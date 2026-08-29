@@ -423,10 +423,9 @@
 /* Contenedor de paginación */
 .paginacion {
   display: flex;
-  justify-content: left;
+  justify-content: right;
   align-items: center;
   gap: 6px;
-  margin-top: 24px;
   padding: 12px 0;
 }
 
@@ -440,11 +439,11 @@
   align-items: center;
   justify-content: center;
 
-  border: none;
+  border: 1px solid #dcdcdc;
   border-radius: 6px;
 
-  background: linear-gradient(135deg, #3e93c7, #1c5a85);
-  color: #ffffff;
+  background: #ffffff;
+  color: #333333;
 
   font-size: 14px;
   font-weight: 500;
@@ -479,6 +478,14 @@
 .paginacion button:first-child,
 .paginacion button:last-child {
   padding: 0 14px;
+}
+
+.footer-tabla {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 0 4px;
 }
 
 @media (max-width: 576px) {
