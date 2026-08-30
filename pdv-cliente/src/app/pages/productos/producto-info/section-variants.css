@@ -1,0 +1,87 @@
+.mv-variants-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.mv-section-title {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #5b6670;
+  text-transform: uppercase;
+}
+
+.mv-section-title .product-name {
+  font-style: normal;
+  color: #3e93c7;
+}
+
+.mv-section-text {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #5b6670;
+  line-height: 1.6;
+}
+
+.mv-section-text span {
+  display: block;
+}
+.mv-btn-primary {
+  border: none;
+  background: linear-gradient(135deg, #3e93c7, #1c5a85);
+  box-shadow: 0 8px 18px -8px rgba(28, 90, 133, 0.5);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+
+.mv-btn-primary:not(:disabled):hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  color: #fff;
+}
+
+.mv-btn-primary:disabled {
+  background: #c7cdd1;
+  color: #f5f6f7;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+  opacity: 1;
+}
+
+.mv-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+.mv-badge.activo {
+  background: #e7f7ed;
+  color: #2e9e5b;
+}
+.mv-badge.inactivo {
+  background: #fbeaea;
+  color: #c13b3b;
+}
+.mv-badge .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}

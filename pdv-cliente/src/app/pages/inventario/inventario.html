@@ -175,6 +175,38 @@
     <i class="bi bi-exclamation-circle"></i>
     No se encontraron registros
   </div>
+  <!-- Footer Tabla -->
+  <div class="footer-tabla">
+    <p class="contador-resultados">
+      Mostrando <b>{{ totalRegistros }}</b> productos encontrados
+    </p>
+    <!-- Sección: Paginado -->
+    <div class="paginacion">
+      <button
+        type="button"
+        [disabled]="paginaActual === 0"
+        (click)="cambiarPagina(paginaActual - 1)"
+      >
+        Anterior
+      </button>
+
+      <button
+        *ngFor="let pagina of paginas"
+        [class.active]="pagina === paginaActual"
+        (click)="cambiarPagina(pagina)"
+      >
+        {{ pagina + 1 }}
+      </button>
+
+      <button
+        type="button"
+        [disabled]="paginaActual === totalPaginas - 1"
+        (click)="cambiarPagina(paginaActual + 1)"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL DE INFORMACIÓN DEL REGISTRO DE STOCK -->

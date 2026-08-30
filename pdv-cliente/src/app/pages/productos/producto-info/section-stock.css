@@ -1,0 +1,101 @@
+.canal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.mv-channel-name.local,
+.canal-badge.local {
+  background: #dceef8;
+  color: #1c5a85;
+}
+
+.mv-channel-name.tiktok,
+.canal-badge.tiktok {
+  background: #efe7fb;
+  color: #6b3fa0;
+}
+
+.mv-channel-name.total {
+  background: #fff3de;
+  color: #a6710c;
+}
+
+/* Estilos para los estado del registro de Stock */
+.estado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.estado-badge.disponible {
+  background: #e7f7ed;
+  color: #2e9e5b;
+}
+.estado-badge.stock-bajo {
+  background: #fff3de;
+  color: #a6710c;
+}
+.estado-badge.sin-stock {
+  background: #fbeaea;
+  color: #c13b3b;
+}
+.estado-badge .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.mv-stock-layout {
+  justify-content: end;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.mv-stock-channel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+}
+
+/* Alineación horizontal de los hijos si están dentro de un <div> interno */
+.mv-stock-channel > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mv-channel-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #5b6670;
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin: 0;
+}
+.mv-channel-stock {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin: 0;
+  color: #5b6670;
+}
+
+@media (max-width: 768px) {
+  .mv-stock-layout {
+    grid-template-columns: 1fr;
+  }
+}

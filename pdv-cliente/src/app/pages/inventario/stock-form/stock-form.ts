@@ -246,7 +246,7 @@ export class StockForm implements OnInit, OnChanges {
           this.cerrarModal();
         },
         error: (error) => {
-          this.toastr.error(error.error.mensaje, 'Registro duplicado');
+          this.toastr.error(error.error.mensaje, 'Error');
         },
       });
   }

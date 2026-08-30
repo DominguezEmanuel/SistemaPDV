@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
 import { VarianteRequest, VarianteResponse } from '../../models/Variante';
 import { Observable } from 'rxjs';
+import { StockProductoResponse } from '../../models/Producto';
 @Injectable({
   providedIn: 'root',
 })
@@ -13,7 +14,9 @@ export class VarianteService {
     this.hostBase = environment.apiUrl + '/variantes/';
   }
 
-  obtenerVariantesPorProducto(idProducto: number) {
+  obtenerVariantesPorProducto(
+    idProducto: number,
+  ): Observable<VarianteResponse[]> {
     return this.http.get<VarianteResponse[]>(
       `${environment.apiUrl}/productos/${idProducto}/variantes`,
     );

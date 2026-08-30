@@ -2,6 +2,7 @@ package com.sistemapdv.backend.controller;
 
 import com.sistemapdv.backend.dto.request.ProductoRequestDTO;
 import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
+import com.sistemapdv.backend.dto.response.StockProductoResponseDTO;
 import com.sistemapdv.backend.dto.response.VarianteProductoResponseDTO;
 import com.sistemapdv.backend.service.ProductoService;
 import jakarta.validation.Valid;
@@ -97,5 +98,11 @@ public class ProductoController {
         ProductoResponseDTO productoActualizado = productoService.updateProduct(id, request);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(productoActualizado);
+    }
+
+    @GetMapping("/{idProducto}/stock")
+    @ResponseBody
+    public List<StockProductoResponseDTO> getStockByProduct(@PathVariable Integer idProducto){
+        return productoService.getStockByProductId(idProducto);
     }
 }

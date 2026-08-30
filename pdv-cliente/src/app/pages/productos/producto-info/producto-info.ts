@@ -8,18 +8,20 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 // Models
-import { ProductoResponse } from '../../../models/Producto';
+import {
+  ProductoResponse,
+  StockProductoResponse,
+} from '../../../models/Producto';
 import { CanalResponse } from '../../../models/Canal';
 import { VarianteResponse } from '../../../models/Variante';
 import { StockResponse } from '../../../models/Stock';
 // Services
+import { ProductoService } from '../../../core/services/producto-service';
 import { VarianteService } from '../../../core/services/variante-service';
-import { CanalService } from '../../../core/services/canal-service';
-import { StockService } from '../../../core/services/stock-service';
 import { ProductoCanalService } from '../../../core/services/producto-canal-service';
 import { ToastrService } from 'ngx-toastr';
 import { AlertService } from '../../../core/services/alert-service';
-// Otros
+// Others
 import { VarianteForm } from '../../variantes/variante-form/variante-form';
 
 interface ConfiguracionCanal {
@@ -34,17 +36,25 @@ type TabId = 'informacion' | 'variantes' | 'stock' | 'comercial';
   selector: 'app-product-view-modal',
   imports: [CommonModule, VarianteForm],
   templateUrl: './producto-info.html',
-  styleUrls: ['./producto-info.css'],
+  styleUrls: [
+    './producto-info.css',
+    './section-stock.css',
+    './section-info.css',
+    './section-variants.css',
+  ],
 })
 export class ProductViewModalComponent implements OnChanges {
   // Estructuras utilizadas
   @Input() producto: ProductoResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
-  variantesCargadas = false;
-  canalesCargados = false;
+  //variantesCargadas = false;
+  //canalesCargados = false;
+
+  // Variables para el formulario de registro/edicion de Variante
   modalFormularioVariante = false;
   varianteSeleccionada: VarianteResponse | null = null;
+
   // Estructura para las secciones de la vista
   tabs: { id: TabId; label: string; icon: string }[] = [
     {
@@ -55,43 +65,46 @@ export class ProductViewModalComponent implements OnChanges {
     {
       id: 'variantes',
       label: 'Variantes del producto',
-      icon: 'bi bi-grid-3x3-gap',
+      icon: 'bi bi-boxes',
     },
-    { id: 'stock', label: 'Stock', icon: 'bi bi-box-seam' },
+    { id: 'stock', label: 'Stock', icon: 'bi bi-columns-gap' },
     {
       id: 'comercial',
       label: 'Configuración Comercial',
       icon: 'bi bi-tag',
     },
   ];
-  // Seccion activada por defecto
+
   tabActiva: TabId = 'informacion';
 
-  variantes: VarianteResponse[] = [];
-  varianteSeleccionadaId: number | null = null;
-  varianteSeleccionadaNombre: string | null = null;
   canales: CanalResponse[] = [];
   stock: StockResponse | null = null;
   configuracionCanales: ConfiguracionCanal[] = [];
   totalStockPorCanal: ConfiguracionCanal[] = [];
-  private totalStockRequestId = 0;
+
+  // Panel Variantes
+  variantes: VarianteResponse[] = [];
+
+  // Panel Stock
+  stocks: StockProductoResponse[] = [];
+  stockLocalFisico!: number;
+  stockTikTok!: number;
 
   constructor(
+    private productoService: ProductoService,
     private varianteService: VarianteService,
-    private canalService: CanalService,
-    private stockService: StockService,
     private productoCanalService: ProductoCanalService,
     private toastr: ToastrService,
     private alertService: AlertService,
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
+    // Evalúa si el componente ha recibido un nuevo producto a través del @Input()
+    // Se asegura que dicho producto sea válido antes de ejecutar la lógica
     if (changes['producto'] && this.producto) {
       this.resetearStock();
       this.cargarVariantes();
-      if (this.tabActiva === 'stock' || this.tabActiva === 'comercial') {
-        this.cargarCanales();
-      }
+      this.cargarStockProducto();
     }
   }
 
@@ -105,26 +118,18 @@ export class ProductViewModalComponent implements OnChanges {
       .subscribe({
         next: (response) => {
           this.variantes = response;
-          // Asignación del primer ID y nombre
-          this.varianteSeleccionadaId = response[0]?.idVariante ?? null;
-          this.varianteSeleccionadaNombre = response[0]?.nombre ?? null;
-
-          if (
-            this.tabActiva === 'stock' &&
-            this.varianteSeleccionadaId !== null
-          ) {
-            this.cargarStockPorCanales(this.varianteSeleccionadaId);
-          }
-
-          this.variantesCargadas = true;
-          this.actualizarStockTotalSiEsNecesario();
         },
         error: (error) => {
-          console.error('Error al cargar variantes:', error);
+          console.log('Error:', error);
+          this.toastr.error(
+            'Error al cargar las variantes del producto',
+            'Error',
+          );
         },
       });
   }
 
+  // Métodos para el panel de variantes del producto
   verFormulario(variante?: VarianteResponse): void {
     if (variante) {
       this.varianteSeleccionada = variante;
@@ -138,6 +143,7 @@ export class ProductViewModalComponent implements OnChanges {
     variante: VarianteResponse;
     accion: 'crear' | 'editar';
   }): void {
+    // Cargar nuevamente el listado de variantes
     this.cargarVariantes();
 
     if (event.accion === 'crear') {
@@ -151,27 +157,6 @@ export class ProductViewModalComponent implements OnChanges {
         'Variante actualizada',
       );
     }
-  }
-
-  cargarCanales() {
-    this.canalService.obtenerCanales().subscribe({
-      next: (response) => {
-        this.canales = response;
-
-        if (
-          this.tabActiva === 'stock' &&
-          this.varianteSeleccionadaId !== null
-        ) {
-          this.cargarStockPorCanales(this.varianteSeleccionadaId);
-        }
-
-        this.canalesCargados = true;
-        this.actualizarStockTotalSiEsNecesario();
-      },
-      error: (error) => {
-        console.error('Error al obtener canales:', error);
-      },
-    });
   }
 
   cargarProductosCanales() {
@@ -205,150 +190,9 @@ export class ProductViewModalComponent implements OnChanges {
     });
   }
 
-  seleccionarVariante(idVariante: number, nombre: string): void {
-    this.varianteSeleccionadaId = idVariante;
-    this.varianteSeleccionadaNombre = nombre;
-    this.cargarStockPorCanales(idVariante);
-  }
-
-  cargarStockPorCanales(idVariante: number): void {
-    if (!this.producto || !this.canales.length) {
-      this.configuracionCanales = [];
-      return;
-    }
-
-    this.configuracionCanales = [];
-
-    this.canales.forEach((canal) => {
-      this.stockService
-        .obtenerStockPorCanalYVariante(canal.idCanalVenta, idVariante)
-        .subscribe({
-          next: (response) => {
-            this.configuracionCanales.push({
-              idCanal: canal.idCanalVenta,
-              nombreCanal: canal.nombre,
-              cantidad: response?.cantidadDisponible ?? 0,
-            });
-          },
-          error: (error) => {
-            console.error(
-              `Error al cargar stock para canal ${canal.idCanalVenta}:`,
-              error,
-            );
-            this.configuracionCanales.push({
-              idCanal: canal.idCanalVenta,
-              nombreCanal: canal.nombre,
-              cantidad: 0,
-            });
-          },
-        });
-    });
-  }
-
-  cargarTotalStockPorCanales(): void {
-    if (!this.producto || !this.canales.length || !this.variantes.length) {
-      this.totalStockPorCanal = [];
-      return;
-    }
-
-    const requestId = ++this.totalStockRequestId;
-    this.totalStockPorCanal = [];
-
-    this.canales.forEach((canal) => {
-      let total = 0;
-      let pendientes = this.variantes.length;
-
-      if (pendientes === 0) {
-        this.totalStockPorCanal.push({
-          idCanal: canal.idCanalVenta,
-          nombreCanal: canal.nombre,
-          cantidad: 0,
-        });
-        return;
-      }
-
-      this.variantes.forEach((variante) => {
-        this.stockService
-          .obtenerStockPorCanalYVariante(
-            canal.idCanalVenta,
-            variante.idVariante,
-          )
-          .subscribe({
-            next: (response) => {
-              if (requestId !== this.totalStockRequestId) {
-                return;
-              }
-              total += response?.cantidadDisponible ?? 0;
-              pendientes -= 1;
-              if (pendientes === 0) {
-                this.totalStockPorCanal.push({
-                  idCanal: canal.idCanalVenta,
-                  nombreCanal: canal.nombre,
-                  cantidad: total,
-                });
-              }
-            },
-            error: (error) => {
-              if (requestId !== this.totalStockRequestId) {
-                return;
-              }
-              console.error(
-                `Error al sumar stock para canal ${canal.idCanalVenta} variante ${variante.idVariante}:`,
-                error,
-              );
-              pendientes -= 1;
-              if (pendientes === 0) {
-                this.totalStockPorCanal.push({
-                  idCanal: canal.idCanalVenta,
-                  nombreCanal: canal.nombre,
-                  cantidad: total,
-                });
-              }
-            },
-          });
-      });
-    });
-  }
-
-  obtenerTotalStockCanal(idCanal: number): number {
-    return (
-      this.totalStockPorCanal.find((item) => item.idCanal === idCanal)
-        ?.cantidad ?? 0
-    );
-  }
-
-  obtenerCantidadByCanal(idCanal: number): number {
-    return (
-      this.configuracionCanales.find((item) => item.idCanal === idCanal)
-        ?.cantidad ?? 0
-    );
-  }
-
   resetearStock(): void {
-    this.varianteSeleccionadaId = null;
-    this.varianteSeleccionadaNombre = null;
-    this.variantesCargadas = false;
-    this.canalesCargados = false;
     this.totalStockPorCanal = [];
     this.configuracionCanales = [];
-  }
-
-  seleccionarTab(id: TabId): void {
-    this.tabActiva = id;
-
-    if (id === 'variantes') {
-      this.cargarVariantes();
-    }
-
-    if (id === 'stock') {
-      this.cargarVariantes();
-      this.cargarCanales();
-    }
-
-    if (id === 'comercial') {
-      this.cargarCanales();
-      this.cargarProductosCanales();
-    }
   }
 
   cambiarEstadoVariante(
@@ -378,20 +222,88 @@ export class ProductViewModalComponent implements OnChanges {
       });
   }
 
-  private actualizarStockTotalSiEsNecesario(): void {
-    if (this.tabActiva !== 'stock') {
+  cargarStockProducto(): void {
+    if (!this.producto) {
       return;
     }
 
-    if (!this.canales.length || !this.variantes.length) {
+    this.productoService
+      .obtenerStockProducto(this.producto.idProducto)
+      .subscribe({
+        next: (response) => {
+          this.stocks = response;
+          this.calcularStockTotalPorCanal();
+        },
+        error: (error) => {
+          console.log('Error: ', error);
+          this.toastr.error('Error al cargar el stock del producto', 'Error');
+        },
+      });
+  }
+
+  private calcularStockTotalPorCanal(): void {
+    if (!this.stocks) {
       return;
     }
 
-    this.cargarTotalStockPorCanales();
+    this.stockLocalFisico = 0;
+    this.stockTikTok = 0;
+
+    this.stocks.forEach((stock) => {
+      if (stock.nombreCanalVenta === 'Local Fisico') {
+        this.stockLocalFisico += stock.cantidadDisponible;
+      } else {
+        this.stockTikTok += stock.cantidadDisponible;
+      }
+    });
+  }
+
+  // Métodos para el estado del Stock
+  asignarEstadoStock(cantidadDisponible: number, stockMinimo: number): string {
+    if (cantidadDisponible <= 0) {
+      return 'Sin stock';
+    }
+
+    if (cantidadDisponible <= stockMinimo) {
+      return 'Stock bajo';
+    }
+
+    return 'Disponible';
+  }
+
+  obtenerClaseEstado(cantidad: number, minimo: number): string {
+    if (cantidad <= 0) {
+      return 'sin-stock';
+    }
+
+    if (cantidad <= minimo) {
+      return 'stock-bajo';
+    }
+
+    return 'disponible';
+  }
+
+  // Funciones para los TABS
+  seleccionarTab(id: TabId): void {
+    this.tabActiva = id;
+
+    if (id === 'comercial') {
+      this.cargarProductosCanales();
+    }
   }
 
   esTabActiva(id: TabId): boolean {
     return this.tabActiva === id;
+  }
+
+  // Limpia todas las variables/estructuras utilizadas en este componente
+  private limpiarDatos(): void {
+    this.variantes = [];
+    this.canales = [];
+    this.stock = null;
+    this.configuracionCanales = [];
+    this.totalStockPorCanal = [];
+    this.tabActiva = 'informacion';
   }
 
   cerrarModal(): void {
@@ -405,18 +317,6 @@ export class ProductViewModalComponent implements OnChanges {
 
   detenerPropagacion(evento: MouseEvent): void {
     evento.stopPropagation();
-  }
-
-  // Limpia todas las variables/estructuras utilizadas en este componente
-  limpiarDatos(): void {
-    this.variantes = [];
-    this.varianteSeleccionadaId = null;
-    this.varianteSeleccionadaNombre = null;
-    this.canales = [];
-    this.stock = null;
-    this.configuracionCanales = [];
-    this.totalStockPorCanal = [];
-    this.tabActiva = 'informacion';
   }
 
   formatearMoneda(valor: number): string {

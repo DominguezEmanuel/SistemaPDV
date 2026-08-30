@@ -22,3 +22,16 @@ export interface ProductoRequest {
   tieneVariantes: boolean;
   idCategoria: number;
 }
+
+export interface StockProductoResponse {
+  idStock: number;
+
+  idVariante: number;
+  nombreVariante: string;
+
+  idCanalVenta: number;
+  nombreCanalVenta: string;
+
+  cantidadDisponible: number;
+  stockMinimo: number;
+}

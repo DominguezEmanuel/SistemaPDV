@@ -3,9 +3,11 @@ package com.sistemapdv.backend.service;
 import com.sistemapdv.backend.dto.request.ProductoRequestDTO;
 import com.sistemapdv.backend.dto.request.VarianteProductoRequestDTO;
 import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
+import com.sistemapdv.backend.dto.response.StockProductoResponseDTO;
 import com.sistemapdv.backend.dto.response.VarianteProductoResponseDTO;
 import com.sistemapdv.backend.entity.Categoria;
 import com.sistemapdv.backend.entity.Producto;
+import com.sistemapdv.backend.entity.Stock;
 import com.sistemapdv.backend.entity.VarianteProducto;
 import com.sistemapdv.backend.exception.ResourceDuplicatedException;
 import com.sistemapdv.backend.exception.ResourceNotFoundException;
@@ -13,6 +15,7 @@ import com.sistemapdv.backend.mapper.ProductoMapper;
 import com.sistemapdv.backend.mapper.VarianteProductoMapper;
 import com.sistemapdv.backend.repository.CategoriaRepository;
 import com.sistemapdv.backend.repository.ProductoRepository;
+import com.sistemapdv.backend.repository.StockRepository;
 import com.sistemapdv.backend.repository.VarianteProductoRepository;
 import com.sistemapdv.backend.repository.specification.ProductoSpecification;
 import org.springframework.data.domain.Page;
@@ -34,15 +37,17 @@ public class ProductoService {
     private final VarianteProductoService varianteService;
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final StockRepository stockRepository;
     private final VarianteProductoRepository varianteRepository;
     private final ProductoMapper productoMapper;
     private final VarianteProductoMapper varianteMapper;
 
-    public ProductoService(CloudinaryService cloudinaryService, VarianteProductoService varianteService, ProductoRepository productoRepository, CategoriaRepository categoriaRepository, VarianteProductoRepository varianteRepository, ProductoMapper productoMapper, VarianteProductoMapper varianteMapper) {
+    public ProductoService(CloudinaryService cloudinaryService, VarianteProductoService varianteService, ProductoRepository productoRepository, CategoriaRepository categoriaRepository, StockRepository stockRepository, VarianteProductoRepository varianteRepository, ProductoMapper productoMapper, VarianteProductoMapper varianteMapper) {
         this.cloudinaryService = cloudinaryService;
         this.varianteService = varianteService;
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.stockRepository = stockRepository;
         this.varianteRepository = varianteRepository;
         this.productoMapper = productoMapper;
         this.varianteMapper = varianteMapper;
@@ -93,6 +98,20 @@ public class ProductoService {
         return productoRepository
                 .findAll(specification, pageable)
                 .map(productoMapper::toResponseDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StockProductoResponseDTO> getStockByProductId(Integer idProducto){
+        if(!productoRepository.existsById(idProducto))
+            throw new ResourceNotFoundException("El producto con ID " +
+                    idProducto + " no existe");
+
+        List<Stock> stocksProducto = stockRepository.findByProductoId(idProducto);
+
+        return stocksProducto
+                .stream()
+                .map(productoMapper::toStockProductoDTO)
+                .toList();
     }
 
     @Transactional(readOnly = true)

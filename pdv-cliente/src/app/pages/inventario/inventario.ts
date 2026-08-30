@@ -44,6 +44,12 @@ export class Inventario implements OnInit {
   registrosConStockBajo!: number;
   registrosSinStock!: number;
 
+  // Variables para paginación
+  paginaActual: number = 0;
+  tamanioPagina: number = 10;
+  totalRegistros: number = 0;
+  totalPaginas: number = 0;
+
   constructor(
     private stockService: StockService,
     private canalService: CanalService,
@@ -61,15 +67,20 @@ export class Inventario implements OnInit {
   }
 
   obtenerStocks(): void {
-    this.stockService.obtenerStocks().subscribe({
-      next: (response) => {
-        this.stocks = response.content;
-        this.cargarTarjetasResumen();
-      },
-      error: (error) => {
-        this.toastr.error('Error al cargar los registros', 'Error');
-      },
-    });
+    this.stockService
+      .obtenerStocks(this.paginaActual, this.tamanioPagina)
+      .subscribe({
+        next: (response) => {
+          this.stocks = response.content;
+          this.totalRegistros = response.page.totalElements;
+          this.totalPaginas = response.page.totalPages;
+          this.paginaActual = response.page.number;
+          this.cargarTarjetasResumen();
+        },
+        error: (error) => {
+          this.toastr.error('Error al cargar los registros', 'Error');
+        },
+      });
   }
 
   private cargarTarjetasResumen(): void {
@@ -106,13 +117,24 @@ export class Inventario implements OnInit {
     console.log('Estado: ', this.estado);
     console.log('Busqueda: ', this.busquedaControl.value);*/
 
+    this.paginaActual = 0;
+
     const nombre = this.busquedaControl.value?.trim() ?? '';
 
     this.stockService
-      .filtrarStock(0, 0, nombre, this.idCanal, this.estado)
+      .filtrarStock(
+        this.paginaActual,
+        this.tamanioPagina,
+        nombre,
+        this.idCanal,
+        this.estado,
+      )
       .subscribe({
         next: (response) => {
           this.stocks = response.content;
+          this.totalRegistros = response.page.totalElements;
+          this.totalPaginas = response.page.totalPages;
+          this.paginaActual = response.page.number;
           this.cargarTarjetasResumen();
         },
         error: (error) => {
@@ -147,6 +169,20 @@ export class Inventario implements OnInit {
       this.registroStockForm = null;
     }
     this.formStockVisible = true;
+  }
+
+  get paginas(): number[] {
+    return Array.from({ length: this.totalPaginas }, (_, i) => i);
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina < 0 || pagina >= this.totalPaginas) {
+      return;
+    }
+
+    this.paginaActual = pagina;
+
+    this.obtenerStocks();
   }
 
   cerrarModalStock(): void {
