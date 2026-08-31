@@ -3,6 +3,7 @@ package com.sistemapdv.backend.controller;
 import com.sistemapdv.backend.dto.request.StockRequestDTO;
 import com.sistemapdv.backend.dto.response.StockResponseDTO;
 import com.sistemapdv.backend.service.StockService;
+import com.sistemapdv.backend.utils.enums.EstadoStock;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,7 +60,7 @@ public class StockController {
     @GetMapping("/buscar")
     public PagedModel<StockResponseDTO> getStockByFilters(@RequestParam (required = false) String nombre,
                                                           @RequestParam (required = false) Integer idCanal,
-                                                          @RequestParam (required = false) String estado,
+                                                          @RequestParam (required = false) EstadoStock estado,
                                                           Pageable pageable){
         Page<StockResponseDTO> registrosFiltrados = stockService.getByFilters(nombre, idCanal, estado, pageable);
 
@@ -73,13 +74,13 @@ public class StockController {
                 .body(stockService.createStock(request));
     }
 
-    /* De esto se encargará MovimientoStock
-    @PatchMapping("/cantidad/{id}")
-    public ResponseEntity<StockResponseDTO> editCantidadDisponible(@PathVariable Integer id,
+    /* De esto se encargará MovimientoStock */
+    @PatchMapping("/cantidad/{idStock}")
+    public ResponseEntity<StockResponseDTO> editStockAvailable(@PathVariable Integer idStock,
                                             @RequestParam Integer nuevaCantidad){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(stockService.editCantidadDisponible(id, nuevaCantidad));
-    }*/
+                .body(stockService.editStock(idStock, nuevaCantidad));
+    }
 
     @PatchMapping("/stock-minimo/{id}")
     public ResponseEntity<StockResponseDTO> editStockMinimo(@PathVariable Integer id,

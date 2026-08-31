@@ -4,8 +4,8 @@ import com.sistemapdv.backend.entity.CanalVenta;
 import com.sistemapdv.backend.entity.Producto;
 import com.sistemapdv.backend.entity.Stock;
 import com.sistemapdv.backend.entity.VarianteProducto;
+import com.sistemapdv.backend.utils.enums.EstadoStock;
 import jakarta.persistence.criteria.Join;
-import org.springframework.boot.autoconfigure.rsocket.RSocketProperties;
 import org.springframework.data.jpa.domain.Specification;
 
 public class StockSpecification {
@@ -51,37 +51,22 @@ public class StockSpecification {
         return buscar;
     }
 
-    public static Specification<Stock> porEstado(String estado){
+    public static Specification<Stock> porEstado(EstadoStock estado) {
         return (root, query, cb) -> {
-            if(estado == null || estado.trim().isEmpty()){
+
+            if (estado == null) {
                 return cb.conjunction();
             }
 
-            String estadoNormalizado = estado.trim().toLowerCase();
+            try {
 
-            switch (estadoNormalizado){
-                case "disponible":
-                    // cantidadDisponible > stockMinimo
-                    return cb.greaterThan(root.get("cantidadDisponible"),
-                            root.get("stockMinimo"));
+                return cb.equal(
+                        root.get("estado"),
+                        estado
+                );
 
-                case "bajo":
-                    // cantidadDisponible > 0 AND cantidadDisponible <= stockMinimo
-                    return cb.and(
-                            cb.greaterThan(root.get("cantidadDisponible"), 0),
-                            cb.lessThanOrEqualTo(
-                                    root.get("cantidadDisponible"),
-                                    root.get("stockMinimo")
-                            )
-                    );
-
-                case "sin":
-                    // cantidadDisponible = 0
-                    return cb.equal(root.get("cantidadDisponible"), 0);
-
-                default:
-                    // Si se envia un estado inválido, se omiten los filtros
-                    return cb.conjunction();
+            } catch (IllegalArgumentException e) {
+                return cb.conjunction();
             }
         };
     }

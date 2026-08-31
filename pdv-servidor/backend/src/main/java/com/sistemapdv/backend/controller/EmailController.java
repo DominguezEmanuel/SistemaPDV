@@ -21,11 +21,11 @@ public class EmailController {
         this.emailService = emailService;
     }
 
-    @PostMapping("/enviar")
+    /*@PostMapping("/enviar")
     public ResponseEntity<?> sendEmail(@Valid @RequestBody SendEmailDTO request){
         emailService.sendEmail(request);
 
         return ResponseEntity.ok(Map.of("mensaje", "Correo enviado correctamente"));
-    }
+    }*/
 
 }

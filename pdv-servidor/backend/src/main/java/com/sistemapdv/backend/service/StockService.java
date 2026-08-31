@@ -31,12 +31,15 @@ public class StockService {
     private final CanalVentaRepository canalVentaRepository;
     private final StockMapper stockMapper;
 
+    private final StockAlertService stockAlertService;
+
     public StockService(StockRepository stockRepository, VarianteProductoRepository varianteRepository,
-                        CanalVentaRepository canalVentaRepository, StockMapper stockMapper) {
+                        CanalVentaRepository canalVentaRepository, StockMapper stockMapper, StockAlertService stockAlertService) {
         this.stockRepository = stockRepository;
         this.varianteRepository = varianteRepository;
         this.canalVentaRepository = canalVentaRepository;
         this.stockMapper = stockMapper;
+        this.stockAlertService = stockAlertService;
     }
 
     @Transactional(readOnly = true)
@@ -148,20 +151,38 @@ public class StockService {
         return EstadoStock.DISPONIBLE;
     }
 
-    /* De esto se encargará MovimientoStock
+    /* De esto se encargará MovimientoStock */
     @Transactional
-    public StockResponseDTO editCantidadDisponible(Integer idStock, Integer nuevaCantidad){
+    public StockResponseDTO editStock(Integer idStock, Integer nuevaCantidad){
         Stock stock = stockRepository.findById(idStock)
-                .orElseThrow(()-> new ResourceNotFoundException("Stock con ID " +
+                .orElseThrow(()-> new ResourceNotFoundException("Registro con ID " +
                         idStock + " no encontrado"));
 
         if(nuevaCantidad < 0)
             throw new IllegalArgumentException("La cantidad disponible no puede ser menor a 0");
 
         stock.setCantidadDisponible(nuevaCantidad);
+        EstadoStock estadoAnterior = stock.getEstado();
+
+        if(!mismoEstado(stock)){
+            if(stock.getCantidadDisponible() == 0){
+                stock.setEstado(EstadoStock.SIN_STOCK);
+            }else{
+                stock.setEstado(EstadoStock.STOCK_BAJO);
+            }
+            stockAlertService.procesarCambioEstado(stock, estadoAnterior);
+        }
 
         return stockMapper.toResponseDTO(stock);
-    }*/
+    }
+
+    private Boolean mismoEstado(Stock stock){
+        EstadoStock estadoOriginal = stock.getEstado();
+
+        EstadoStock nuevoEstado = obtenerEstadoStock(stock.getCantidadDisponible(), stock.getStockMinimo());
+
+        return estadoOriginal.equals(nuevoEstado);
+    }
 
     @Transactional
     public StockResponseDTO editStockMinimo(Integer idStock, Integer nuevoStockMinimo){
@@ -178,7 +199,7 @@ public class StockService {
     }
 
     @Transactional(readOnly = true)
-    public Page<StockResponseDTO> getByFilters(String nombre, Integer idCanal, String estado, Pageable pageable){
+    public Page<StockResponseDTO> getByFilters(String nombre, Integer idCanal, EstadoStock estado, Pageable pageable){
         Specification<Stock> specification = (root, query, cb) -> null;
 
         if(nombre != null && !nombre.isBlank()){
@@ -189,7 +210,7 @@ public class StockService {
             specification = specification.and(StockSpecification.porCanal(idCanal));
         }
 
-        if(estado != null && !estado.isBlank()){
+        if(estado != null){
             specification = specification.and(StockSpecification.porEstado(estado));
         }
 
