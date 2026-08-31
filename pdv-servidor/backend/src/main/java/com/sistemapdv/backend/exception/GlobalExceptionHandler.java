@@ -68,6 +68,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<ErrorResponseDTO> reportEmailNotSend(EmailException ex,
+                                                               HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request));
+    }
+
     public ErrorResponseDTO buildError(HttpStatus status,
             String mensaje, HttpServletRequest request){
 

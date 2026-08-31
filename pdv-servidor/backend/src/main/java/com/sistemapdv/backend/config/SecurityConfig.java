@@ -73,6 +73,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/canales-venta/**").permitAll()
                     .requestMatchers("/api/stock/**").permitAll()
                     .requestMatchers("/api/productos-canales/**").permitAll()
+                    .requestMatchers("/api/email/**").permitAll()
                     // Toda request que no haya sido permitida, requiere un usuario autenticado
                 .anyRequest().authenticated()
             )
