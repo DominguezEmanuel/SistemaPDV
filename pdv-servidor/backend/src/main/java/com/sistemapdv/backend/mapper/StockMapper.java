@@ -15,6 +15,7 @@ public class StockMapper {
                 .idStock(stock.getIdStock())
                 .cantidadDisponible(stock.getCantidadDisponible())
                 .stockMinimo(stock.getStockMinimo())
+                .estado(stock.getEstado())
                 .idProducto(stock.getVarianteProducto().getProducto().getIdProducto())
                 .nombreProducto(stock.getVarianteProducto().getProducto().getNombre())
                 .idVariante(stock.getVarianteProducto().getIdVariante())

@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> reportIllegalArguments(IllegalArgumentException ex,
                                                                    HttpServletRequest request){
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request));
+                .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

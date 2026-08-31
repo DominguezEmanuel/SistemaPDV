@@ -12,6 +12,7 @@ import com.sistemapdv.backend.repository.CanalVentaRepository;
 import com.sistemapdv.backend.repository.StockRepository;
 import com.sistemapdv.backend.repository.VarianteProductoRepository;
 import com.sistemapdv.backend.repository.specification.StockSpecification;
+import com.sistemapdv.backend.utils.enums.EstadoStock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,6 +23,8 @@ import java.util.List;
 
 @Service
 public class StockService {
+
+    private static final Integer STOCK_MINIMO_ACEPTADO = 3;
 
     private final StockRepository stockRepository;
     private final VarianteProductoRepository varianteRepository;
@@ -38,20 +41,25 @@ public class StockService {
 
     @Transactional(readOnly = true)
     public StockResponseDTO getStockById(Integer id){
+
         Stock stock = stockRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Stock con ID "
+                .orElseThrow(()-> new ResourceNotFoundException("Registro con ID "
                 + id + " no encontrado"));
+
         return stockMapper.toResponseDTO(stock);
     }
 
     @Transactional(readOnly = true)
     public Page<StockResponseDTO> getAllStocks(Pageable pageable){
+
         Page<Stock> stocks = stockRepository.findAll(pageable);
+
         return stocks.map(stockMapper::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
     public List<StockResponseDTO> getStocksByIdVariant(Integer idVariante){
+
         if(!varianteRepository.existsById(idVariante))
             throw new ResourceNotFoundException("Variante con ID " +
                 idVariante + " no encontrada");
@@ -64,6 +72,7 @@ public class StockService {
 
     @Transactional(readOnly = true)
     public List<StockResponseDTO> getStocksByIdChannel(Integer idCanal){
+
         if(!canalVentaRepository.existsById(idCanal))
             throw new ResourceNotFoundException("Canal con ID " +
                     idCanal + " no encontrado");
@@ -76,10 +85,12 @@ public class StockService {
 
     @Transactional(readOnly = true)
     public StockResponseDTO getStockByChannelAndVariant(Integer idCanal, Integer idVariante) {
+
         // Verificar que exista la Variante
         VarianteProducto variante = varianteRepository.findById(idVariante)
                 .orElseThrow(()-> new ResourceNotFoundException("Canal con ID " +
                     idCanal + " no encontrado"));
+
         // Verificar que exista la Canal
         CanalVenta canal = canalVentaRepository.findById(idCanal)
                 .orElseThrow(()-> new ResourceNotFoundException("Variante con ID " +
@@ -88,7 +99,7 @@ public class StockService {
         Stock stock = stockRepository.findByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
                         idVariante, idCanal)
                 .orElseThrow(() -> new ResourceNotFoundException("Registro no encontrado para " +
-                        "variante " + variante.getNombre() + " y canal " + canal.getNombre()));
+                        "variante '" + variante.getNombre() + "' y canal '" + canal.getNombre() + "'"));
 
         return stockMapper.toResponseDTO(stock);
     }
@@ -116,9 +127,25 @@ public class StockService {
 
         Stock nuevoStock = stockMapper.toStock(request, variante, canal);
 
+        // Obtener el estado del stock
+        nuevoStock.setEstado(obtenerEstadoStock(nuevoStock.getCantidadDisponible(), nuevoStock.getStockMinimo()));
+
         stockRepository.save(nuevoStock);
 
         return stockMapper.toResponseDTO(nuevoStock);
+    }
+
+    private EstadoStock obtenerEstadoStock(Integer cantidad, Integer minimo){
+
+        if(cantidad == 0) {
+            return EstadoStock.SIN_STOCK;
+        }
+
+        if(cantidad <= minimo){
+            return EstadoStock.STOCK_BAJO;
+        }
+
+        return EstadoStock.DISPONIBLE;
     }
 
     /* De esto se encargará MovimientoStock
@@ -139,10 +166,10 @@ public class StockService {
     @Transactional
     public StockResponseDTO editStockMinimo(Integer idStock, Integer nuevoStockMinimo){
         Stock stock = stockRepository.findById(idStock)
-                .orElseThrow(()-> new ResourceNotFoundException("Registro de stock con ID " +
+                .orElseThrow(()-> new ResourceNotFoundException("Registro con ID " +
                         idStock + " no encontrado"));
 
-        if(nuevoStockMinimo < 3)
+        if(nuevoStockMinimo < STOCK_MINIMO_ACEPTADO)
             throw new IllegalArgumentException("El stock mínimo no puede ser menor a 3");
 
         stock.setStockMinimo(nuevoStockMinimo);

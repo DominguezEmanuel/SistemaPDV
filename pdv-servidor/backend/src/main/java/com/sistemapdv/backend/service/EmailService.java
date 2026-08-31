@@ -28,6 +28,7 @@ public class EmailService {
     }
 
     public void sendEmail(SendEmailDTO requestEmail){
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
 
@@ -37,8 +38,8 @@ public class EmailService {
             message.setText(requestEmail.getBody());
 
             mailSender.send(message);
-        }catch (MailException e){
 
+        }catch (MailException e){
             logger.error("Error al enviar correo electrónico", e);
 
             throw new EmailException("No se pudo enviar el correo electrónico");

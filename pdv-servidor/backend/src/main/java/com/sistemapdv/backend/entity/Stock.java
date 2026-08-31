@@ -1,5 +1,6 @@
 package com.sistemapdv.backend.entity;
 
+import com.sistemapdv.backend.utils.enums.EstadoStock;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +28,10 @@ public class Stock {
 
     @Column(name = "stock_minimo", nullable = false)
     private Integer stockMinimo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false, length = 30)
+    private EstadoStock estado;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_variante", nullable = false)

@@ -1,6 +1,7 @@
 package com.sistemapdv.backend.dto.response;
 
 
+import com.sistemapdv.backend.utils.enums.EstadoStock;
 import lombok.*;
 
 @Getter
@@ -13,6 +14,7 @@ public class StockResponseDTO {
 
     private Integer cantidadDisponible;
     private Integer stockMinimo;
+    private EstadoStock estado;
 
     private Integer idProducto;
     private String nombreProducto;

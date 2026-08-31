@@ -38,15 +38,15 @@ public class StockController {
     }
 
     @GetMapping("/variante/{idVariante}")
-    @ResponseBody
-    public List<StockResponseDTO> getStocksByIdVariant(@PathVariable Integer idVariante) {
-        return stockService.getStocksByIdVariant(idVariante);
+    public ResponseEntity<List<StockResponseDTO>> getStocksByIdVariant(@PathVariable Integer idVariante) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(stockService.getStocksByIdVariant(idVariante));
     }
 
     @GetMapping("/canal/{idCanal}")
-    @ResponseBody
-    public List<StockResponseDTO> getStocksByIdChannel(@PathVariable Integer idCanal) {
-        return stockService.getStocksByIdChannel(idCanal);
+    public ResponseEntity<List<StockResponseDTO>> getStocksByIdChannel(@PathVariable Integer idCanal) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(stockService.getStocksByIdChannel(idCanal));
     }
 
     @GetMapping("/canal/{idCanal}/variante/{idVariante}")

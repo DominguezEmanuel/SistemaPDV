@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Alerta de Stock</title>
+</head>
+
+<body style="
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    font-family: Arial, Helvetica, sans-serif;
+">
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background-color: #f4f4f4; padding: 30px 0;">
+
+    <tr>
+        <td align="center">
+
+            <!-- Contenedor principal -->
+            <table width="600" cellpadding="0" cellspacing="0" border="0"
+                   style="
+                       max-width: 600px;
+                       width: 100%;
+                       background-color: #ffffff;
+                       border-radius: 8px;
+                       overflow: hidden;
+                   ">
+
+                <!-- Encabezado -->
+                <tr>
+                    <td style="
+                        padding: 25px;
+                        text-align: center;
+                        background-color: #212529;
+                    ">
+
+                        <h1 style="
+                            margin: 0;
+                            color: #ffffff;
+                            font-size: 24px;
+                        ">
+                            Sistema PDV
+                        </h1>
+
+                        <p style="
+                            margin: 8px 0 0;
+                            color: #dddddd;
+                            font-size: 14px;
+                        ">
+                            Notificación de inventario
+                        </p>
+
+                    </td>
+                </tr>
+
+
+                <!-- Contenido -->
+                <tr>
+                    <td style="padding: 30px;">
+
+                        <h2 style="
+                            margin: 0 0 15px;
+                            color: #212529;
+                            font-size: 22px;
+                        ">
+                            ⚠️ Alerta de stock
+                        </h2>
+
+                        <p style="
+                            margin: 0 0 25px;
+                            color: #555555;
+                            font-size: 15px;
+                            line-height: 1.6;
+                        ">
+                            Uno de los productos registrados en el sistema
+                            requiere atención debido a su nivel de stock.
+                        </p>
+
+
+                        <!-- Información del producto -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                               style="
+                                   border: 1px solid #dddddd;
+                                   border-radius: 6px;
+                               ">
+
+                            <tr>
+                                <td style="
+                                    padding: 12px 15px;
+                                    background-color: #f8f9fa;
+                                    font-weight: bold;
+                                    color: #555555;
+                                    width: 40%;
+                                ">
+                                    Producto
+                                </td>
+
+                                <td style="
+                                    padding: 12px 15px;
+                                    color: #212529;
+                                ">
+                                    {{producto}}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="
+                                    padding: 12px 15px;
+                                    background-color: #f8f9fa;
+                                    font-weight: bold;
+                                    color: #555555;
+                                ">
+                                    Variante
+                                </td>
+
+                                <td style="
+                                    padding: 12px 15px;
+                                    color: #212529;
+                                ">
+                                    {{variante}}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="
+                                    padding: 12px 15px;
+                                    background-color: #f8f9fa;
+                                    font-weight: bold;
+                                    color: #555555;
+                                ">
+                                    Canal de venta
+                                </td>
+
+                                <td style="
+                                    padding: 12px 15px;
+                                    color: #212529;
+                                ">
+                                    {{canalVenta}}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="
+                                    padding: 12px 15px;
+                                    background-color: #f8f9fa;
+                                    font-weight: bold;
+                                    color: #555555;
+                                ">
+                                    Stock actual
+                                </td>
+
+                                <td style="
+                                    padding: 12px 15px;
+                                    color: #212529;
+                                    font-weight: bold;
+                                ">
+                                    {{stockActual}} unidades
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="
+                                    padding: 12px 15px;
+                                    background-color: #f8f9fa;
+                                    font-weight: bold;
+                                    color: #555555;
+                                ">
+                                    Stock mínimo
+                                </td>
+
+                                <td style="
+                                    padding: 12px 15px;
+                                    color: #212529;
+                                ">
+                                    {{stockMinimo}} unidades
+                                </td>
+                            </tr>
+
+                        </table>
+
+
+                        <!-- Mensaje de alerta -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                               style="margin-top: 25px;">
+
+                            <tr>
+                                <td style="
+                                    padding: 15px;
+                                    background-color: #fff3cd;
+                                    border: 1px solid #ffe69c;
+                                    border-radius: 6px;
+                                    color: #664d03;
+                                    font-size: 14px;
+                                    line-height: 1.5;
+                                ">
+
+                                    <strong>Recomendación:</strong><br>
+
+                                    Se recomienda revisar el inventario y
+                                    realizar la reposición correspondiente.
+
+                                </td>
+                            </tr>
+
+                        </table>
+
+                    </td>
+                </tr>
+
+
+                <!-- Footer -->
+                <tr>
+                    <td style="
+                        padding: 20px;
+                        text-align: center;
+                        background-color: #f8f9fa;
+                        border-top: 1px solid #eeeeee;
+                    ">
+
+                        <p style="
+                            margin: 0;
+                            color: #888888;
+                            font-size: 12px;
+                        ">
+                            Este correo fue generado automáticamente por el
+                            Sistema PDV.
+                        </p>
+
+                        <p style="
+                            margin: 8px 0 0;
+                            color: #aaaaaa;
+                            font-size: 11px;
+                        ">
+                            No es necesario responder a este correo.
+                        </p>
+
+                    </td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+
+</table>
+
+</body>
+</html>

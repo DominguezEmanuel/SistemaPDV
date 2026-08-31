@@ -11,7 +11,7 @@ import lombok.*;
 public class StockRequestDTO {
 
     @NotNull(message = "Debe indicar la cantidad disponible")
-    @Min(value = 1, message = "La cantidad mínima disponible debe ser mayor o igual a 1")
+    @Min(value = 0, message = "La cantidad mínima disponible no puede ser menor a 0")
     private Integer cantidadDisponible;
 
     @NotNull(message = "Debe indicar el stock mínimo de la variante")
