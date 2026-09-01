@@ -3,6 +3,7 @@ export interface StockResponse {
 
   cantidadDisponible: number;
   stockMinimo: number;
+  estado: string;
 
   idProducto: number;
   nombreProducto: string;

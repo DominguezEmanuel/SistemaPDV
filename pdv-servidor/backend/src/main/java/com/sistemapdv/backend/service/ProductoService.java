@@ -101,6 +101,27 @@ public class ProductoService {
     }
 
     @Transactional(readOnly = true)
+    public List<ProductoResponseDTO> filterByName(String nombre){
+        Specification<Producto> specification = (root, query, cb) -> null;
+
+        // Filtra por nombre y 'activo' == true
+        if(nombre != null && !nombre.isBlank()){
+            specification = specification.and(
+                    ProductoSpecification.contieneNombre(nombre.trim())
+            );
+            specification = specification.and(
+                    ProductoSpecification.tieneEstado(true)
+            );
+        }
+
+        return productoRepository
+                .findAll(specification)
+                .stream()
+                .map(productoMapper::toResponseDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<StockProductoResponseDTO> getStockByProductId(Integer idProducto){
         if(!productoRepository.existsById(idProducto))
             throw new ResourceNotFoundException("El producto con ID " +

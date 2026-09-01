@@ -43,7 +43,7 @@ public class ProductoController {
                 .body(productoEncontrado);
     }
 
-    @GetMapping("/buscar")
+    @GetMapping("/filtrar")
     public PagedModel<ProductoResponseDTO> findByFilters(@RequestParam(required = false) String nombre,
                                                          @RequestParam(required = false) Integer idCategoria,
                                                          @RequestParam(required = false) Boolean activo,
@@ -52,6 +52,12 @@ public class ProductoController {
         Page<ProductoResponseDTO> productosFiltrados = productoService.filterByFilters(nombre, idCategoria, activo, pageable);
 
         return new PagedModel<>(productosFiltrados);
+    }
+
+    @GetMapping("/filtrar/nombre")
+    public ResponseEntity<List<ProductoResponseDTO>> filterByNameProduct(@RequestParam String nombre){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(productoService.filterByName(nombre));
     }
 
     @GetMapping("/")
@@ -101,8 +107,8 @@ public class ProductoController {
     }
 
     @GetMapping("/{idProducto}/stock")
-    @ResponseBody
-    public List<StockProductoResponseDTO> getStockByProduct(@PathVariable Integer idProducto){
-        return productoService.getStockByProductId(idProducto);
+    public ResponseEntity<List<StockProductoResponseDTO>> getStockByProduct(@PathVariable Integer idProducto){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(productoService.getStockByProductId(idProducto));
     }
 }

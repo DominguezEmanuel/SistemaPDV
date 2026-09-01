@@ -1,5 +1,6 @@
 <div class="rs-overlay" *ngIf="visible" (click)="cerrarModal()">
   <div class="rs-modal" (click)="detenerPropagacion($event)">
+    <!-- HEADER -->
     <div class="rs-header">
       <h2>
         <i
@@ -21,8 +22,8 @@
     <div class="rs-body">
       <form [formGroup]="formStock" (ngSubmit)="procesarFormulario()">
         <div class="rs-row">
+          <!-- PRODUCTO -->
           <div class="rs-field-form">
-            <!-- PRODUCTO -->
             <div class="rs-section-title">
               <i class="bi bi-box-seam"></i>
               Producto
@@ -39,8 +40,8 @@
               autocomplete="off"
             />
           </div>
+          <!-- Listado de Productos Filtrados -->
           <div class="rs-field-form">
-            <!-- Listado de Productos Filtrados -->
             <div class="rs-section-title">
               <i class="bi bi-filter"></i>
               Productos filtrados
@@ -67,8 +68,8 @@
         </div>
 
         <div class="rs-row">
+          <!-- VARIANTE -->
           <div class="rs-field-form">
-            <!-- VARIANTE -->
             <div class="rs-section-title">
               <i class="bi bi-boxes"></i>
               Variante
@@ -121,9 +122,8 @@
               una variante.
             </div>
           </div>
-
+          <!-- CANAL DE VENTA -->
           <div class="rs-field-form">
-            <!-- CANAL DE VENTA -->
             <div class="rs-section-title">
               <i class="bi bi-house-add-fill"></i>
               Canal de Venta
@@ -154,7 +154,7 @@
 
         <div class="rs-section-title full">
           <i class="bi bi-square"></i>
-          Otros datos
+          Cantidades
         </div>
         <div class="rs-row">
           <!-- CANTIDAD DISPONIBLE -->
@@ -178,7 +178,7 @@
                 La cantidad disponible es obligatoria.
               </div>
               <div *ngIf="formStock.get('disponible')?.errors?.['min']">
-                La cantidad disponible debe ser mayor o igual a 1.
+                La cantidad disponible no puede ser menor a 0.
               </div>
               <div *ngIf="formStock.get('disponible')?.errors?.['pattern']">
                 Ingresá un número entero válido

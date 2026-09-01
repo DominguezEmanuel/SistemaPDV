@@ -89,8 +89,8 @@
     >
       <option [ngValue]="null">Todos los estados</option>
       <option [ngValue]="'disponible'">Disponible</option>
-      <option [ngValue]="'bajo'">Stock bajo</option>
-      <option [ngValue]="'sin'">Sin stock</option>
+      <option [ngValue]="'stock_bajo'">Stock bajo</option>
+      <option [ngValue]="'sin_stock'">Sin stock</option>
     </select>
     <!-- BTN LIMPIAR FILTROS -->
     @if (busquedaControl.value || idCanal != null || estado != null){
@@ -107,7 +107,7 @@
 
   <!-- TABLA DE REGISTROS DE STOCK -->
   <div class="stock-tabla-card" *ngIf="stocks.length > 0">
-    <table class="tabla-stock" id="tablaStock">
+    <table class="tabla-stock">
       <thead>
         <tr>
           <th>Producto</th>
@@ -143,9 +143,8 @@
           <td class="text-center">
             <span
               class="estado-badge"
-              [ngClass]="obtenerClaseEstado(stock.cantidadDisponible, stock.stockMinimo)"
-              ><span class="dot"></span>{{
-              asignarEstadoStock(stock.cantidadDisponible, stock.stockMinimo)
+              [ngClass]="obtenerClaseEstado(stock.estado)"
+              ><span class="dot"></span>{{ asignarEstadoStock(stock.estado)
               }}</span
             >
           </td>
@@ -171,6 +170,7 @@
       </tbody>
     </table>
   </div>
+  <!-- Mensaje para resultado vacío -->
   <div class="sin-stock-msg" *ngIf="stocks.length === 0">
     <i class="bi bi-exclamation-circle"></i>
     No se encontraron registros

@@ -58,8 +58,8 @@ public class ProductoMapper {
                 .nombreCanalVenta(stock.getCanalVenta().getNombre())
                 .cantidadDisponible(stock.getCantidadDisponible())
                 .stockMinimo(stock.getStockMinimo())
+                .estado(stock.getEstado())
                 .build();
-
         return dto;
     }
 }

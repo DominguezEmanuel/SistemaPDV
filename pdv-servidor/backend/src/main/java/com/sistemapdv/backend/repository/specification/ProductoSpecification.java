@@ -4,6 +4,7 @@ import com.sistemapdv.backend.entity.Producto;
 import com.sistemapdv.backend.entity.VarianteProducto;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import org.springframework.boot.autoconfigure.rsocket.RSocketProperties;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ProductoSpecification {
@@ -53,6 +54,14 @@ public class ProductoSpecification {
                 criteriaBuilder.equal(
                         root.get("categoria").get("idCategoria"),
                         idCategoria
+                );
+    }
+
+    public static Specification<Producto> contieneNombre(String nombre){
+        return (root, query, cb) ->
+                cb.like(
+                        cb.lower(root.get("nombre")),
+                        "%" + nombre.toLowerCase() + "%"
                 );
     }
 

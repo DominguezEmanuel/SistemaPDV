@@ -15,11 +15,14 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { finalize } from 'rxjs';
+// Models
 import { ProductoResponse } from '../../../models/Producto';
 import { VarianteRequest, VarianteResponse } from '../../../models/Variante';
+// Services
 import { VarianteService } from '../../../core/services/variante-service';
 import { ToastrService } from 'ngx-toastr';
+// Others
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-variante-form',
@@ -28,6 +31,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrl: './variante-form.css',
 })
 export class VarianteForm implements OnChanges {
+  // Variables de entrada y salida del componente
   @Input() producto: ProductoResponse | null = null;
   @Input() variante: VarianteResponse | null = null;
   @Input() visible = false;
@@ -37,6 +41,7 @@ export class VarianteForm implements OnChanges {
     accion: 'crear' | 'editar';
   }>();
 
+  // Variables del formulario
   formVariante!: FormGroup;
   varianteForm: VarianteRequest | null = null;
   modo: 'crear' | 'editar' = 'crear';
@@ -113,8 +118,8 @@ export class VarianteForm implements OnChanges {
 
     if (this.modo === 'editar' && !this.cambiosEnFormulario()) {
       this.toastr.info(
-        'No se realizaron cambios en la variante',
-        'Sin cambios',
+        'No se realizaron cambios en el formulario',
+        'Información',
       );
       return;
     }
@@ -151,11 +156,12 @@ export class VarianteForm implements OnChanges {
   }
 
   actualizarVariante(): void {
+    if (!this.variante) {
+      return;
+    }
+
     this.varianteService
-      .actualizarVariante(
-        this.variante?.idVariante ? this.variante.idVariante : 0,
-        this.varianteForm,
-      )
+      .actualizarVariante(this.variante.idVariante, this.varianteForm)
       .pipe(
         finalize(() => {
           this.guardando = false;
@@ -172,13 +178,17 @@ export class VarianteForm implements OnChanges {
       });
   }
 
-  asignarValores(): void {
+  private asignarValores(): void {
+    if (!this.producto) {
+      return;
+    }
+
     const valores = this.formVariante.getRawValue();
 
     this.varianteForm = {
       nombre: valores.nombre,
       codigoBarras: valores.codigoBarras,
-      idProducto: this.producto?.idProducto ? this.producto.idProducto : 0,
+      idProducto: this.producto.idProducto,
     };
   }
 

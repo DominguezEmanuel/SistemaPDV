@@ -51,11 +51,19 @@ export class ProductoService {
     }
 
     return this.http.get<PageResponse<ProductoResponse>>(
-      `${this.hostBase}buscar`,
+      `${this.hostBase}filtrar`,
       {
         params,
       },
     );
+  }
+
+  buscarPorNombre(nombre: string): Observable<ProductoResponse[]> {
+    const params = new HttpParams().set('nombre', nombre.trim());
+
+    return this.http.get<ProductoResponse[]>(`${this.hostBase}filtrar/nombre`, {
+      params,
+    });
   }
 
   crearProducto(formData: FormData): Observable<ProductoResponse> {

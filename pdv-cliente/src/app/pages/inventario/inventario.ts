@@ -91,11 +91,11 @@ export class Inventario implements OnInit {
     this.stocks.forEach((stock) => {
       this.unidadesTotales = this.unidadesTotales + stock.cantidadDisponible;
 
-      if (this.tieneStockBajo(stock.cantidadDisponible, stock.stockMinimo)) {
+      if (stock.estado === 'STOCK_BAJO') {
         this.registrosConStockBajo++;
       }
 
-      if (this.noTieneStock(stock.cantidadDisponible)) {
+      if (stock.estado === 'SIN_STOCK') {
         this.registrosSinStock++;
       }
     });
@@ -113,9 +113,12 @@ export class Inventario implements OnInit {
   }
 
   aplicarFiltros(): void {
-    /*console.log('\nCanal: ', this.idCanal);
-    console.log('Estado: ', this.estado);
-    console.log('Busqueda: ', this.busquedaControl.value);*/
+    // Si se envía el estado, se convierte a mayúsculas para que coincida
+    // con los valores esperados en el backend
+    let estadoFiltro = '';
+    if (this.estado) {
+      estadoFiltro = this.estado.toUpperCase();
+    }
 
     this.paginaActual = 0;
 
@@ -127,7 +130,7 @@ export class Inventario implements OnInit {
         this.tamanioPagina,
         nombre,
         this.idCanal,
-        this.estado,
+        estadoFiltro || null,
       )
       .subscribe({
         next: (response) => {
@@ -210,32 +213,24 @@ export class Inventario implements OnInit {
     }
   }
 
-  private tieneStockBajo(cantidad: number, stock: number): boolean {
-    return cantidad > 0 && cantidad <= stock;
-  }
-
-  private noTieneStock(cantidad: number): boolean {
-    return cantidad === 0;
-  }
-
-  asignarEstadoStock(cantidadDisponible: number, stockMinimo: number): string {
-    if (cantidadDisponible <= 0) {
+  asignarEstadoStock(estado: string): string {
+    if (estado === 'SIN_STOCK') {
       return 'Sin stock';
     }
 
-    if (cantidadDisponible <= stockMinimo) {
+    if (estado === 'STOCK_BAJO') {
       return 'Stock bajo';
     }
 
     return 'Disponible';
   }
 
-  obtenerClaseEstado(cantidad: number, minimo: number): string {
-    if (cantidad <= 0) {
+  obtenerClaseEstado(estado: string): string {
+    if (estado === 'SIN_STOCK') {
       return 'sin-stock';
     }
 
-    if (cantidad <= minimo) {
+    if (estado === 'STOCK_BAJO') {
       return 'stock-bajo';
     }
 

@@ -12,8 +12,8 @@ public class StockAlertService {
 
     private final EmailService emailService;
 
-    @Value("${spring.mail.admin}")
-    private String adminEmail;
+    //@Value("${spring.mail.admin}")
+    private String adminEmail = "dmanu401@gmail.com";
 
     public StockAlertService(EmailService emailService) {
         this.emailService = emailService;

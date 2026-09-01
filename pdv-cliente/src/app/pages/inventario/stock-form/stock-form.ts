@@ -38,6 +38,7 @@ import { finalize } from 'rxjs';
   styleUrl: './stock-form.css',
 })
 export class StockForm implements OnInit, OnChanges {
+  // Variables de entrada y salida del componente
   @Input() stockForm: StockResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
@@ -46,18 +47,18 @@ export class StockForm implements OnInit, OnChanges {
     accion: 'crear' | 'editar';
   }>();
 
+  // Variables del formulario
   formStock!: FormGroup;
+  busquedaControl = new FormControl('');
+  productoControl = new FormControl<ProductoResponse | null>(null);
   nuevoRegistroStock: StockRequest | null = null;
-  stock: StockResponse | null = null;
-  canales: CanalResponse[] = [];
   modo: 'crear' | 'editar' = 'crear';
   guardando = false;
   productos: ProductoResponse[] = [];
   variantes: VarianteResponse[] = [];
+  canales: CanalResponse[] = [];
   productoSeleccionado: ProductoResponse | null = null;
-  //cargandoVariantes = false;
-  busquedaControl = new FormControl('');
-  productoControl = new FormControl<ProductoResponse | null>(null);
+  //stock: StockResponse | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -78,11 +79,11 @@ export class StockForm implements OnInit, OnChanges {
       .subscribe((texto) => {
         const busqueda = texto?.trim() ?? '';
 
-        this.reiniciarCamposDependientes();
-
         if (busqueda.length < 2) {
           return;
         }
+
+        this.reiniciarCamposDependientes();
 
         this.buscarProductos(busqueda);
       });
@@ -96,35 +97,7 @@ export class StockForm implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['visible'] && !changes['visible'].currentValue) {
-    }
-
-    if (changes['stockForm']) {
-      if (this.stockForm) {
-      } else {
-      }
-    }
-  }
-
-  private cargarDatosRegistro(): void {
-    if (!this.stockForm) {
-      return;
-    }
-
-    this.modo = 'editar';
-
-    this.formStock.patchValue({});
-  }
-
-  private reiniciarCamposDependientes(): void {
-    this.productos = [];
-    this.productoControl.setValue(null);
-    this.variantes = [];
-    this.formStock.get('variante')?.reset(null);
-    this.formStock.get('variante')?.disable();
-    this.productoSeleccionado = null;
-  }
+  ngOnChanges(changes: SimpleChanges): void {}
 
   private getControlesFormulario() {
     return {
@@ -142,7 +115,7 @@ export class StockForm implements OnInit, OnChanges {
       disponible: new FormControl<number | null>(null, {
         validators: [
           Validators.required,
-          Validators.min(1),
+          Validators.min(0),
           Validators.pattern(/^[0-9]+$/),
         ],
       }),
@@ -157,11 +130,21 @@ export class StockForm implements OnInit, OnChanges {
     };
   }
 
+  // Reinicia los campos dependientes si se cambia el producto seleccionado
+  private reiniciarCamposDependientes(): void {
+    this.productos = [];
+    this.productoControl.setValue(null);
+    this.variantes = [];
+    this.formStock.get('variante')?.reset(null);
+    this.formStock.get('variante')?.disable();
+    this.productoSeleccionado = null;
+  }
+
   buscarProductos(nombre: string): void {
-    // Filtra los productos que contengan 'nombre' y estén activos
-    this.productoService.buscarPorFiltros(0, 0, nombre, null, true).subscribe({
+    // Filtra los productos que contengan 'nombre' y están activos
+    this.productoService.buscarPorNombre(nombre).subscribe({
       next: (response) => {
-        this.productos = response.content;
+        this.productos = response;
         if (this.productos.length === 0) {
           this.toastr.info(
             'Verifica que hayas escrito bien el nombre del producto',
@@ -195,9 +178,6 @@ export class StockForm implements OnInit, OnChanges {
         this.controlarCampoVariante(this.variantes);
       },
       error: (error) => {
-        /*this.variantes = [];
-        this.formStock.get('variante')?.disable();
-        this.formStock.get('variante')?.reset(null);*/
         this.toastr.error(
           'Error al cargar las variantes del productos',
           'Error',
@@ -207,7 +187,11 @@ export class StockForm implements OnInit, OnChanges {
   }
 
   private controlarCampoVariante(variantes: VarianteResponse[]): void {
-    if (this.productoSeleccionado?.tieneVariantes == false) {
+    if (!this.productoSeleccionado) {
+      return;
+    }
+
+    if (!this.productoSeleccionado.tieneVariantes) {
       this.formStock.patchValue({ variante: variantes[0].idVariante });
       this.formStock.get('variante')?.disable();
       return;
@@ -275,7 +259,6 @@ export class StockForm implements OnInit, OnChanges {
 
   private resetearFormulario(): void {
     this.formStock.reset({
-      producto: null,
       variante: null,
       canal: null,
       disponible: null,

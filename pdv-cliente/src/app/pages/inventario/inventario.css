@@ -261,19 +261,6 @@
   background: #efe7fb;
   color: #6b3fa0;
 }
-.canal-badge.whatsapp {
-  background: #e7f7ed;
-  color: #2e9e5b;
-}
-.canal-badge.meli {
-  background: #fff3de;
-  color: #a6710c;
-}
-
-.canal-badge.instagram {
-  background: #fbeaea;
-  color: #c13b3b;
-}
 
 .disponible-num {
   font-weight: 700;
@@ -334,6 +321,7 @@
     border-color 0.15s ease;
   cursor: pointer;
 }
+/*
 .btn-accion.editar:hover {
   background: #dceef8;
   color: #1c5a85;
@@ -343,7 +331,7 @@
   background: #e7f7ed;
   color: #2e9e5b;
   border-color: #2e9e5b;
-}
+}*/
 
 .btn-accion.visualizar:hover {
   background: #dceef8;

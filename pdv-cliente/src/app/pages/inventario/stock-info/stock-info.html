@@ -83,9 +83,8 @@
           <div class="rs-value">
             <span
               class="estado-badge"
-              [ngClass]="obtenerClaseEstado(stock.cantidadDisponible, stock.stockMinimo)"
-              >{{ asignarEstadoStock(stock.cantidadDisponible,
-              stock.stockMinimo) }}</span
+              [ngClass]="obtenerClaseEstado(stock.estado)"
+              >{{ asignarEstadoStock(stock.estado) }}</span
             >
           </div>
         </div>

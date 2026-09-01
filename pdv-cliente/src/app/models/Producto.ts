@@ -34,4 +34,5 @@ export interface StockProductoResponse {
 
   cantidadDisponible: number;
   stockMinimo: number;
+  estado: string;
 }

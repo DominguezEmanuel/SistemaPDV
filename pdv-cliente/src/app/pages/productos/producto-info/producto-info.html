@@ -248,10 +248,9 @@
               <td>
                 <span
                   class="estado-badge"
-                  [ngClass]="obtenerClaseEstado(stock.cantidadDisponible, stock.stockMinimo)"
-                  ><span class="dot"></span> {{
-                  asignarEstadoStock(stock.cantidadDisponible,
-                  stock.stockMinimo) }}</span
+                  [ngClass]="obtenerClaseEstado(stock.estado)"
+                  ><span class="dot"></span> {{ asignarEstadoStock(stock.estado)
+                  }}</span
                 >
               </td>
             </tr>

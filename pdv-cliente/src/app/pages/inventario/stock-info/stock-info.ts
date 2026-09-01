@@ -23,24 +23,24 @@ export class StockInfo {
 
   constructor() {}
 
-  asignarEstadoStock(cantidadDisponible: number, stockMinimo: number): string {
-    if (cantidadDisponible <= 0) {
+  asignarEstadoStock(estado: string): string {
+    if (estado === 'SIN_STOCK') {
       return 'Sin stock';
     }
 
-    if (cantidadDisponible <= stockMinimo) {
+    if (estado === 'STOCK_BAJO') {
       return 'Stock bajo';
     }
 
     return 'Disponible';
   }
 
-  obtenerClaseEstado(cantidad: number, minimo: number): string {
-    if (cantidad <= 0) {
+  obtenerClaseEstado(estado: string): string {
+    if (estado === 'SIN_STOCK') {
       return 'sin-stock';
     }
 
-    if (cantidad <= minimo) {
+    if (estado === 'STOCK_BAJO') {
       return 'stock-bajo';
     }
 
