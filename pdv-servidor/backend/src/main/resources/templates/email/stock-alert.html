@@ -1,257 +1,334 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Alerta de Stock</title>
 </head>
 
-<body style="
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    font-family: Arial, Helvetica, sans-serif;
-">
-
-<table width="100%" cellpadding="0" cellspacing="0" border="0"
-       style="background-color: #f4f4f4; padding: 30px 0;">
-
+<body
+        style="
+      margin: 0;
+      padding: 0;
+      background: none;
+      font-family: Arial, Helvetica, sans-serif;
+    "
+>
+<table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="background-color: #41464b; padding: 30px 0"
+>
     <tr>
         <td align="center">
-
             <!-- Contenedor principal -->
-            <table width="600" cellpadding="0" cellspacing="0" border="0"
-                   style="
-                       max-width: 600px;
-                       width: 100%;
-                       background-color: #ffffff;
-                       border-radius: 8px;
-                       overflow: hidden;
-                   ">
-
+            <table
+                    width="600"
+                    cellpadding="0"
+                    cellspacing="0"
+                    border="0"
+                    style="
+              max-width: 600px;
+              width: 100%;
+              background-color: #f8f9fa;
+              border-radius: 10px;
+              border: 1px solid #3e93c7;
+              overflow: hidden;
+            "
+            >
                 <!-- Encabezado -->
                 <tr>
-                    <td style="
-                        padding: 25px;
-                        text-align: center;
-                        background-color: #212529;
-                    ">
-
-                        <h1 style="
-                            margin: 0;
-                            color: #ffffff;
-                            font-size: 24px;
-                        ">
-                            Sistema PDV
+                    <td
+                            style="
+                  padding: 25px;
+                  text-align: center;
+                  background-color: #3e93c7;
+                "
+                    >
+                        <h1 style="margin: 0; color: #ffffff; font-size: 24px">
+                            Sistema Punto de Venta
                         </h1>
-
-                        <p style="
-                            margin: 8px 0 0;
-                            color: #dddddd;
-                            font-size: 14px;
-                        ">
+                        <!--<h3 style="margin: 8px; color: #ffffff; font-size: 18px">
+                                  Romina Albornoz - Insumos
+                                </h3>-->
+                        <p style="margin: 8px 0 0; color: #dddddd; font-size: 16px">
                             Notificación de inventario
                         </p>
-
                     </td>
                 </tr>
 
-
                 <!-- Contenido -->
                 <tr>
-                    <td style="padding: 30px;">
-
-                        <h2 style="
-                            margin: 0 0 15px;
-                            color: #212529;
-                            font-size: 22px;
-                        ">
-                            ⚠️ Alerta de stock
+                    <td style="padding: 30px">
+                        <h2
+                                th:if="${estado} == 'Stock bajo'"
+                                style="margin: 0 0 15px; color: #212529; font-size: 22px"
+                        >
+                            ⚠️ Alerta de Stock
                         </h2>
 
-                        <p style="
-                            margin: 0 0 25px;
-                            color: #555555;
-                            font-size: 15px;
-                            line-height: 1.6;
-                        ">
-                            Uno de los productos registrados en el sistema
-                            requiere atención debido a su nivel de stock.
+                        <h2
+                                th:if="${estado} == 'Sin stock'"
+                                style="margin: 0 0 15px; color: #212529; font-size: 22px"
+                        >
+                            🔴 Producto sin Stock
+                        </h2>
+
+                        <p
+                                style="
+                    margin: 0 0 25px;
+                    color: #555555;
+                    font-size: 15px;
+                    line-height: 1.6;
+                  "
+                        >
+                            Uno de los productos registrados en el sistema requiere
+                            atención debido a su nivel de stock.
                         </p>
 
-
                         <!-- Información del producto -->
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                               style="
-                                   border: 1px solid #dddddd;
-                                   border-radius: 6px;
-                               ">
-
+                        <table
+                                width="100%"
+                                cellpadding="0"
+                                cellspacing="0"
+                                border="0"
+                                style="border: 1px solid #dddddd; border-radius: 6px"
+                        >
                             <tr>
-                                <td style="
-                                    padding: 12px 15px;
-                                    background-color: #f8f9fa;
-                                    font-weight: bold;
-                                    color: #555555;
-                                    width: 40%;
-                                ">
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        background-color: #f8f9fa;
+                        font-weight: bold;
+                        color: #555555;
+                        width: 40%;
+                      "
+                                >
                                     Producto
                                 </td>
 
-                                <td style="
-                                    padding: 12px 15px;
-                                    color: #212529;
-                                "
-                                th:text="${producto}">
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        color: #212529;
+                        text-align: center;
+                      "
+                                        th:text="${producto}"
+                                >
                                     Labial Mate
                                 </td>
                             </tr>
 
                             <tr>
-                                <td style="
-                                    padding: 12px 15px;
-                                    background-color: #f8f9fa;
-                                    font-weight: bold;
-                                    color: #555555;
-                                ">
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        background-color: #f8f9fa;
+                        font-weight: bold;
+                        color: #555555;
+                      "
+                                >
                                     Variante
                                 </td>
 
-                                <td style="
-                                    padding: 12px 15px;
-                                    color: #212529;
-                                "
-                                th:text="${variante}">
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        color: #212529;
+                        text-align: center;
+                      "
+                                        th:text="${variante}"
+                                >
                                     Color Rojo
                                 </td>
                             </tr>
 
                             <tr>
-                                <td style="
-                                    padding: 12px 15px;
-                                    background-color: #f8f9fa;
-                                    font-weight: bold;
-                                    color: #555555;
-                                ">
-                                    Canal de venta
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        background-color: #f8f9fa;
+                        font-weight: bold;
+                        color: #555555;
+                      "
+                                >
+                                    Canal de Venta
                                 </td>
 
-                                <td style="
-                                    padding: 12px 15px;
-                                    color: #212529;
-                                "
-                                th:text="${canalVenta}">
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        color: #212529;
+                        text-align: center;
+                      "
+                                        th:text="${canalVenta}"
+                                >
                                     Local Fisico
                                 </td>
                             </tr>
 
                             <tr>
-                                <td style="
-                                    padding: 12px 15px;
-                                    background-color: #f8f9fa;
-                                    font-weight: bold;
-                                    color: #555555;
-                                ">
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        background-color: #f8f9fa;
+                        font-weight: bold;
+                        color: #555555;
+                      "
+                                >
                                     Stock actual
                                 </td>
 
-                                <td style="
-                                    padding: 12px 15px;
-                                    color: #212529;
-                                    font-weight: bold;
-                                "
-                                th:text="${stockActual}">
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        color: #212529;
+                        text-align: center;
+                      "
+                                        th:text="${stockActual != null && stockActual != '' ? stockActual + ' unidades' : ''}"
+                                >
                                     4 unidades
                                 </td>
                             </tr>
 
                             <tr>
-                                <td style="
-                                    padding: 12px 15px;
-                                    background-color: #f8f9fa;
-                                    font-weight: bold;
-                                    color: #555555;
-                                ">
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        background-color: #f8f9fa;
+                        font-weight: bold;
+                        color: #555555;
+                      "
+                                >
                                     Stock mínimo
                                 </td>
 
-                                <td style="
-                                    padding: 12px 15px;
-                                    color: #212529;
-                                "
-                                th:text="${stockMinimo}">
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        color: #212529;
+                        text-align: center;
+                      "
+                                        th:text="${stockMinimo != null && stockMinimo != '' ? stockMinimo + ' unidades' : ''}"
+                                >
                                     3 unidades
                                 </td>
                             </tr>
 
-                        </table>
-
-
-                        <!-- Mensaje de alerta -->
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0"
-                               style="margin-top: 25px;">
-
                             <tr>
-                                <td style="
-                                    padding: 15px;
-                                    background-color: #fff3cd;
-                                    border: 1px solid #ffe69c;
-                                    border-radius: 6px;
-                                    color: #664d03;
-                                    font-size: 14px;
-                                    line-height: 1.5;
-                                ">
+                                <td
+                                        style="
+                        padding: 12px 15px;
+                        background-color: #f8f9fa;
+                        font-weight: bold;
+                        color: #555555;
+                      "
+                                >
+                                    Estado
+                                </td>
 
-                                    <strong>Recomendación:</strong><br>
+                                <td style="padding: 12px 15px; text-align: center">
+                      <span
+                              th:if="${estado} == 'Stock bajo'"
+                              style="
+                          display: inline-block;
+                          padding: 6px 12px;
+                          border-radius: 999px;
+                          background-color: #fff3cd;
+                          color: #856404;
+                        "
+                              th:text="${estado}"
+                      >
+                        Stock bajo
+                      </span>
 
-                                    Se recomienda revisar el inventario y
-                                    realizar la reposición correspondiente.
+                                    <span
+                                            th:if="${estado} == 'Sin stock'"
+                                            style="
+                          display: inline-block;
+                          padding: 6px 12px;
+                          border-radius: 999px;
+                          background-color: #f8d7da;
+                          color: #842029;
+                        "
+                                            th:text="${estado}"
+                                    >
+                        Sin stock
+                      </span>
 
+                                    <!--<span
+                                                    th:unless="${estado} == 'Stock bajo' or ${estado} == 'Sin stock'"
+                                                    style="
+                                                      display: inline-block;
+                                                      padding: 6px 12px;
+                                                      border-radius: 999px;
+                                                      background-color: #e2e3e5;
+                                                      color: #41464b;
+                                                      font-weight: bold;
+                                                    "
+                                                    th:text="${estado}"
+                                                  >
+                                                    Normal
+                                                  </span>-->
                                 </td>
                             </tr>
-
                         </table>
 
+                        <!-- Mensaje de alerta -->
+                        <table
+                                width="100%"
+                                cellpadding="0"
+                                cellspacing="0"
+                                border="0"
+                                style="margin-top: 25px"
+                        >
+                            <tr>
+                                <td
+                                        style="
+                        padding: 15px;
+                        background-color: #fff3cd;
+                        border: 1px solid #ffe69c;
+                        border-radius: 6px;
+                        color: #664d03;
+                        font-size: 14px;
+                        line-height: 1.5;
+                      "
+                                >
+                                    <strong>Recomendación:</strong><br />
+
+                                    Se recomienda revisar el inventario y realizar la
+                                    reposición correspondiente.
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
-
 
                 <!-- Footer -->
                 <tr>
-                    <td style="
-                        padding: 20px;
-                        text-align: center;
-                        background-color: #f8f9fa;
-                        border-top: 1px solid #eeeeee;
-                    ">
-
-                        <p style="
-                            margin: 0;
-                            color: #888888;
-                            font-size: 12px;
-                        ">
-                            Este correo fue generado automáticamente por el
-                            Sistema PDV.
+                    <td
+                            style="
+                  padding: 20px;
+                  text-align: center;
+                  background-color: #f8f9fa;
+                  border-top: 1px solid #eeeeee;
+                "
+                    >
+                        <p style="margin: 0; color: #888888; font-size: 12px">
+                            Este correo fue generado automáticamente por el Sistema Punto
+                            de Venta.
                         </p>
 
-                        <p style="
-                            margin: 8px 0 0;
-                            color: #aaaaaa;
-                            font-size: 11px;
-                        ">
+                        <p style="margin: 8px 0 0; color: #aaaaaa; font-size: 11px">
                             No es necesario responder a este correo.
                         </p>
-
                     </td>
                 </tr>
-
             </table>
-
         </td>
     </tr>
-
 </table>
-
 </body>
 </html>

@@ -66,14 +66,14 @@ public class EmailService {
 
         try {
 
-            String htmlBody = generarStockAlertHtml(stock);
+            String htmlBody = generarStockAlert(stock);
 
             String subject;
 
-            if (stock.getEstado() == EstadoStock.SIN_STOCK) {
-                subject = "Producto sin stock";
+            if (stock.getEstado().equals(EstadoStock.SIN_STOCK)) {
+                subject = "Producto sin Stock";
             } else {
-                subject = "Stock bajo";
+                subject = "Producto con Stock Bajo";
             }
 
             sendEmail(to, subject, htmlBody);
@@ -92,7 +92,9 @@ public class EmailService {
         }
     }
 
-    private String generarStockAlertHtml(Stock stock) {
+    private String generarStockAlert(Stock stock) {
+
+        String estado = stock.getEstado().equals(EstadoStock.SIN_STOCK) ? "Sin stock" : "Stock bajo";
 
         Context context = new Context();
 
@@ -125,10 +127,10 @@ public class EmailService {
                 stock.getStockMinimo()
         );
 
-        /*context.setVariable(
+        context.setVariable(
                 "estado",
-                stock.getEstado()
-        );*/
+                estado
+        );
 
         return templateEngine.process(
                 "email/stock-alert",

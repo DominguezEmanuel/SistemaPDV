@@ -13,7 +13,7 @@ public class StockAlertService {
     private final EmailService emailService;
 
     //@Value("${spring.mail.admin}")
-    private String adminEmail = "dmanu401@gmail.com";
+    private final String adminEmail = "dmanu401@gmail.com";
 
     public StockAlertService(EmailService emailService) {
         this.emailService = emailService;
@@ -42,12 +42,13 @@ public class StockAlertService {
         EstadoStock estadoNuevo =
                 stock.getEstado();
 
-        if (estadoAnterior == estadoNuevo) {
+        // Verificar que no sean el mismo estado
+        if (estadoNuevo.equals(estadoAnterior)) {
             return;
         }
 
-        if (estadoNuevo == EstadoStock.STOCK_BAJO ||
-                estadoNuevo == EstadoStock.SIN_STOCK) {
+        if (estadoNuevo.equals(EstadoStock.STOCK_BAJO) ||
+                estadoNuevo.equals(EstadoStock.SIN_STOCK)) {
 
             emailService.sendStockAlert(
                     adminEmail,

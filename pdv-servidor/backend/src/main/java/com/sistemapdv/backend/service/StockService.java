@@ -158,25 +158,20 @@ public class StockService {
                 .orElseThrow(()-> new ResourceNotFoundException("Registro con ID " +
                         idStock + " no encontrado"));
 
-        if(nuevaCantidad < 0)
-            throw new IllegalArgumentException("La cantidad disponible no puede ser menor a 0");
-
         stock.setCantidadDisponible(nuevaCantidad);
-        EstadoStock estadoAnterior = stock.getEstado();
+        //EstadoStock estadoAnterior = stock.getEstado();
 
-        if(!mismoEstado(stock)){
-            if(stock.getCantidadDisponible() == 0){
-                stock.setEstado(EstadoStock.SIN_STOCK);
-            }else{
-                stock.setEstado(EstadoStock.STOCK_BAJO);
-            }
+        if(!tieneMismoEstado(stock)){
+            EstadoStock estadoAnterior = stock.getEstado();
+            stock.setEstado(obtenerEstadoStock(stock.getCantidadDisponible(), stock.getStockMinimo()));
             stockAlertService.procesarCambioEstado(stock, estadoAnterior);
         }
 
         return stockMapper.toResponseDTO(stock);
     }
 
-    private Boolean mismoEstado(Stock stock){
+    // Función para verificar si el registro cambió de estado o no
+    private Boolean tieneMismoEstado(Stock stock){
         EstadoStock estadoOriginal = stock.getEstado();
 
         EstadoStock nuevoEstado = obtenerEstadoStock(stock.getCantidadDisponible(), stock.getStockMinimo());
