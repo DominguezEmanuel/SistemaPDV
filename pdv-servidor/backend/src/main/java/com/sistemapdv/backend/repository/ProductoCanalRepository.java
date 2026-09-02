@@ -10,15 +10,19 @@ import java.util.Optional;
 @Repository
 public interface ProductoCanalRepository extends JpaRepository<ProductoCanal, Integer> {
 
+    // Todos los canales asociados a un producto
     List<ProductoCanal> findByProductoIdProducto(Integer idProducto);
 
+    // Todos los canales asociados a una venta
     List<ProductoCanal> findByCanalVentaIdCanalVenta(Integer idCanal);
 
+    // Asociación específica Producto + Canal
     Optional<ProductoCanal>
     findByProductoIdProductoAndCanalVentaIdCanalVenta(
             Integer idProducto,
             Integer idCanal);
 
+    // Verificar si ya existe una asociación
     boolean existsByProductoIdProductoAndCanalVentaIdCanalVenta(
             Integer idProducto,
             Integer idCanal);

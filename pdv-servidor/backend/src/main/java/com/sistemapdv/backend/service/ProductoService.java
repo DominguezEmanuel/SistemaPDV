@@ -2,21 +2,17 @@ package com.sistemapdv.backend.service;
 
 import com.sistemapdv.backend.dto.request.ProductoRequestDTO;
 import com.sistemapdv.backend.dto.request.VarianteProductoRequestDTO;
+import com.sistemapdv.backend.dto.response.ProductoCanalResponseDTO;
 import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
 import com.sistemapdv.backend.dto.response.StockProductoResponseDTO;
 import com.sistemapdv.backend.dto.response.VarianteProductoResponseDTO;
-import com.sistemapdv.backend.entity.Categoria;
-import com.sistemapdv.backend.entity.Producto;
-import com.sistemapdv.backend.entity.Stock;
-import com.sistemapdv.backend.entity.VarianteProducto;
+import com.sistemapdv.backend.entity.*;
 import com.sistemapdv.backend.exception.ResourceDuplicatedException;
 import com.sistemapdv.backend.exception.ResourceNotFoundException;
+import com.sistemapdv.backend.mapper.ProductoCanalMapper;
 import com.sistemapdv.backend.mapper.ProductoMapper;
 import com.sistemapdv.backend.mapper.VarianteProductoMapper;
-import com.sistemapdv.backend.repository.CategoriaRepository;
-import com.sistemapdv.backend.repository.ProductoRepository;
-import com.sistemapdv.backend.repository.StockRepository;
-import com.sistemapdv.backend.repository.VarianteProductoRepository;
+import com.sistemapdv.backend.repository.*;
 import com.sistemapdv.backend.repository.specification.ProductoSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,18 +35,22 @@ public class ProductoService {
     private final CategoriaRepository categoriaRepository;
     private final StockRepository stockRepository;
     private final VarianteProductoRepository varianteRepository;
+    private final ProductoCanalRepository productoCanalRepository;
     private final ProductoMapper productoMapper;
     private final VarianteProductoMapper varianteMapper;
+    private final ProductoCanalMapper productoCanalMapper;
 
-    public ProductoService(CloudinaryService cloudinaryService, VarianteProductoService varianteService, ProductoRepository productoRepository, CategoriaRepository categoriaRepository, StockRepository stockRepository, VarianteProductoRepository varianteRepository, ProductoMapper productoMapper, VarianteProductoMapper varianteMapper) {
+    public ProductoService(CloudinaryService cloudinaryService, VarianteProductoService varianteService, ProductoRepository productoRepository, CategoriaRepository categoriaRepository, StockRepository stockRepository, VarianteProductoRepository varianteRepository, ProductoCanalRepository productoCanalRepository, ProductoMapper productoMapper, VarianteProductoMapper varianteMapper, ProductoCanalMapper productoCanalMapper) {
         this.cloudinaryService = cloudinaryService;
         this.varianteService = varianteService;
         this.productoRepository = productoRepository;
         this.categoriaRepository = categoriaRepository;
         this.stockRepository = stockRepository;
         this.varianteRepository = varianteRepository;
+        this.productoCanalRepository = productoCanalRepository;
         this.productoMapper = productoMapper;
         this.varianteMapper = varianteMapper;
+        this.productoCanalMapper = productoCanalMapper;
     }
 
     @Transactional(readOnly = true)
@@ -305,5 +305,24 @@ public class ProductoService {
         producto.setCategoria(categoria);
 
         return productoMapper.toResponseDTO(producto);
+    }
+
+    /**
+     * Devuelve todas las configuraciones ProductoCanal del producto enviado
+     *
+     * @param idProducto Identificador del producto
+     * @return Listado de todas las configuraciones asociadas al producto
+     */
+    @Transactional(readOnly = true)
+    public List<ProductoCanalResponseDTO> getChannelsByProduct(Integer idProducto){
+        if(!productoRepository.existsById(idProducto)){
+            throw new ResourceNotFoundException("El producto con ID " +
+            idProducto + " no existe");
+        }
+
+        return productoCanalRepository.findByProductoIdProducto(idProducto)
+                .stream()
+                .map(productoCanalMapper::toResponseDTO)
+                .toList();
     }
 }

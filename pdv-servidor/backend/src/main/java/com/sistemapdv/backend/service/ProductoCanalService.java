@@ -34,8 +34,13 @@ public class ProductoCanalService {
         this.mapper = mapper;
     }
 
+    /**
+     * Devuelve todos los registros de ProductoCanal
+     *
+     * @return Listado de ProductoCanal
+     */
     @Transactional(readOnly = true)
-    public List<ProductoCanalResponseDTO> getAllProductosCanales(){
+    public List<ProductoCanalResponseDTO> getAllProductsChannels(){
         List<ProductoCanal> productosCanales = repository.findAll();
         return productosCanales
                 .stream()
@@ -43,70 +48,46 @@ public class ProductoCanalService {
                 .toList();
     }
 
+    /**
+     * Devuelve un registro ProductoCanal
+     *
+     * @param id Identificador del registro del que se desea información
+     * @return Registro ProductoCanal solicitado
+     */
     @Transactional(readOnly = true)
-    public ProductoCanalResponseDTO getProductoCanalById(Integer id){
+    public ProductoCanalResponseDTO getProductChannelById(Integer id){
         ProductoCanal productoCanal = repository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Configuración no encontrada"));
+                .orElseThrow(()-> new ResourceNotFoundException("Configuración con ID "
+                + id + " no encontrada"));
         return mapper.toResponseDTO(productoCanal);
     }
 
-    @Transactional(readOnly = true)
-    public List<ProductoCanalResponseDTO> findByProducto(Integer idProducto){
-
-        if(!productoRepository.existsById(idProducto))
-            throw new ResourceNotFoundException("Producto con ID " + idProducto + " no encontrado");
-
-        return repository.findByProductoIdProducto(idProducto)
-                .stream()
-                .map(mapper::toResponseDTO)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ProductoCanalResponseDTO> findByCanal(Integer idCanal){
-
-        if(!canalVentaRepository.existsById(idCanal))
-            throw new ResourceNotFoundException("Canal Venta con ID " + idCanal + " no encontrado");
-
-        return repository.findByCanalVentaIdCanalVenta(idCanal)
-                .stream()
-                .map(mapper::toResponseDTO)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public ProductoCanalResponseDTO findByCanalAndProducto(Integer idCanal, Integer idProducto){
-
-        if(!productoRepository.existsById(idProducto))
-            throw new ResourceNotFoundException("Producto con ID " + idProducto + " no encontrado");
-
-        if(!canalVentaRepository.existsById(idCanal))
-            throw new ResourceNotFoundException("Canal Venta con ID " + idCanal + " no encontrado");
-
-        ProductoCanal productoCanal = repository.findByProductoIdProductoAndCanalVentaIdCanalVenta(idProducto, idCanal)
-                .orElseThrow(()-> new ResourceNotFoundException("Registro no encontrado para Canal "
-                + idCanal + " Producto " + idProducto));
-
-        return mapper.toResponseDTO(productoCanal);
-    }
-
+    /**
+     * Agrega un nuevo registro de ProductoCanal
+     *
+     * @param request Solicitud con los datos necesarios para el registro
+     * @return Nuevo registro ya almacenado en la base de datos
+     */
     @Transactional
-    public ProductoCanalResponseDTO saveProductoCanal(ProductoCanalRequestDTO request){
-
+    public ProductoCanalResponseDTO createProductChannel(ProductoCanalRequestDTO request){
+        // Validar producto existente
+        Producto producto = productoRepository.findById(request.getIdProducto())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Producto con ID " + request.getIdProducto()
+                                + " no encontrado"));
+        // Validar canal de venta existente
+        CanalVenta canal = canalVentaRepository.findById(request.getIdCanalVenta())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Canal de venta con ID " + request.getIdCanalVenta()
+                                + " no encontrado"));
+        // Validar que no exista la configuración Producto + CanalVenta
         if(repository.existsByProductoIdProductoAndCanalVentaIdCanalVenta(
                 request.getIdProducto(),
                 request.getIdCanalVenta())){
-            throw new ResourceDuplicatedException("Ya existe una configuración para ese producto y canal");
+            throw new ResourceDuplicatedException("Ya existe una configuración para "
+                + producto.getNombre() + " y " + canal.getNombre());
         }
-
-        Producto producto = productoRepository.findById(request.getIdProducto())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Producto no encontrado"));
-
-        CanalVenta canal = canalVentaRepository.findById(request.getIdCanalVenta())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Canal de venta no encontrado"));
-
+        // Crear el registro y guardarlo
         ProductoCanal entity = ProductoCanal.builder()
                 .producto(producto)
                 .canalVenta(canal)
@@ -116,23 +97,44 @@ public class ProductoCanalService {
         return mapper.toResponseDTO(repository.save(entity));
     }
 
+    /**
+     * Modifica el atributo 'limiteMayorista' del registro de ProductoCanal
+     *
+     * @param id Identificador del registro que se desea modificar
+     * @param nuevoLimite Nuevo valor para el campo 'limiteMayorisya' del registro
+     * @return Registro actualizado
+     */
     @Transactional
-    public ProductoCanalResponseDTO updateLimiteMayorista(Integer id,
-                                                          Integer nuevoLimite){
+    public ProductoCanalResponseDTO updateLimiteMayorista(Integer id, Integer nuevoLimite){
 
         ProductoCanal entity = repository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Configuración no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Configuración con ID " +
+                        id + " no encontrada"));
 
         if(nuevoLimite < 1)
-            throw new IllegalArgumentException("El limite mayorista debe ser al menos 1");
+            throw new IllegalArgumentException("El limite mayorista debe ser mayor o igual a 1");
 
         if(entity.getLimiteMayorista().compareTo(nuevoLimite) == 0)
-            throw new IllegalArgumentException("El producto ya tiene el limite mayorista de "
-                                                + nuevoLimite);
+            throw new IllegalArgumentException("El registro ya tiene configurado a " + nuevoLimite
+                                                + " como limite mayorista");
 
         entity.setLimiteMayorista(nuevoLimite);
 
-        return mapper.toResponseDTO(repository.save(entity));
+        return mapper.toResponseDTO(entity);
+    }
+
+    /**
+     * Elimina un registro ProductoCanal de la base de datos
+     *
+     * @param id Identificador del registro que se desea eliminar
+     */
+    @Transactional
+    public void deleteProductChannel(Integer id){
+        if(!repository.existsById(id)){
+            throw new ResourceNotFoundException("Configuración con ID "
+                    + id + " no encontrada");
+        }
+
+        repository.deleteById(id);
     }
 }

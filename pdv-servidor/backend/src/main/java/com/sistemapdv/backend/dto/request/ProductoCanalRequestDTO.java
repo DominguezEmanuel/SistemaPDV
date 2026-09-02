@@ -16,6 +16,6 @@ public class ProductoCanalRequestDTO {
     private Integer idCanalVenta;
 
     @NotNull(message = "El limite mayorista es obligatorio")
-    @Min(value = 1, message = "El limite mayorista debe ser al menos 1")
+    @Min(value = 1, message = "El limite mayorista debe ser mayor o igual a 1")
     private Integer limiteMayorista;
 }

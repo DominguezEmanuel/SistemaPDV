@@ -12,11 +12,9 @@ public class ProductoCanalResponseDTO {
     private Integer idProductoCanal;
 
     private Integer idProducto;
-
     private String nombreProducto;
 
     private Integer idCanalVenta;
-
     private String nombreCanalVenta;
 
     private Integer limiteMayorista;

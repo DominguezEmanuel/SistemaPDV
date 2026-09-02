@@ -22,44 +22,34 @@ public class ProductoCanalController {
 
     @GetMapping("/")
     @ResponseBody
-    public List<ProductoCanalResponseDTO> getAllProductosCanales(){
-        return productoCanalService.getAllProductosCanales();
+    public List<ProductoCanalResponseDTO> getAllProductsChannels(){
+        return productoCanalService.getAllProductsChannels();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoCanalResponseDTO> getById(@PathVariable Integer id){
+    public ResponseEntity<ProductoCanalResponseDTO> getProductChannelById(@PathVariable Integer id){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(productoCanalService.getProductoCanalById(id));
-    }
-
-    @GetMapping("/producto/{idProducto}")
-    public ResponseEntity<List<ProductoCanalResponseDTO>> findByProducto(@PathVariable Integer idProducto){
-        return ResponseEntity.ok(productoCanalService.findByProducto(idProducto));
-    }
-
-    @GetMapping("/canal/{idCanal}")
-    public ResponseEntity<List<ProductoCanalResponseDTO>> findByCanal(@PathVariable Integer idCanal){
-        return ResponseEntity.ok(productoCanalService.findByCanal(idCanal));
-    }
-
-    @GetMapping("/canal/{idCanal}/producto/{idProducto}")
-    public ResponseEntity<ProductoCanalResponseDTO> findByCanalAndProducto(@PathVariable Integer idCanal,
-                                                                           @PathVariable Integer idProducto){
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(productoCanalService.findByCanalAndProducto(idCanal, idProducto));
+                .body(productoCanalService.getProductChannelById(id));
     }
 
     @PostMapping("/")
-    public ResponseEntity<ProductoCanalResponseDTO> addProductoCanal(
+    public ResponseEntity<ProductoCanalResponseDTO> createProductChannel(
             @Valid @RequestBody ProductoCanalRequestDTO request){
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(productoCanalService.saveProductoCanal(request));
+                .body(productoCanalService.createProductChannel(request));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProductoCanalResponseDTO> updateLimiteMayorista(@PathVariable Integer id,
-                                                                        @RequestParam Integer nuevoLimite){
+                                                                          @RequestParam Integer nuevoLimite){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(productoCanalService.updateLimiteMayorista(id, nuevoLimite));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteProductChannel(@PathVariable Integer id){
+        productoCanalService.deleteProductChannel(id);
+        String msg = "El registro con ID " + id + " ha sido eliminado correctamente";
+        return ResponseEntity.status(HttpStatus.OK).body(msg);
     }
 }

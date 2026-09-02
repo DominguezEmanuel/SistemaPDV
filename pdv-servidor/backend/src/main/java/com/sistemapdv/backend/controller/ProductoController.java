@@ -1,9 +1,7 @@
 package com.sistemapdv.backend.controller;
 
 import com.sistemapdv.backend.dto.request.ProductoRequestDTO;
-import com.sistemapdv.backend.dto.response.ProductoResponseDTO;
-import com.sistemapdv.backend.dto.response.StockProductoResponseDTO;
-import com.sistemapdv.backend.dto.response.VarianteProductoResponseDTO;
+import com.sistemapdv.backend.dto.response.*;
 import com.sistemapdv.backend.service.ProductoService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -17,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.xml.transform.OutputKeys;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -110,5 +110,10 @@ public class ProductoController {
     public ResponseEntity<List<StockProductoResponseDTO>> getStockByProduct(@PathVariable Integer idProducto){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(productoService.getStockByProductId(idProducto));
+    }
+
+    @GetMapping("/{idProducto}/canales")
+    public ResponseEntity<List<ProductoCanalResponseDTO>> getChannelsByProduct(@PathVariable Integer idProducto){
+        return ResponseEntity.status(HttpStatus.OK).body(productoService.getChannelsByProduct(idProducto));
     }
 }
