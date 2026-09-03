@@ -1,5 +1,6 @@
 package com.sistemapdv.backend.mapper;
 
+import com.sistemapdv.backend.dto.StockAlertDTO;
 import com.sistemapdv.backend.dto.request.StockRequestDTO;
 import com.sistemapdv.backend.dto.response.StockResponseDTO;
 import com.sistemapdv.backend.entity.CanalVenta;
@@ -33,6 +34,17 @@ public class StockMapper {
                 .stockMinimo(request.getStockMinimo())
                 .varianteProducto(variante)
                 .canalVenta(canal)
+                .build();
+    }
+
+    public StockAlertDTO toStockAlertDTO(Stock stock){
+        return StockAlertDTO.builder()
+                .producto(stock.getVarianteProducto().getProducto().getNombre())
+                .variante(stock.getVarianteProducto().getNombre())
+                .canalVenta(stock.getCanalVenta().getNombre())
+                .stockActual(stock.getCantidadDisponible())
+                .stockMinimo(stock.getStockMinimo())
+                .estado(stock.getEstado())
                 .build();
     }
 }

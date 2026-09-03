@@ -1,6 +1,7 @@
 package com.sistemapdv.backend.service;
 
 import com.sistemapdv.backend.dto.SendEmailDTO;
+import com.sistemapdv.backend.dto.StockAlertDTO;
 import com.sistemapdv.backend.entity.Stock;
 import com.sistemapdv.backend.exception.EmailException;
 import com.sistemapdv.backend.utils.enums.EstadoStock;
@@ -39,6 +40,13 @@ public class EmailService {
         this.templateEngine = templateEngine;
     }
 
+    /**
+     * Envia la notificación de alerta de stock al propietario del sistema
+     *
+     * @param to Correo electrónico del propietario del sistema
+     * @param subject Tema del correo electrónico
+     * @param htmlBody Cuerpo html del correo
+     */
     public void sendEmail(String to, String subject, String htmlBody){
 
         try {
@@ -54,45 +62,40 @@ public class EmailService {
             mailSender.send(message);
 
         }catch (MailException | MessagingException e){
-            logger.error("Error al enviar correo electrónico", e);
+            logger.error("Error al enviar correo electrónico a {}", to, e);
 
-            throw new EmailException("No se pudo enviar el correo electrónico");
+            throw new EmailException("No se pudo enviar el correo electrónico", e);
         }
     }
 
+    /**
+     * Construye el correo para ser enviado al propietario
+     *
+     * @param to Correo electrónico del propietario del sistema
+     * @param stock Registro de stock usado para obtener ciertos datos
+     */
     public void sendStockAlert(
             String to,
-            Stock stock) {
+            StockAlertDTO stock) {
 
         try {
 
             String htmlBody = generarStockAlert(stock);
 
-            String subject;
-
-            if (stock.getEstado().equals(EstadoStock.SIN_STOCK)) {
-                subject = "Producto sin Stock";
-            } else {
-                subject = "Producto con Stock Bajo";
-            }
+            String subject = stock.getEstado().equals(EstadoStock.SIN_STOCK) ? "Producto sin Stock" :
+                    "Producto con Stock Bajo";
 
             sendEmail(to, subject, htmlBody);
 
         } catch (Exception e) {
 
-            logger.error(
-                    "Error al cargar la plantilla de alerta de stock",
-                    e
-            );
+            logger.error("Error al preparar alerta de stock", e);
 
-            throw new EmailException(
-                    "No se pudo preparar el correo de alerta de stock",
-                    e
-            );
+            throw new EmailException("No se pudo preparar el correo de alerta de stock", e);
         }
     }
 
-    private String generarStockAlert(Stock stock) {
+    private String generarStockAlert(StockAlertDTO stock) {
 
         String estado = stock.getEstado().equals(EstadoStock.SIN_STOCK) ? "Sin stock" : "Stock bajo";
 
@@ -100,26 +103,22 @@ public class EmailService {
 
         context.setVariable(
                 "producto",
-                stock.getVarianteProducto()
-                        .getProducto()
-                        .getNombre()
+                stock.getProducto()
         );
 
         context.setVariable(
                 "variante",
-                stock.getVarianteProducto()
-                        .getNombre()
+                stock.getVariante()
         );
 
         context.setVariable(
                 "canalVenta",
                 stock.getCanalVenta()
-                        .getNombre()
         );
 
         context.setVariable(
                 "stockActual",
-                stock.getCantidadDisponible()
+                stock.getStockActual()
         );
 
         context.setVariable(

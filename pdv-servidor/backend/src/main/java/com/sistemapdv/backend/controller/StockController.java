@@ -77,7 +77,7 @@ public class StockController {
     /* De esto se encargará MovimientoStock */
     @PatchMapping("/cantidad/{idStock}")
     public ResponseEntity<StockResponseDTO> editStockAvailable(@PathVariable Integer idStock,
-                                            @RequestParam Integer nuevaCantidad){
+                                                               @RequestParam Integer nuevaCantidad){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(stockService.editStock(idStock, nuevaCantidad));
     }

@@ -30,7 +30,6 @@ public class StockService {
     private final VarianteProductoRepository varianteRepository;
     private final CanalVentaRepository canalVentaRepository;
     private final StockMapper stockMapper;
-
     private final StockAlertService stockAlertService;
 
     public StockService(StockRepository stockRepository, VarianteProductoRepository varianteRepository,
@@ -151,7 +150,13 @@ public class StockService {
         return EstadoStock.DISPONIBLE;
     }
 
-    /* De esto se encargará MovimientoStock */
+    /**
+     * Actualiza la cantidad disponible de un registro de Stock
+     *
+     * @param idStock Identificador del registro de Stock
+     * @param nuevaCantidad Nuevo valor para 'cantidadDisponible' del registro
+     * @return El registro ya actualizado
+     */
     @Transactional
     public StockResponseDTO editStock(Integer idStock, Integer nuevaCantidad){
         Stock stock = stockRepository.findById(idStock)
@@ -159,18 +164,21 @@ public class StockService {
                         idStock + " no encontrado"));
 
         stock.setCantidadDisponible(nuevaCantidad);
-        //EstadoStock estadoAnterior = stock.getEstado();
-
+        // Si el registro cambia de estado, se realizan las demás acciones
         if(!tieneMismoEstado(stock)){
-            EstadoStock estadoAnterior = stock.getEstado();
             stock.setEstado(obtenerEstadoStock(stock.getCantidadDisponible(), stock.getStockMinimo()));
-            stockAlertService.procesarCambioEstado(stock, estadoAnterior);
+            stockAlertService.procesarCambioEstado(stockMapper.toStockAlertDTO(stock));
         }
 
         return stockMapper.toResponseDTO(stock);
     }
 
-    // Función para verificar si el registro cambió de estado o no
+    /**
+     * Verifica si un registro de Stock cambió de estado
+     *
+     * @param stock Registro de stock con los campos necesarios para verificar el estado
+     * @return Verdadero -> el registro cambió de estado - Falso -> el registro no cambió de estado
+     */
     private Boolean tieneMismoEstado(Stock stock){
         EstadoStock estadoOriginal = stock.getEstado();
 

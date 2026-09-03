@@ -1,10 +1,15 @@
 package com.sistemapdv.backend.service;
 
 import com.sistemapdv.backend.dto.SendEmailDTO;
+import com.sistemapdv.backend.dto.StockAlertDTO;
 import com.sistemapdv.backend.entity.Stock;
+import com.sistemapdv.backend.exception.EmailException;
 import com.sistemapdv.backend.utils.enums.EstadoStock;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,8 +17,11 @@ public class StockAlertService {
 
     private final EmailService emailService;
 
-    //@Value("${spring.mail.admin}")
-    private final String adminEmail = "dmanu401@gmail.com";
+    @Value("${spring.mail.admin}")
+    private String adminEmail;
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(EmailService.class);
 
     public StockAlertService(EmailService emailService) {
         this.emailService = emailService;
@@ -38,94 +46,27 @@ public class StockAlertService {
         }
     }
 
-    public void procesarCambioEstado(Stock stock, EstadoStock estadoAnterior){
-        EstadoStock estadoNuevo =
-                stock.getEstado();
+    /**
+     * Verifica que el registro haya cambiado de estado y solicita a emailService
+     * enviar una notificación de alerta de stock al propietario
+     *
+     * @param stock Registro de Stock
+     */
+    @Async
+    public void procesarCambioEstado(StockAlertDTO stock){
 
-        // Verificar que no sean el mismo estado
-        if (estadoNuevo.equals(estadoAnterior)) {
+        if (stock.getEstado() != EstadoStock.STOCK_BAJO &&
+                stock.getEstado() != EstadoStock.SIN_STOCK) {
             return;
         }
 
-        if (estadoNuevo.equals(EstadoStock.STOCK_BAJO) ||
-                estadoNuevo.equals(EstadoStock.SIN_STOCK)) {
-
-            emailService.sendStockAlert(
-                    adminEmail,
-                    stock
+        try{
+            emailService.sendStockAlert(adminEmail, stock);
+        }catch (EmailException e){
+            logger.error(
+                    "No se pudo enviar la alerta de stock para el producto {}",
+                    stock.getProducto(), e
             );
         }
     }
-
-    /*
-    public void sendStockAlert(
-            String to,
-            Stock stock,
-            String tipoAlerta) {
-
-        try {
-
-            String html = cargarPlantillaStock();
-
-            html = html.replace(
-                    "{{producto}}",
-                    stock.getVarianteProducto()
-                            .getProducto()
-                            .getNombre()
-            );
-
-            html = html.replace(
-                    "{{variante}}",
-                    stock.getVarianteProducto()
-                            .getNombre()
-            );
-
-            html = html.replace(
-                    "{{canalVenta}}",
-                    stock.getCanalVenta()
-                            .getNombre()
-            );
-
-            html = html.replace(
-                    "{{stockActual}}",
-                    String.valueOf(
-                            stock.getCantidadDisponible()
-                    )
-            );
-
-            html = html.replace(
-                    "{{stockMinimo}}",
-                    String.valueOf(
-                            stock.getStockMinimo()
-                    )
-            );
-
-            html = html.replace(
-                    "{{tipoAlerta}}",
-                    tipoAlerta
-            );
-
-            String subject;
-
-            if (tipoAlerta.equals("AGOTADO")) {
-                subject = "🔴 Producto sin stock";
-            } else {
-                subject = "⚠️ Stock bajo";
-            }
-
-            sendEmail(to, subject, html);
-
-        } catch (IOException e) {
-
-            logger.error(
-                    "Error al cargar la plantilla de alerta de stock",
-                    e
-            );
-
-            throw new EmailException(
-                    "No se pudo preparar el correo de alerta de stock",
-                    e
-            );
-        }
-    }*/
 }
