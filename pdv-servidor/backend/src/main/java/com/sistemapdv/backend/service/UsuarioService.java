@@ -33,32 +33,33 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public UsuarioResponseDTO findByUsername(String username){
         Usuario usuario = usuarioRepository.findByUsername(username)
-                .orElseThrow( ()-> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow( ()-> new ResourceNotFoundException("Usuario con nombre de usuario '"
+                                                                + username + "' no encontrado"));
         return usuarioMapper.toResponseDTO(usuario);
     }
 
     @Transactional(readOnly = true)
     public UsuarioResponseDTO findById(Integer id){
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow( ()-> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow( ()-> new ResourceNotFoundException("Usuario con ID " + id + " no encontrado"));
         return usuarioMapper.toResponseDTO(usuario);
     }
 
     @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> findAllUsers(){
         List<Usuario> usuarios = usuarioRepository.findAll();
-        //List<Usuario> usuarios = usuarioRepository.findAllByOrderByIdAsc();
-        List<UsuarioResponseDTO> listadoUsuarios = new ArrayList<UsuarioResponseDTO>();
-        for (Usuario u: usuarios){
-            listadoUsuarios.add(usuarioMapper.toResponseDTO(u));
-        }
-        return listadoUsuarios;
+        return usuarios
+                .stream()
+                .map(usuarioMapper::toResponseDTO)
+                .toList();
     }
 
     @Transactional
     public UsuarioResponseDTO createUser(UsuarioRequestDTO request){
+        // Validar nombre de usuario
         if(usuarioRepository.existsByUsername(request.getUsername()))
-            throw new ResourceDuplicatedException("El nombre de usuario ya existe");
+            throw new ResourceDuplicatedException("El nombre de usuario '"
+                    + request.getUsername() + "' ya se encuentra registrado");
 
         Usuario usuario = usuarioMapper.toUsuario(request);
 

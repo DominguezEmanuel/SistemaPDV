@@ -16,10 +16,6 @@ public class CloudinaryService {
 
     private static final long MAX_SIZE = 2 * 1024 * 1024;
 
-    private static final Set<String> TIPOS_PERMITIDOS = Set.of("image/jpeg", "image/png");
-
-    private static final Set<String> EXTENSIONES_PERMITIDAS = Set.of(".jpg", ".jpeg", ".png");
-
     private final Cloudinary cloudinary;
 
     public CloudinaryService(Cloudinary cloudinary) {

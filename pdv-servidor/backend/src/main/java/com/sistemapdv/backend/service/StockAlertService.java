@@ -1,11 +1,9 @@
 package com.sistemapdv.backend.service;
 
-import com.sistemapdv.backend.dto.SendEmailDTO;
 import com.sistemapdv.backend.dto.StockAlertDTO;
 import com.sistemapdv.backend.entity.Stock;
 import com.sistemapdv.backend.exception.EmailException;
 import com.sistemapdv.backend.utils.enums.EstadoStock;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

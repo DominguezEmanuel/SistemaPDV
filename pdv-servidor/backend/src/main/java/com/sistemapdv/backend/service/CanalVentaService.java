@@ -23,6 +23,11 @@ public class CanalVentaService {
         this.canalMapper = canalMapper;
     }
 
+    /**
+     * Devuelve todos los canales de venta registrados
+     *
+     * @return Listado de canales de venta
+     */
     @Transactional(readOnly = true)
     public List<CanalResponseDTO> getAllCanales(){
         List<CanalVenta> canales = canalRepository.findAll();
@@ -31,6 +36,12 @@ public class CanalVentaService {
                 .toList();
     }
 
+    /**
+     * Retorna un canal de venta de acuerdo a un ID enviado
+     *
+     * @param idCanal Identificador del canal buscado
+     * @return Canal de venta registrado en la base de datos
+     */
     @Transactional(readOnly = true)
     public CanalResponseDTO getCanalById(Integer idCanal){
         CanalVenta canal = canalRepository.findById(idCanal)
@@ -40,6 +51,12 @@ public class CanalVentaService {
         return canalMapper.toResponseDTO(canal);
     }
 
+    /**
+     * Agrega un nuevo canal de venta en la base de datos
+     *
+     * @param request Datos necesarios para la creación de un nuevo canal
+     * @return Canal de venta ya creado
+     */
     @Transactional
     public CanalResponseDTO createCanal(CanalRequestDTO request){
         // Verificar que el nombre del canal no se encuentre registrado
@@ -56,11 +73,24 @@ public class CanalVentaService {
         return canalMapper.toResponseDTO(nuevoCanal);
     }
 
+    /**
+     * Edita el campo 'nombre' de un canal de venta
+     *
+     * @param idCanal Identificador del canal de venta que se desea edutar
+     * @param request Solicitud con el nuevo nombre del canal de venta
+     * @return Canal de venta con el 'nombre' actualizado
+     */
     @Transactional
     public CanalResponseDTO updateCanal(Integer idCanal, CanalRequestDTO request){
+        // Verifica que el canal exista
         CanalVenta canal = canalRepository.findById(idCanal)
                 .orElseThrow(()-> new ResourceNotFoundException("Canal con ID "
                         + idCanal + " no encontrado"));
+
+        // Comprobar si tiene el mismo nombre
+        if(canal.getNombre().equalsIgnoreCase(request.getNombre())){
+            throw new IllegalArgumentException("Esta intentando guardar el mismo nombre");
+        }
 
         // Como solamente se puede editar el 'nombre'
         // Solamente se controla que el nuevo nombre no esté registrado

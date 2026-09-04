@@ -1,27 +1,19 @@
 package com.sistemapdv.backend.service;
 
-import com.sistemapdv.backend.dto.SendEmailDTO;
 import com.sistemapdv.backend.dto.StockAlertDTO;
-import com.sistemapdv.backend.entity.Stock;
 import com.sistemapdv.backend.exception.EmailException;
 import com.sistemapdv.backend.utils.enums.EstadoStock;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-
-import java.io.IOException;
-
 
 @Service
 public class EmailService {
