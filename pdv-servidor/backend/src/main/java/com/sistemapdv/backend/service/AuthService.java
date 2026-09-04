@@ -9,10 +9,8 @@ import com.sistemapdv.backend.mapper.UsuarioMapper;
 import com.sistemapdv.backend.repository.UsuarioRepository;
 import com.sistemapdv.backend.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,7 +18,6 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
-    //private final PasswordEncoder passwordEncoder;
     private final UsuarioMapper usuarioMapper;
     private final JwtService jwtService;
 

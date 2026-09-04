@@ -49,6 +49,33 @@ public class ProductoCanalService {
     }
 
     /**
+     * Devuelve un registro Producto-Canal de acuerdo a los ID's enviados
+     *
+     * @param idProducto Identifiacdor del producto
+     * @param idCanal Identificador del canal de venta
+     * @return Registro que pertenece a la configuración idProducto + idCanal
+     */
+    @Transactional(readOnly = true)
+    public ProductoCanalResponseDTO getByIdProductAndIdChannel(Integer idProducto, Integer idCanal){
+        // Validar producto existente
+        Producto producto = productoRepository.findById(idProducto)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Producto con ID " + idProducto
+                                + " no encontrado"));
+        // Validar canal de venta existente
+        CanalVenta canal = canalVentaRepository.findById(idCanal)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Canal de venta con ID " + idCanal
+                                + " no encontrado"));
+        // Verificar la existencia del registro de Producto + Canal
+        ProductoCanal registro = repository.findByProductoIdProductoAndCanalVentaIdCanalVenta(idProducto, idCanal)
+                .orElseThrow(()-> new ResourceNotFoundException("Registro para " +
+                        producto.getNombre() + " y " + canal.getNombre() + " no encontrado"));
+
+        return mapper.toResponseDTO(registro);
+    }
+
+    /**
      * Devuelve un registro ProductoCanal
      *
      * @param id Identificador del registro del que se desea información

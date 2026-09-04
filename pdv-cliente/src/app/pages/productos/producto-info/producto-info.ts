@@ -15,6 +15,7 @@ import {
 import { CanalResponse } from '../../../models/Canal';
 import { VarianteResponse } from '../../../models/Variante';
 import { StockResponse } from '../../../models/Stock';
+import { ProductoCanalResponse } from '../../../models/ProductoCanal';
 // Services
 import { ProductoService } from '../../../core/services/producto-service';
 import { VarianteService } from '../../../core/services/variante-service';
@@ -23,18 +24,13 @@ import { ToastrService } from 'ngx-toastr';
 import { AlertService } from '../../../core/services/alert-service';
 // Others
 import { VarianteForm } from '../../variantes/variante-form/variante-form';
-
-interface ConfiguracionCanal {
-  idCanal: number;
-  nombreCanal: string;
-  cantidad: number;
-}
+import { ProductoCanalForm } from '../../productos/producto-canal-form/producto-canal-form';
 
 type TabId = 'informacion' | 'variantes' | 'stock' | 'comercial';
 
 @Component({
   selector: 'app-product-view-modal',
-  imports: [CommonModule, VarianteForm],
+  imports: [CommonModule, VarianteForm, ProductoCanalForm],
   templateUrl: './producto-info.html',
   styleUrls: [
     './producto-info.css',
@@ -48,8 +44,6 @@ export class ProductViewModalComponent implements OnChanges {
   @Input() producto: ProductoResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
-  //variantesCargadas = false;
-  //canalesCargados = false;
 
   // Variables para el formulario de registro/edicion de Variante
   modalFormularioVariante = false;
@@ -77,23 +71,26 @@ export class ProductViewModalComponent implements OnChanges {
 
   tabActiva: TabId = 'informacion';
 
-  canales: CanalResponse[] = [];
-  stock: StockResponse | null = null;
-  configuracionCanales: ConfiguracionCanal[] = [];
-  totalStockPorCanal: ConfiguracionCanal[] = [];
-
   // Panel Variantes
   variantes: VarianteResponse[] = [];
+  variantesCargadas = false;
 
   // Panel Stock
   stocks: StockProductoResponse[] = [];
   stockLocalFisico!: number;
   stockTikTok!: number;
+  stockCargado = false;
+
+  // Panel Configuración Comercial
+  configuracionesComerciales: ProductoCanalResponse[] = [];
+  configuracionesCargadas = false;
+  formConfiguracionVisible = false;
+  configuracionSeleccionada: ProductoCanalResponse | null = null;
 
   constructor(
     private productoService: ProductoService,
     private varianteService: VarianteService,
-    private productoCanalService: ProductoCanalService,
+    private configuracionService: ProductoCanalService,
     private toastr: ToastrService,
     private alertService: AlertService,
   ) {}
@@ -102,14 +99,12 @@ export class ProductViewModalComponent implements OnChanges {
     // Evalúa si el componente ha recibido un nuevo producto a través del @Input()
     // Se asegura que dicho producto sea válido antes de ejecutar la lógica
     if (changes['producto'] && this.producto) {
-      this.resetearStock();
-      this.cargarVariantes();
-      this.cargarStockProducto();
+      this.limpiarDatos();
     }
   }
 
   cargarVariantes(): void {
-    if (!this.producto) {
+    if (!this.producto || this.variantesCargadas) {
       return;
     }
 
@@ -118,6 +113,7 @@ export class ProductViewModalComponent implements OnChanges {
       .subscribe({
         next: (response) => {
           this.variantes = response;
+          this.variantesCargadas = true;
         },
         error: (error) => {
           this.toastr.error(
@@ -138,11 +134,21 @@ export class ProductViewModalComponent implements OnChanges {
     this.modalFormularioVariante = true;
   }
 
+  verFormularioConfiguracion(configuracion?: ProductoCanalResponse): void {
+    if (configuracion) {
+      this.configuracionSeleccionada = configuracion;
+    } else {
+      this.configuracionSeleccionada = null;
+    }
+    this.formConfiguracionVisible = true;
+  }
+
   onVarianteGuardada(event: {
     variante: VarianteResponse;
     accion: 'crear' | 'editar';
   }): void {
     // Cargar nuevamente el listado de variantes
+    this.variantesCargadas = false;
     this.cargarVariantes();
 
     if (event.accion === 'crear') {
@@ -158,40 +164,46 @@ export class ProductViewModalComponent implements OnChanges {
     }
   }
 
+  onConfiguracionGuardada(event: {
+    configuracion: ProductoCanalResponse;
+    accion: 'crear' | 'editar';
+  }): void {
+    // Cargar nuevamente el listado de configuraciones comerciales
+    this.configuracionesCargadas = false;
+    this.cargarProductosCanales();
+
+    if (event.accion === 'crear') {
+      this.toastr.success(
+        'La configuración comercial se creó correctamente',
+        'Configuración creada',
+      );
+    } else {
+      this.toastr.success(
+        'Los cambios de la configuración comercial se guardaron correctamente',
+        'Configuración actualizada',
+      );
+    }
+  }
+
   cargarProductosCanales() {
-    if (!this.producto || !this.canales.length) {
-      this.configuracionCanales = [];
+    if (!this.producto || this.configuracionesCargadas) {
       return;
     }
 
-    this.configuracionCanales = [];
-
-    this.canales.forEach((canal) => {
-      this.productoCanalService
-        .findByCanalAndProducto(canal.idCanalVenta, this.producto?.idProducto)
-        .subscribe({
-          next: (response) => {
-            this.configuracionCanales.push({
-              idCanal: canal.idCanalVenta,
-              nombreCanal: canal.nombre,
-              cantidad: response.limiteMayorista ?? 0,
-            });
-          },
-          error: (error) => {
-            console.error('Error:', error);
-            this.configuracionCanales.push({
-              idCanal: canal.idCanalVenta,
-              nombreCanal: canal.nombre,
-              cantidad: 0,
-            });
-          },
-        });
-    });
-  }
-
-  resetearStock(): void {
-    this.totalStockPorCanal = [];
-    this.configuracionCanales = [];
+    this.productoService
+      .obtenerConfiguracionesProducto(this.producto.idProducto)
+      .subscribe({
+        next: (response) => {
+          this.configuracionesComerciales = response;
+          this.configuracionesCargadas = true;
+        },
+        error: (error) => {
+          this.toastr.error(
+            'Error al cargar la configuración comercial del producto',
+            'Error',
+          );
+        },
+      });
   }
 
   cambiarEstadoVariante(
@@ -211,6 +223,7 @@ export class ProductViewModalComponent implements OnChanges {
                   'Estado de la variante actualizado correctamente',
                   'Éxito',
                 );
+                this.variantesCargadas = false;
                 this.cargarVariantes();
               },
               error: (error) => {
@@ -221,8 +234,34 @@ export class ProductViewModalComponent implements OnChanges {
       });
   }
 
+  eliminarConfiguracion(idConfiguracion: number, nombre: string): void {
+    this.alertService
+      .confirmarEliminacionConfiguracion(nombre)
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.configuracionService
+            .eliminarConfiguracionProductoCanal(idConfiguracion)
+            .subscribe({
+              next: (response) => {
+                console.log(response);
+                this.toastr.success(
+                  'La configuración comercial se eliminó correctamente',
+                  'Éxito',
+                );
+                this.configuracionesCargadas = false;
+                this.cargarProductosCanales();
+              },
+              error: (error) => {
+                console.log(error);
+                this.toastr.error(error.error.mensaje, 'Error');
+              },
+            });
+        }
+      });
+  }
+
   cargarStockProducto(): void {
-    if (!this.producto) {
+    if (!this.producto || this.stockCargado) {
       return;
     }
 
@@ -231,6 +270,7 @@ export class ProductViewModalComponent implements OnChanges {
       .subscribe({
         next: (response) => {
           this.stocks = response;
+          this.stockCargado = true;
           this.calcularStockTotalPorCanal();
         },
         error: (error) => {
@@ -282,31 +322,47 @@ export class ProductViewModalComponent implements OnChanges {
   }
 
   // Funciones para los TABS
-  seleccionarTab(id: TabId): void {
-    this.tabActiva = id;
+  seleccionarTab(tab: TabId): void {
+    this.tabActiva = tab;
 
-    if (id === 'comercial') {
-      this.cargarProductosCanales();
+    switch (tab) {
+      case 'variantes':
+        this.cargarVariantes();
+        break;
+
+      case 'stock':
+        this.cargarStockProducto();
+        break;
+
+      case 'comercial':
+        this.cargarProductosCanales();
+        break;
     }
   }
 
-  esTabActiva(id: TabId): boolean {
-    return this.tabActiva === id;
+  esTabActiva(tab: TabId): boolean {
+    return this.tabActiva === tab;
   }
 
   // Limpia todas las variables/estructuras utilizadas en este componente
   private limpiarDatos(): void {
     this.variantes = [];
-    this.canales = [];
-    this.stock = null;
-    this.configuracionCanales = [];
-    this.totalStockPorCanal = [];
+    this.stocks = [];
+    this.configuracionesComerciales = [];
+
+    this.variantesCargadas = false;
+    this.stockCargado = false;
+    this.configuracionesCargadas = false;
+
+    this.varianteSeleccionada = null;
     this.tabActiva = 'informacion';
   }
 
   cerrarModal(): void {
     if (this.modalFormularioVariante) {
       this.modalFormularioVariante = false;
+    } else if (this.formConfiguracionVisible) {
+      this.formConfiguracionVisible = false;
     } else {
       this.limpiarDatos();
       this.cerrar.emit();

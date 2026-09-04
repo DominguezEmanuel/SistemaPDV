@@ -21,15 +21,21 @@ public class ProductoCanalController {
     }
 
     @GetMapping("/")
-    @ResponseBody
-    public List<ProductoCanalResponseDTO> getAllProductsChannels(){
-        return productoCanalService.getAllProductsChannels();
+    public ResponseEntity<List<ProductoCanalResponseDTO>> getAllProductsChannels(){
+        return ResponseEntity.status(HttpStatus.OK).body(productoCanalService.getAllProductsChannels());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductoCanalResponseDTO> getProductChannelById(@PathVariable Integer id){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(productoCanalService.getProductChannelById(id));
+    }
+
+    @GetMapping("/producto/{idProducto}/canal/{idCanalVenta}")
+    public ResponseEntity<ProductoCanalResponseDTO> getByProductAndChannel(@PathVariable Integer idProducto,
+                                                                           @PathVariable Integer idCanalVenta){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(productoCanalService.getByIdProductAndIdChannel(idProducto, idCanalVenta));
     }
 
     @PostMapping("/")
@@ -47,9 +53,8 @@ public class ProductoCanalController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProductChannel(@PathVariable Integer id){
+    public ResponseEntity<Void> deleteProductChannel(@PathVariable Integer id){
         productoCanalService.deleteProductChannel(id);
-        String msg = "El registro con ID " + id + " ha sido eliminado correctamente";
-        return ResponseEntity.status(HttpStatus.OK).body(msg);
+        return ResponseEntity.noContent().build();
     }
 }

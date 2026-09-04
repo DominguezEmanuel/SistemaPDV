@@ -298,36 +298,77 @@
       </div>
     </div>
 
-    <!-- Panel: Configuración Comercial -->
+    <!-- 4to Panel: Configuración Comercial -->
     <div class="mv-tab-panel" *ngIf="esTabActiva('comercial')">
       <div class="mv-variants-header">
         <div>
-          <h3 class="mv-section-title">Configuración Comercial</h3>
+          <h3 class="mv-section-title">
+            Configuración del producto:
+            <b class="product-name">{{ producto.nombre }}</b>
+          </h3>
           <p class="mv-section-text">
-            Configuración sobre cómo se vende el producto
+            Configuración sobre cómo se vende el producto dentro de cada canal
+            de venta
           </p>
         </div>
+        <button
+          type="button"
+          class="mv-btn-primary"
+          title="Agregar configuración"
+          (click)="verFormularioConfiguracion()"
+        >
+          <i class="bi bi-plus-lg"></i>
+          Agregar configuración
+        </button>
       </div>
 
-      <table class="mv-table" *ngIf="canales.length; else sinProductosCanales">
+      <table
+        class="mv-table"
+        *ngIf="configuracionesComerciales.length > 0; else sinProductosCanales"
+      >
         <thead>
           <tr>
-            <th>Canal</th>
+            <th>Canal de venta</th>
             <th>Limite mayorista</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let canal of canales">
-            <td>{{ canal.nombre }}</td>
-            <td></td>
+          <tr *ngFor="let c of configuracionesComerciales">
+            <td>{{ c.nombreCanalVenta }}</td>
+            <td>{{ c.limiteMayorista }} unidades</td>
+            <td>
+              <div class="mv-actions">
+                <button
+                  type="button"
+                  class="mv-action-btn"
+                  title="Modificar"
+                  (click)="verFormularioConfiguracion(c)"
+                >
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button
+                  type="button"
+                  class="mv-action-btn mv-negativo"
+                  title="Eliminar"
+                  (click)="eliminarConfiguracion(c.idProductoCanal, c.nombreProducto)"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
 
       <ng-template #sinProductosCanales>
         <div class="mv-empty-state">
-          <i class="bi bi-boxes"></i>
-          <div>No hay registros para esta combinación de Producto y Canal</div>
+          <i class="bi bi-tag"></i>
+          Producto sin configuraciones
+          <div>
+            Este producto no tiene configuraciones asociadas a ningún canal de
+            venta
+          </div>
         </div>
       </ng-template>
     </div>
@@ -341,7 +382,7 @@
   </div>
 </div>
 
-<!-- MODAL DE AGREGAR/EDITAR VARIANTE  -->
+<!-- FORMULARIO PARA AGREGAR/EDITAR VARIANTE  -->
 <app-variante-form
   [producto]="producto"
   [variante]="varianteSeleccionada"
@@ -350,3 +391,13 @@
   (varianteGuardada)="onVarianteGuardada($event)"
 >
 </app-variante-form>
+
+<!-- FORMULARIO PARA AGREGAR CONFIGURACIÓN PRODUCTO + CANAL -->
+<app-producto-canal-form
+  [producto]="producto"
+  [configuracion]="configuracionSeleccionada"
+  [visible]="formConfiguracionVisible"
+  (cerrar)="cerrarModal()"
+  (configuracionGuardada)="onConfiguracionGuardada($event)"
+>
+</app-producto-canal-form>

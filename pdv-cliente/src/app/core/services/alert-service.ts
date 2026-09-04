@@ -68,4 +68,19 @@ export class AlertService {
       },
     });
   }
+
+  confirmarEliminacionConfiguracion(nombre: string): Promise<any> {
+    return Swal.fire({
+      title: '¿Eliminar Configuración Comercial?',
+      text: `La configuración comercial del producto "${nombre}" será eliminada y no podrá ser recuperada.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        confirmButton: 'btn btn-danger',
+        cancelButton: 'btn btn-secondary',
+      },
+    });
+  }
 }

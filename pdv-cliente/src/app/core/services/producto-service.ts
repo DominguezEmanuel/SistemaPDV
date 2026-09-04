@@ -5,6 +5,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { ProductoResponse } from '../../models/Producto';
 import { PageResponse } from '../../models/PageResponse';
 import { StockProductoResponse } from '../../models/Producto';
+import { ProductoCanalResponse } from '../../models/ProductoCanal';
 
 @Injectable({
   providedIn: 'root',
@@ -98,6 +99,14 @@ export class ProductoService {
   ): Observable<StockProductoResponse[]> {
     return this.http.get<StockProductoResponse[]>(
       `${this.hostBase}${idProducto}/stock`,
+    );
+  }
+
+  obtenerConfiguracionesProducto(
+    idProducto: number,
+  ): Observable<ProductoCanalResponse[]> {
+    return this.http.get<ProductoCanalResponse[]>(
+      `${this.hostBase}${idProducto}/canales`,
     );
   }
 }

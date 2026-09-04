@@ -1,0 +1,116 @@
+<div class="mv-overlay" *ngIf="visible" (click)="cerrarModal()">
+  <div class="mv-modal" (click)="detenerPropagacion($event)">
+    <!-- HEADER -->
+    <div class="mv-header">
+      <div class="mv-header-info">
+        <h2 class="mv-title">
+          <i
+            class="bi"
+            [ngClass]="modo === 'editar' ? 'bi-pencil-square' : 'bi-plus-circle'"
+          ></i>
+          {{ modo === 'crear' ? "Nueva configuración" : "Editar configuración"
+          }}
+        </h2>
+      </div>
+      <button
+        type="button"
+        class="mv-close-btn"
+        (click)="cerrarModal()"
+        aria-label="Cerrar"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <!-- CONTENIDO -->
+    <div class="mv-body">
+      <form [formGroup]="formConfiguracion" (ngSubmit)="procesarFormulario()">
+        <!-- Datos generales -->
+        <div class="nu-section-title">
+          <i class="bi bi-square"></i>
+          Datos generales
+        </div>
+        <div class="nu-row">
+          <!-- CANAL DE VENTA -->
+          <div class="nu-field">
+            <label class="nu-label" for="canal"
+              >Canal de venta<span class="req">*</span></label
+            >
+            <select id="canal" class="nu-select" formControlName="canal">
+              <option [ngValue]="null" disabled>
+                Seleccioná un canal de venta
+              </option>
+              <option
+                *ngFor="let canal of canales"
+                [value]="canal.idCanalVenta"
+              >
+                {{ canal.nombre }}
+              </option>
+            </select>
+            <div *ngIf="modo === 'editar'" class="nu-hint">
+              <i class="bi bi-exclamation-circle"></i>
+              No es posible cambiar el canal de venta
+            </div>
+            <div
+              *ngIf="formConfiguracion.get('canal')?.touched && formConfiguracion.get('canal')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div *ngIf="formConfiguracion.get('canal')?.errors?.['required']">
+                Seleccioná un canal de venta.
+              </div>
+            </div>
+          </div>
+          <!-- LIMITE MAYORISTA -->
+          <div class="nu-field">
+            <label class="nu-label" for="limiteMayorista"
+              >Limite mayorista<span class="req">*</span></label
+            >
+            <input
+              type="number"
+              id="limiteMayorista"
+              class="nu-input"
+              placeholder="Ej: 5"
+              formControlName="limiteMayorista"
+            />
+            <div
+              *ngIf="formConfiguracion.get('limiteMayorista')?.touched && formConfiguracion.get('limiteMayorista')?.invalid"
+              class="form-error-msg"
+            >
+              <i class="bi bi-exclamation-circle"></i>
+              <div
+                *ngIf="formConfiguracion.get('limiteMayorista')?.errors?.['required']"
+              >
+                El código de barras es obligatorio.
+              </div>
+              <div
+                *ngIf="formConfiguracion.get('limiteMayorista')?.errors?.['min']"
+              >
+                El limite mayorista debe ser mayor o igual a 1.
+              </div>
+              <div
+                *ngIf="formConfiguracion.get('limiteMayorista')?.errors?.['pattern']"
+              >
+                Ingresá un número entero válido.
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- BOTÓN GUARDAR -->
+        <button
+          [disabled]="formConfiguracion.invalid || guardando"
+          type="submit"
+          class="nu-btn-guardar"
+        >
+          <i class="bi bi-floppy-fill"></i>
+          {{ guardando ? 'Guardando...' : 'Guardar configuración' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="mv-footer">
+      <button type="button" class="mv-btn-cancelar" (click)="cerrarModal()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

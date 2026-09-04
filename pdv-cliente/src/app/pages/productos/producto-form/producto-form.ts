@@ -18,12 +18,15 @@ import {
   FormControl,
   Validators,
 } from '@angular/forms';
-import { finalize } from 'rxjs';
+// Models
 import { ProductoRequest, ProductoResponse } from '../../../models/Producto';
 import { CategoriaResponse } from '../../../models/Categoria';
+// Services
 import { CategoriaService } from '../../../core/services/categoria-service';
 import { ProductoService } from '../../../core/services/producto-service';
 import { ToastrService } from 'ngx-toastr';
+// Others
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-producto-form',
@@ -32,6 +35,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrl: './producto-form.css',
 })
 export class ProductoForm implements OnInit, OnChanges {
+  // Variables de entrada y salida del componente
   @Input() productoForm: ProductoResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
@@ -41,7 +45,7 @@ export class ProductoForm implements OnInit, OnChanges {
   }>();
   @ViewChild('inputImagen')
   inputImagen!: ElementRef<HTMLInputElement>;
-  // Estructuras
+  // Estructuras de datos y variables internas del componente
   formProducto!: FormGroup;
   categorias: CategoriaResponse[] = [];
   nuevoProducto: ProductoRequest | null = null;
