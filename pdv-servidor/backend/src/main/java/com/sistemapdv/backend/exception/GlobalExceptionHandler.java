@@ -45,6 +45,20 @@ public class GlobalExceptionHandler {
                 .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
     }
 
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponseDTO> reportBusinessError(BusinessException ex,
+                                                                HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
+    }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ErrorResponseDTO> reportInsufficientStock(InsufficientStockException ex,
+                                                                    HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> reportValidationErrors(
             MethodArgumentNotValidException ex,

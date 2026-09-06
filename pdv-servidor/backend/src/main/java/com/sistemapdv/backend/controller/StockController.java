@@ -1,7 +1,10 @@
 package com.sistemapdv.backend.controller;
 
+import com.sistemapdv.backend.dto.request.MovimientoRequestDTO;
 import com.sistemapdv.backend.dto.request.StockRequestDTO;
+import com.sistemapdv.backend.dto.response.MovimientoResponseDTO;
 import com.sistemapdv.backend.dto.response.StockResponseDTO;
+import com.sistemapdv.backend.service.MovimientoService;
 import com.sistemapdv.backend.service.StockService;
 import com.sistemapdv.backend.utils.enums.EstadoStock;
 import jakarta.validation.Valid;
@@ -19,9 +22,11 @@ import java.util.List;
 public class StockController {
 
     private final StockService stockService;
+    private final MovimientoService movimientoService;
 
-    public StockController(StockService stockService) {
+    public StockController(StockService stockService, MovimientoService movimientoService) {
         this.stockService = stockService;
+        this.movimientoService = movimientoService;
     }
 
     @GetMapping("/{id}")
@@ -87,5 +92,12 @@ public class StockController {
                                                             @RequestParam Integer nuevoStockMinimo){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(stockService.editStockMinimo(id, nuevoStockMinimo));
+    }
+
+    @PostMapping("{idStock}/movimientos")
+    public ResponseEntity<MovimientoResponseDTO> createMovimientoStock(@PathVariable Integer idStock,
+                                                                       @Valid @RequestBody MovimientoRequestDTO request){
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(movimientoService.registerMovimiento(idStock, request));
     }
 }

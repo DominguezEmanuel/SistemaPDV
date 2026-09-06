@@ -137,7 +137,7 @@ public class StockService {
         return stockMapper.toResponseDTO(nuevoStock);
     }
 
-    private EstadoStock obtenerEstadoStock(Integer cantidad, Integer minimo){
+    public EstadoStock obtenerEstadoStock(Integer cantidad, Integer minimo){
 
         if(cantidad == 0) {
             return EstadoStock.SIN_STOCK;
@@ -179,7 +179,7 @@ public class StockService {
      * @param stock Registro de stock con los campos necesarios para verificar el estado
      * @return Verdadero -> el registro cambió de estado - Falso -> el registro no cambió de estado
      */
-    private Boolean tieneMismoEstado(Stock stock){
+    public Boolean tieneMismoEstado(Stock stock){
         EstadoStock estadoOriginal = stock.getEstado();
 
         EstadoStock nuevoEstado = obtenerEstadoStock(stock.getCantidadDisponible(), stock.getStockMinimo());

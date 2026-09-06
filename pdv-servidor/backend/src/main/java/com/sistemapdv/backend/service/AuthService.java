@@ -8,6 +8,8 @@ import com.sistemapdv.backend.exception.InvalidCredentialsException;
 import com.sistemapdv.backend.mapper.UsuarioMapper;
 import com.sistemapdv.backend.repository.UsuarioRepository;
 import com.sistemapdv.backend.security.JwtService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -21,6 +23,9 @@ public class AuthService {
     private final UsuarioMapper usuarioMapper;
     private final JwtService jwtService;
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(AuthService.class);
+
     public AuthService(UsuarioRepository usuarioRepository, UsuarioMapper usuarioMapper,
                        AuthenticationManager authenticationManager, UsuarioMapper usuarioMapper1,
                        JwtService jwtService) {
@@ -31,7 +36,7 @@ public class AuthService {
     }
 
     /**
-     * Autentica un usuario mediante sus credenciales (username y contraseña).
+     * Autentica un usuario mediante sus credenciales (username y password)
      * 
      * Proceso de validación:
      * 1. Verifica que el usuario exista en la base de datos
@@ -43,12 +48,9 @@ public class AuthService {
      * @param request DTO con username y password del usuario
      * @return LoginResponseDTO con token JWT y datos del usuario autenticado
      * @throws InvalidCredentialsException si las credenciales son inválidas o el usuario está inactivo
-     * @author Emanuel Dev
      */
     public LoginResponseDTO login(LoginRequestDTO request){
-
         try {
-            // Autenticar credenciales
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getUsername(),
@@ -59,21 +61,18 @@ public class AuthService {
             throw new InvalidCredentialsException("Usuario o contraseña incorrectos");
         }
 
-        // Buscar el usuario ya autenticado
         Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new InvalidCredentialsException("Usuario no encontrado"));
 
-        // Verificar que el usuario esté activo
+
         if(!usuario.getActivo())
             throw new InvalidCredentialsException("El usuario se encuentra inactivo");
 
         // Generar token JWT para el usuario autenticado
         String token = jwtService.generateToken(usuario);
 
-        // Convertir usuario a DTO
         UsuarioResponseDTO usuarioDTO = usuarioMapper.toResponseDTO(usuario);
 
-        // Retornar respuesta con token e información del usuario
         return LoginResponseDTO.builder()
                 .token(token)
                 .tokenType("Bearer")

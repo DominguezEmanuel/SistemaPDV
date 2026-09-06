@@ -91,6 +91,8 @@ public class EmailService {
 
         String estado = stock.getEstado().equals(EstadoStock.SIN_STOCK) ? "Sin stock" : "Stock bajo";
 
+        String variante = stock.getVariante().equals("Unica") ? "-" : stock.getVariante();
+
         Context context = new Context();
 
         context.setVariable(
@@ -100,7 +102,7 @@ public class EmailService {
 
         context.setVariable(
                 "variante",
-                stock.getVariante()
+                variante
         );
 
         context.setVariable(

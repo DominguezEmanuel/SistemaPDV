@@ -15,8 +15,9 @@ public class LoginRequestDTO {
 
     @NotBlank(message = "El nombre de usuario es obligatorio")
     @Size(max = 50, message = "El nombre de usuario no puede superar los 50 caracteres")
-    String username;
+    private String username;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    String password;
+    @Size(max = 50, message = "La contraseña no puede superar los 50 caracteres")
+    private String password;
 }
