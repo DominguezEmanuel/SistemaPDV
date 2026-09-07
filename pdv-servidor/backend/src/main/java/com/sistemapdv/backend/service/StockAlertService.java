@@ -45,8 +45,10 @@ public class StockAlertService {
     }
 
     /**
-     * Verifica que el registro haya cambiado de estado y solicita a emailService
-     * enviar una notificación de alerta de stock al propietario
+     * Verifica que el registro haya cambiado de estado a 'STOCK_BAJO' o 'SIN_STOCK' y
+     * solicita a emailService enviar una notificación de alerta de stock al propietario
+     *
+     * Esta función es asíncrona para no retrasar la respuesta de la solicitud de movimientoStock
      *
      * @param stock Registro de Stock
      */

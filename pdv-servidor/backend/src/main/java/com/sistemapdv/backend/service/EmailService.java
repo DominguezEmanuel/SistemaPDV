@@ -66,9 +66,7 @@ public class EmailService {
      * @param to Correo electrónico del propietario del sistema
      * @param stock Registro de stock usado para obtener ciertos datos
      */
-    public void sendStockAlert(
-            String to,
-            StockAlertDTO stock) {
+    public void sendStockAlert(String to, StockAlertDTO stock) {
 
         try {
 
@@ -87,6 +85,12 @@ public class EmailService {
         }
     }
 
+    /**
+     * Genera el cuerpo HTML de la notificación que se enviará al propietario
+     *
+     * @param stock Registro de stock con datos necesarios para construir el correo
+     * @return Cuerpo HTML del correo
+     */
     private String generarStockAlert(StockAlertDTO stock) {
 
         String estado = stock.getEstado().equals(EstadoStock.SIN_STOCK) ? "Sin stock" : "Stock bajo";

@@ -137,19 +137,6 @@ public class StockService {
         return stockMapper.toResponseDTO(nuevoStock);
     }
 
-    public EstadoStock obtenerEstadoStock(Integer cantidad, Integer minimo){
-
-        if(cantidad == 0) {
-            return EstadoStock.SIN_STOCK;
-        }
-
-        if(cantidad <= minimo){
-            return EstadoStock.STOCK_BAJO;
-        }
-
-        return EstadoStock.DISPONIBLE;
-    }
-
     /**
      * Actualiza la cantidad disponible de un registro de Stock
      *
@@ -185,6 +172,26 @@ public class StockService {
         EstadoStock nuevoEstado = obtenerEstadoStock(stock.getCantidadDisponible(), stock.getStockMinimo());
 
         return estadoOriginal.equals(nuevoEstado);
+    }
+
+    /**
+     * Obtiene el estado del registro de stock en base a su cantidad disponible y stock minimo
+     *
+     * @param cantidad Representa a la cantidad de stock disponible en ese momento
+     * @param minimo Representa el mínimo de stock que acepta el registro
+     * @return EstadoStock (DISPONIBLE, STOCK_BAJO o SIN_STOCK)
+     */
+    public EstadoStock obtenerEstadoStock(int cantidad, int minimo){
+
+        if(cantidad == 0) {
+            return EstadoStock.SIN_STOCK;
+        }
+
+        if(cantidad <= minimo){
+            return EstadoStock.STOCK_BAJO;
+        }
+
+        return EstadoStock.DISPONIBLE;
     }
 
     @Transactional

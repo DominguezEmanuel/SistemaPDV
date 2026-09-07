@@ -17,6 +17,9 @@ public class MovimientoResponseDTO {
     private Integer stockAnterior;
     private Integer stockResultante;
     private String motivo;
+
     private Integer idUsuario;
+    private String nombreUsuario;
+
     private Integer idStock;
 }

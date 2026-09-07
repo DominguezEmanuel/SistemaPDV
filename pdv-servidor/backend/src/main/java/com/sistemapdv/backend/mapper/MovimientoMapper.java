@@ -7,7 +7,6 @@ import com.sistemapdv.backend.entity.Stock;
 import com.sistemapdv.backend.entity.Usuario;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import static java.lang.Math.abs;
@@ -16,7 +15,7 @@ import static java.lang.Math.abs;
 public class MovimientoMapper {
 
     public MovimientoStock toMovimiento(MovimientoRequestDTO request, Usuario usuario, Stock stock,
-                                         Integer stockAnterior, Integer cantidadMovimiento){
+                                         int stockAnterior, int cantidadMovimiento){
         MovimientoStock movimiento = MovimientoStock.builder()
                 .fechaHora(OffsetDateTime.now())
                 .tipoMovimiento(request.getTipo())
@@ -40,6 +39,7 @@ public class MovimientoMapper {
                 .stockResultante(movimientoStock.getStockResultante())
                 .motivo(movimientoStock.getMotivo())
                 .idUsuario(movimientoStock.getUsuario().getIdUsuario())
+                .nombreUsuario(movimientoStock.getUsuario().getUsername())
                 .idStock(movimientoStock.getStock().getIdStock())
                 .build();
 

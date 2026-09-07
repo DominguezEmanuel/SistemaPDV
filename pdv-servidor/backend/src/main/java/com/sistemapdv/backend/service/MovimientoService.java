@@ -12,6 +12,7 @@ import com.sistemapdv.backend.mapper.MovimientoMapper;
 import com.sistemapdv.backend.mapper.StockMapper;
 import com.sistemapdv.backend.repository.MovimientoRepository;
 import com.sistemapdv.backend.repository.StockRepository;
+import com.sistemapdv.backend.utils.enums.TipoMovimiento;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,13 @@ public class MovimientoService {
         this.movimientoMapper = movimientoMapper;
     }
 
+    /**
+     * Registra un movimiento de Stock en la base de datos
+     *
+     * @param idStock Identificador del Stock que se va a modificar
+     * @param request Solicitud con los datos necesarios para realizar la transacción
+     * @return Nuevo registro de movimiento
+     */
     @Transactional
     public MovimientoResponseDTO registerMovimiento(Integer idStock, MovimientoRequestDTO request){
 
@@ -43,11 +51,22 @@ public class MovimientoService {
                 .orElseThrow( () -> new ResourceNotFoundException("Registro con ID " + idStock +
                         " no encontrado"));
 
-        Integer stockAnterior = stock.getCantidadDisponible();
+        Usuario usuarioAutenticado = authenticationService.getUserAuthenticated();
 
-        Integer cantidadMovimiento = calcularCantidad(request, stockAnterior);
+        if(!cantidadesValidas(request)){
+            throw new IllegalArgumentException("La cantidad enviada es inválida");
+        }
 
-        Integer stockResultante = stockAnterior + cantidadMovimiento;
+        if(!motivoValido(request.getTipo(), request.getMotivo())){
+            throw new IllegalArgumentException("El motivo es obligatorio para el tipo de movimiento '"
+                    + request.getTipo() + "'");
+        }
+
+        int stockAnterior = stock.getCantidadDisponible();
+
+        int cantidadMovimiento = calcularCantidad(request, stockAnterior);
+
+        int stockResultante = stockAnterior + cantidadMovimiento;
 
         stock.setCantidadDisponible(stockResultante);
 
@@ -57,18 +76,67 @@ public class MovimientoService {
             stockAlertService.procesarCambioEstado(stockMapper.toStockAlertDTO(stock));
         }
 
-        Usuario usuarioAutenticado = authenticationService.getUserAuthenticated();
-
-        MovimientoStock movimiento = movimientoMapper.toMovimiento(request, usuarioAutenticado,
+        MovimientoStock nuevoMovimiento = movimientoMapper.toMovimiento(request, usuarioAutenticado,
                 stock, stockAnterior, cantidadMovimiento);
 
-        movimientoRepository.save(movimiento);
+        movimientoRepository.save(nuevoMovimiento);
 
-        return movimientoMapper.toResponseDTO(movimiento);
+        return movimientoMapper.toResponseDTO(nuevoMovimiento);
     }
 
-    private Integer calcularCantidad(MovimientoRequestDTO request, Integer stockAnterior){
-        Integer cantidad = 0;
+    /**
+     * Verifica que 'motivo' se encuentre dentro de la request
+     *
+     * Para 'SALIDA' y 'AJUSTE': 'motivo' es obligatorio
+     *
+     * Para 'ENTRADA': 'motivo' es opcional
+     *
+     * @param tipo Tipo de movimiento de la request
+     * @param motivo Motivo por el cual se realiza la transacción
+     * @return
+     * true -> 'motivo' enviado o no para el tipo de movimiento
+     * false -> 'motivo' NO enviado para el tipo de movimiento que lo requiere
+     */
+    private boolean motivoValido(TipoMovimiento tipo, String motivo){
+        if(tipo.equals(TipoMovimiento.SALIDA) || tipo.equals(TipoMovimiento.AJUSTE)){
+            if(motivo == null || motivo.isEmpty()){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Valida que las cantidades enviadas sean válidas
+     *
+     * Para 'ENTRADA' o 'SALIDA': se debe enviar 'cantidad' en la request y debe ser > 0
+     *
+     * Para 'AJUSTE': se debe enviar 'stockFisico' en la request y que NO sea < 0
+     *
+     * @param request Solicitud con los datos necesarios
+     * @return true -> cantidad enviada válida - false -> cantidad enviada inválida
+     */
+    private boolean cantidadesValidas(MovimientoRequestDTO request){
+        if(request.getTipo().equals(TipoMovimiento.ENTRADA)
+                || request.getTipo().equals(TipoMovimiento.SALIDA)){
+            if(request.getCantidad() == null || request.getCantidad() <= 0)
+                return false;
+        }else{
+            if(request.getStockFisico() == null || request.getStockFisico() < 0)
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Calcula la cantidad de unidades que va a modificar del registro de Stock
+     *
+     * @param request Solicitud de dónde se obtiene el 'tipoMovimiento' y la cantidad para modificar
+     * @param stockAnterior Cantidad disponible del Stock antes de realizar la solicitud
+     * @return Cantidad que debe modificar del registro de Stock
+     */
+    private int calcularCantidad(MovimientoRequestDTO request, int stockAnterior){
+        int cantidad = 0;
         switch (request.getTipo()){
             case ENTRADA:
                 cantidad = request.getCantidad();
