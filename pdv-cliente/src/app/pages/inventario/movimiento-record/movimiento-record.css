@@ -11,7 +11,7 @@
 
 .rs-modal {
   width: 100%;
-  max-width: 600px;
+  max-width: 700px;
   max-height: 90vh;
   overflow-y: auto;
   background: #ffffff;
@@ -82,6 +82,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px 20px;
+  margin-bottom: 20px;
 }
 .rs-field label {
   display: block;
@@ -123,7 +124,7 @@
   color: #6b3fa0;
 }
 
-.estado-badge {
+.ms-type {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -131,17 +132,16 @@
   font-weight: 600;
   padding: 5px 12px;
   border-radius: 20px;
-  white-space: nowrap;
 }
-.estado-badge.disponible {
+.ms-type.entrada {
   background: #e7f7ed;
   color: #2e9e5b;
 }
-.estado-badge.stock-bajo {
+.ms-type.ajuste {
   background: #fff3de;
   color: #a6710c;
 }
-.estado-badge.sin-stock {
+.ms-type.salida {
   background: #fbeaea;
   color: #c13b3b;
 }
@@ -169,6 +169,75 @@
 
 .rs-section-title.full {
   grid-column: 1 / -1;
+}
+
+.mv-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 28px 18px;
+  color: #5b6670;
+  font-size: 0.9rem;
+  border: 1.5px dashed #dbe7ee;
+  border-radius: 14px;
+  background: #fbfdfe;
+}
+.mv-empty-state i {
+  font-size: 1.4rem;
+  color: #3e93c7;
+}
+
+.mv-section-text {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #5b6670;
+  line-height: 1.6;
+}
+
+.mv-section-text span {
+  display: block;
+}
+
+.tabla-container {
+  overflow-x: auto;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.mv-table {
+  border-collapse: collapse;
+  min-width: 600px;
+  max-width: 650px;
+}
+.mv-table thead th {
+  text-align: center;
+  font-size: 0.66rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #5b6670;
+  padding: 9px 12px;
+  border-bottom: 2px solid #e4edf3;
+}
+.mv-table tbody td {
+  text-align: center;
+  padding: 11px 12px;
+  font-size: 0.84rem;
+  color: #14181c;
+  border-bottom: 1px solid #e4edf3;
+}
+
+.nu-hint {
+  font-size: 0.72rem;
+  color: #5b6670;
+  margin-top: 15px;
+}
+
+.nu-hint i {
+  color: #3e93c7;
 }
 
 .rs-btn-cerrar {

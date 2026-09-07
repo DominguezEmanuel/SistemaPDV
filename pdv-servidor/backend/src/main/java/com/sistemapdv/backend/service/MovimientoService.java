@@ -13,10 +13,14 @@ import com.sistemapdv.backend.mapper.StockMapper;
 import com.sistemapdv.backend.repository.MovimientoRepository;
 import com.sistemapdv.backend.repository.StockRepository;
 import com.sistemapdv.backend.utils.enums.TipoMovimiento;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
+@AllArgsConstructor
 public class MovimientoService {
 
     private final StockService stockService;
@@ -27,14 +31,39 @@ public class MovimientoService {
     private final StockMapper stockMapper;
     private final MovimientoMapper movimientoMapper;
 
-    public MovimientoService(StockService stockService, StockAlertService stockAlertService, AuthenticationService authenticationService, MovimientoRepository movimientoRepository, StockRepository stockRepository, StockMapper stockMapper, MovimientoMapper movimientoMapper) {
-        this.stockService = stockService;
-        this.stockAlertService = stockAlertService;
-        this.authenticationService = authenticationService;
-        this.movimientoRepository = movimientoRepository;
-        this.stockRepository = stockRepository;
-        this.stockMapper = stockMapper;
-        this.movimientoMapper = movimientoMapper;
+    /**
+     * Devuelve un registro de movimiento
+     *
+     * @param idMovimiento Identificador del movimiento
+     * @return Datos del movimiento solicitado
+     */
+    @Transactional(readOnly = true)
+    public MovimientoResponseDTO getRegisterById(Integer idMovimiento){
+
+        MovimientoStock movimiento = movimientoRepository.findById(idMovimiento)
+                .orElseThrow( () -> new ResourceNotFoundException("Movimiento con ID "
+                + idMovimiento + " no encontrado"));
+
+        return movimientoMapper.toResponseDTO(movimiento);
+    }
+
+    /**
+     * Devuelve los últimos 5 movimientos de un Stock
+     *
+     * @param idStock Identificador del Stock para consultar sus movimientos
+     * @return Listado de los últimos 5 movimientos ordenados por fecha
+     */
+    @Transactional(readOnly = true)
+    public List<MovimientoResponseDTO> getLastFiveRecordsByStock(Integer idStock){
+
+        if(!stockRepository.existsById(idStock)){
+            throw new ResourceNotFoundException("Registro con ID " + idStock + " no encontrado");
+        }
+
+        return movimientoRepository.findTop5ByStockIdStockOrderByFechaHoraDesc(idStock)
+                .stream()
+                .map(movimientoMapper::toResponseDTO)
+                .toList();
     }
 
     /**
@@ -70,6 +99,8 @@ public class MovimientoService {
 
         stock.setCantidadDisponible(stockResultante);
 
+        // Verificar si el registro de Stock cambió de estado a 'STOCK_BAJO' o 'SIN_STOCK'
+        // para enviar alerta al propietario
         if(!stockService.tieneMismoEstado(stock)){
             stock.setEstado(stockService.obtenerEstadoStock(stock.getCantidadDisponible(),
                     stock.getStockMinimo()));
@@ -157,7 +188,7 @@ public class MovimientoService {
                 break;
 
             default:
-                throw new BusinessException("Tipo de movimiento no válido");
+                throw new BusinessException("Tipo de movimiento inválido");
         }
         return cantidad;
     }

@@ -15,11 +15,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     // Es una forma segura de manejar la ausencia de datos sin usar null.
     Optional<Usuario> findByUsername(String username);
 
-    //Optional<Usuario> findByUsernameAndActivo(String username, Boolean activo);
-
-    //List<Usuario> findByActivo(Boolean activo);
-
-    //List<Usuario> findByNombreContainingIgnoreCase(String nombre);
-
     boolean existsByUsername(String username);
 }

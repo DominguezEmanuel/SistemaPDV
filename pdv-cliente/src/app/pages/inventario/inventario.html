@@ -157,13 +157,13 @@
               >
                 <i class="bi bi-eye"></i>
               </button>
-              <!--<button
-                class="btn-accion ajustar"
-                title="Editar registro"
-                (click)="verFormularioStock(stock)"
+              <button
+                class="btn-accion historial"
+                title="Ver historial"
+                (click)="verHistorialMovimientos(stock)"
               >
-                <i class="bi bi-pencil-square"></i>
-              </button>-->
+                <i class="bi bi-journal"></i>
+              </button>
             </div>
           </td>
         </tr>
@@ -225,3 +225,11 @@
   (stockGuardado)="onStockGuardado($event)"
 >
 </app-stock-form>
+
+<!-- MODAL DE HISTORIAL DE MOVIMIENTOS DEL STOCK -->
+<app-movimiento-record
+  [stock]="registroStockSeleccionado"
+  [visible]="modalHistorialVisible"
+  (cerrar)="cerrarModalHistorial()"
+>
+</app-movimiento-record>

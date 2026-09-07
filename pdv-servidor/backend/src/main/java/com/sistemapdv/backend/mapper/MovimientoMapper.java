@@ -8,6 +8,8 @@ import com.sistemapdv.backend.entity.Usuario;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import static java.lang.Math.abs;
 
@@ -32,7 +34,7 @@ public class MovimientoMapper {
     public MovimientoResponseDTO toResponseDTO(MovimientoStock movimientoStock){
         MovimientoResponseDTO dto = MovimientoResponseDTO.builder()
                 .idMovimiento(movimientoStock.getIdMovimiento())
-                .fechaHora(movimientoStock.getFechaHora().toString())
+                .fechaHora(formatearFechaRegistro(movimientoStock.getFechaHora()))
                 .tipo(movimientoStock.getTipoMovimiento())
                 .cantidad(movimientoStock.getCantidad())
                 .stockAnterior(movimientoStock.getStockAnterior())
@@ -44,5 +46,16 @@ public class MovimientoMapper {
                 .build();
 
         return dto;
+    }
+
+    private String formatearFechaRegistro(OffsetDateTime fechaOriginal){
+
+        OffsetDateTime fechaLocal = fechaOriginal
+                .atZoneSameInstant(ZoneId.systemDefault())
+                .toOffsetDateTime();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM - HH:mm");
+
+        return fechaLocal.format(formatter);
     }
 }

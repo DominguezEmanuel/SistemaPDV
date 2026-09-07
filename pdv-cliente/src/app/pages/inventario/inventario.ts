@@ -11,6 +11,7 @@ import { CanalResponse } from '../../models/Canal';
 // Others
 import { StockInfo } from './stock-info/stock-info';
 import { StockForm } from './stock-form/stock-form';
+import { MovimientoRecord } from './movimiento-record/movimiento-record';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
@@ -21,23 +22,27 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
     ReactiveFormsModule,
     StockInfo,
     StockForm,
+    MovimientoRecord,
   ],
   templateUrl: './inventario.html',
   styleUrl: './inventario.css',
 })
 export class Inventario implements OnInit {
-  // Estructuras utilizadas
+  // Estructuras utilizadas en el componente
   stocks: StockResponse[] = [];
   canales: CanalResponse[] = [];
   idCanal: number | null = null;
   estado: string | null = null;
   busquedaControl = new FormControl('');
 
-  // Variables que controlan la vista de modal de info y formulario
+  // Variables que controlan la vista de modal de info y formulario de Stock
   modalStockVisible = false;
   registroStockSeleccionado: StockResponse | null = null;
   formStockVisible = false;
   registroStockForm: StockResponse | null = null;
+
+  // Variable/s para consiltar el historial de movimientos
+  modalHistorialVisible = false;
 
   // Variables para las tarjetas de resumen
   unidadesTotales!: number;
@@ -174,6 +179,11 @@ export class Inventario implements OnInit {
     this.formStockVisible = true;
   }
 
+  verHistorialMovimientos(stock: StockResponse) {
+    this.registroStockSeleccionado = stock;
+    this.modalHistorialVisible = true;
+  }
+
   get paginas(): number[] {
     return Array.from({ length: this.totalPaginas }, (_, i) => i);
   }
@@ -196,6 +206,11 @@ export class Inventario implements OnInit {
   cerrarFormularioStock(): void {
     this.formStockVisible = false;
     this.registroStockForm = null;
+  }
+
+  cerrarModalHistorial(): void {
+    this.registroStockSeleccionado = null;
+    this.modalHistorialVisible = false;
   }
 
   onStockGuardado(event: {

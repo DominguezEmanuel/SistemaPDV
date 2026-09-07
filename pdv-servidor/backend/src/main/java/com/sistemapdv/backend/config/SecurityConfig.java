@@ -74,6 +74,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/stock/**").permitAll()
                     .requestMatchers("/api/productos-canales/**").permitAll()
                     .requestMatchers("/api/email/**").permitAll()
+                    .requestMatchers("/api/movimientos-stock/**").permitAll()
                     // Toda request que no haya sido permitida, requiere un usuario autenticado
                 .anyRequest().authenticated()
             )

@@ -1,0 +1,109 @@
+<div class="rs-overlay" *ngIf="visible && stock" (click)="cerrarModal()">
+  <div class="rs-modal" (click)="detenerPropagacion($event)">
+    <!-- HEADER -->
+    <div class="rs-header">
+      <h2>
+        <i class="bi bi-journal"></i>
+        Historial de movimientos
+      </h2>
+      <button
+        class="rs-close-btn"
+        type="button"
+        (click)="cerrarModal()"
+        aria-label="Cerrar"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <!-- CUERPO DEL MODAL -->
+    <div class="rs-body">
+      <div class="rs-info-grid">
+        <!-- Datos del producto -->
+        <div class="rs-section-title full">
+          <i class="bi bi-layout-wtf"></i>
+          Información del Stock
+        </div>
+        <div class="rs-field">
+          <label>Producto</label>
+          <div class="rs-value">{{ stock.nombreProducto }}</div>
+        </div>
+        <div class="rs-field">
+          <label>Variante</label>
+          <div class="rs-value">
+            {{ stock.nombreVariante === 'Unica' ? '-' : stock.nombreVariante }}
+          </div>
+        </div>
+        <div class="rs-field">
+          <label>Canal de venta</label>
+          <div class="rs-value">
+            <span
+              class="canal-badge"
+              [class.local]="stock.nombreCanalVenta === 'Local Fisico'"
+              [class.tiktok]="stock.nombreCanalVenta === 'Lives Tik Tok'"
+            >
+              {{ stock.nombreCanalVenta }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="tabla-container">
+        <table
+          class="mv-table"
+          *ngIf="movimientos.length > 0; else sinRegistros"
+        >
+          <thead>
+            <tr>
+              <th>Fecha - Hora</th>
+              <th>Tipo</th>
+              <th>Cantidad</th>
+              <th>Stock final</th>
+              <th>Motivo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of movimientos">
+              <td>{{ m.fechaHora }}</td>
+              <td>
+                <span
+                  class="ms-type"
+                  [class.entrada]="m.tipo === 'ENTRADA'"
+                  [class.salida]="m.tipo === 'SALIDA'"
+                  [class.ajuste]="m.tipo === 'AJUSTE'"
+                >
+                  {{ m.tipo }}
+                </span>
+              </td>
+              <td>{{ m.cantidad }} uds</td>
+              <td>{{ m.stockResultante }} uds</td>
+              <td>{{ m.motivo }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="nu-hint">
+          <i class="bi bi-info-circle"></i>
+          Se observan los últimos 5 movimientos registrados para el stock
+          seleccionado
+        </div>
+      </div>
+      <ng-template #sinRegistros>
+        <div class="mv-empty-state">
+          <i class="bi bi-info-circle"></i>
+          <p class="mv-section-text">
+            <span>Sin movimientos</span>
+            <span
+              >Debe realizar un movimiento sobre este registro de stock para
+              visualizar la información</span
+            >
+          </p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Footer -->
+    <div class="rs-footer">
+      <button type="button" class="rs-btn-cerrar" (click)="cerrarModal()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

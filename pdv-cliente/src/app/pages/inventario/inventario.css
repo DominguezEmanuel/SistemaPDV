@@ -321,17 +321,12 @@
     border-color 0.15s ease;
   cursor: pointer;
 }
-/*
-.btn-accion.editar:hover {
-  background: #dceef8;
-  color: #1c5a85;
-  border-color: #3e93c7;
-}
-.btn-accion.ajustar:hover {
+
+.btn-accion.historial:hover {
   background: #e7f7ed;
   color: #2e9e5b;
   border-color: #2e9e5b;
-}*/
+}
 
 .btn-accion.visualizar:hover {
   background: #dceef8;
