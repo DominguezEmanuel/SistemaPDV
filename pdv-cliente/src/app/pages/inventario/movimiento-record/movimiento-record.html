@@ -75,7 +75,7 @@
               </td>
               <td>{{ m.cantidad }} uds</td>
               <td>{{ m.stockResultante }} uds</td>
-              <td>{{ m.motivo }}</td>
+              <td>{{ m.motivo ? m.motivo : "-" }}</td>
             </tr>
           </tbody>
         </table>

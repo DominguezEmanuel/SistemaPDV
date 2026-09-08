@@ -12,7 +12,9 @@ import { CanalResponse } from '../../models/Canal';
 import { StockInfo } from './stock-info/stock-info';
 import { StockForm } from './stock-form/stock-form';
 import { MovimientoRecord } from './movimiento-record/movimiento-record';
+import { MovimientoForm } from './movimiento-form/movimiento-form';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { MovimientoResponse } from '../../models/Movimiento';
 
 @Component({
   selector: 'app-inventario',
@@ -23,6 +25,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
     StockInfo,
     StockForm,
     MovimientoRecord,
+    MovimientoForm,
   ],
   templateUrl: './inventario.html',
   styleUrl: './inventario.css',
@@ -43,6 +46,7 @@ export class Inventario implements OnInit {
 
   // Variable/s para consiltar el historial de movimientos
   modalHistorialVisible = false;
+  formularioMovimientoVisible = false;
 
   // Variables para las tarjetas de resumen
   unidadesTotales!: number;
@@ -179,9 +183,15 @@ export class Inventario implements OnInit {
     this.formStockVisible = true;
   }
 
-  verHistorialMovimientos(stock: StockResponse) {
+  verModalMovimiento(stock: StockResponse, accion: string) {
+    if (accion === 'info') {
+      //this.registroStockSeleccionado = stock;
+      this.modalHistorialVisible = true;
+    } else {
+      //this.registroStockSeleccionado = null;
+      this.formularioMovimientoVisible = true;
+    }
     this.registroStockSeleccionado = stock;
-    this.modalHistorialVisible = true;
   }
 
   get paginas(): number[] {
@@ -208,9 +218,13 @@ export class Inventario implements OnInit {
     this.registroStockForm = null;
   }
 
-  cerrarModalHistorial(): void {
+  cerrarModalMovimiento(): void {
+    if (this.modalHistorialVisible) {
+      this.modalHistorialVisible = false;
+    } else {
+      this.formularioMovimientoVisible = false;
+    }
     this.registroStockSeleccionado = null;
-    this.modalHistorialVisible = false;
   }
 
   onStockGuardado(event: {
@@ -224,6 +238,19 @@ export class Inventario implements OnInit {
       this.toastr.success(
         'El registro se creó correctamente',
         'Registro creado',
+      );
+    }
+  }
+
+  onMovimientoGuardado(event: {
+    movimiento: MovimientoResponse | null;
+    accion: 'crear' | 'editar';
+  }): void {
+    this.aplicarFiltros();
+    if (event.accion === 'crear') {
+      this.toastr.success(
+        'El movimiento de stock se creó correctamente',
+        'Movimiento creado',
       );
     }
   }

@@ -13,4 +13,11 @@ export interface MovimientoResponse {
   idStock: number;
 }
 
-export interface MovimientoRequest {}
+export interface MovimientoRequest {
+  tipo: string;
+
+  cantidad: number;
+  stockFisico: number;
+
+  motivo: string;
+}

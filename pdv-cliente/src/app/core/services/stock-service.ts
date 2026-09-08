@@ -4,6 +4,7 @@ import { environment } from '../../../environment/environment';
 import { StockRequest, StockResponse } from '../../models/Stock';
 import { Observable } from 'rxjs';
 import { PageResponse } from '../../models/PageResponse';
+import { MovimientoRequest, MovimientoResponse } from '../../models/Movimiento';
 
 @Injectable({
   providedIn: 'root',
@@ -60,6 +61,16 @@ export class StockService {
     return this.http.get<PageResponse<StockResponse>>(
       `${this.hostBase}buscar`,
       { params },
+    );
+  }
+
+  crearMovimientoStock(
+    idStock: number,
+    request: MovimientoRequest,
+  ): Observable<MovimientoResponse> {
+    return this.http.post<MovimientoResponse>(
+      `${this.hostBase}${idStock}/movimientos`,
+      request,
     );
   }
 }

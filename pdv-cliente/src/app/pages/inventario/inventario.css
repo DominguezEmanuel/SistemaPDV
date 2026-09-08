@@ -334,6 +334,12 @@
   border-color: #3e93c7;
 }
 
+.btn-accion.nuevo-movimiento:hover {
+  background: #fff3de;
+  color: #a6710c;
+  border-color: #a6710c;
+}
+
 .sin-stock-msg {
   grid-column: 1 / -1;
   display: flex;

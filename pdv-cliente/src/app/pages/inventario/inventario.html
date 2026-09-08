@@ -160,9 +160,16 @@
               <button
                 class="btn-accion historial"
                 title="Ver historial"
-                (click)="verHistorialMovimientos(stock)"
+                (click)="verModalMovimiento(stock, 'info')"
               >
                 <i class="bi bi-journal"></i>
+              </button>
+              <button
+                class="btn-accion nuevo-movimiento"
+                title="Registrar movimiento"
+                (click)="verModalMovimiento(stock, 'registro')"
+              >
+                <i class="bi bi-journal-plus"></i>
               </button>
             </div>
           </td>
@@ -230,6 +237,13 @@
 <app-movimiento-record
   [stock]="registroStockSeleccionado"
   [visible]="modalHistorialVisible"
-  (cerrar)="cerrarModalHistorial()"
+  (cerrar)="cerrarModalMovimiento()"
 >
 </app-movimiento-record>
+
+<app-movimiento-form
+  [stock]="registroStockSeleccionado"
+  [visible]="formularioMovimientoVisible"
+  (cerrar)="cerrarModalMovimiento()"
+  (movimientoGuardado)="onMovimientoGuardado($event)"
+></app-movimiento-form>

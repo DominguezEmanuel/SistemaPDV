@@ -1,1 +1,185 @@
-<p>movimiento-form works!</p>
+<div class="rs-overlay" *ngIf="visible && stock" (click)="cerrarModal()">
+  <div class="rs-modal" (click)="detenerPropagacion($event)">
+    <!-- HEADER -->
+    <div class="rs-header">
+      <h2>
+        <i class="bi bi-journal-plus"></i>
+        Registrar movimiento
+      </h2>
+      <button
+        class="rs-close-btn"
+        type="button"
+        (click)="cerrarModal()"
+        aria-label="Cerrar"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <!-- CUERPO DEL MODAL -->
+    <div class="rs-body">
+      <div class="rs-info-grid">
+        <!-- Datos del producto -->
+        <div class="rs-section-title full">
+          <i class="bi bi-layout-wtf"></i>
+          Información del Stock
+        </div>
+        <div class="rs-field">
+          <label>Producto</label>
+          <div class="rs-value">{{ stock.nombreProducto }}</div>
+        </div>
+        <div class="rs-field">
+          <label>Variante</label>
+          <div class="rs-value">
+            {{ stock.nombreVariante === 'Unica' ? '-' : stock.nombreVariante }}
+          </div>
+        </div>
+        <div class="rs-field">
+          <label>Canal de venta</label>
+          <div class="rs-value">
+            <span
+              class="canal-badge"
+              [class.local]="stock.nombreCanalVenta === 'Local Fisico'"
+              [class.tiktok]="stock.nombreCanalVenta === 'Lives Tik Tok'"
+            >
+              {{ stock.nombreCanalVenta }}
+            </span>
+          </div>
+        </div>
+        <form [formGroup]="formMovimiento" (ngSubmit)="procesarFormulario()">
+          <!-- Datos generales -->
+          <div class="rs-section-title full" style="margin-bottom: 15px">
+            <i class="bi bi-square"></i>
+            Datos generales
+          </div>
+
+          <div class="rs-row">
+            <!-- TIPO DE MOVIMIENTO -->
+            <div class="rs-field">
+              <label for="tipo"
+                >Tipo de movimiento<span class="req">*</span></label
+              >
+              <select id="tipo" class="rs-select" formControlName="tipo">
+                <option value="null" disabled>
+                  Elegí un tipo de movimiento
+                </option>
+                <option value="ENTRADA">Entrada</option>
+                <option value="SALIDA">Salida</option>
+                <option value="AJUSTE">Ajuste</option>
+              </select>
+              <div
+                *ngIf="formMovimiento.get('tipo')?.touched && formMovimiento.get('tipo')?.invalid"
+                class="form-error-msg"
+              >
+                <i class="bi bi-exclamation-circle"></i>
+                <div *ngIf="formMovimiento.get('tipo')?.errors?.['required']">
+                  Seleccioná un tipo de movimiento.
+                </div>
+              </div>
+            </div>
+            <!-- CANTIDAD -->
+            <div class="rs-field" *ngIf="obtenerTipoMovimiento() !== 'AJUSTE'">
+              <label for="cantidad">Cantidad<span class="req">*</span></label>
+              <input
+                type="number"
+                id="cantidad"
+                class="rs-input"
+                placeholder="Ej: 5"
+                formControlName="cantidad"
+              />
+              <div
+                *ngIf="formMovimiento.get('cantidad')?.touched && formMovimiento.get('cantidad')?.invalid"
+                class="form-error-msg"
+              >
+                <i class="bi bi-exclamation-circle"></i>
+                <div
+                  *ngIf="formMovimiento.get('cantidad')?.errors?.['required']"
+                >
+                  La cantidad es obligatoria.
+                </div>
+                <div *ngIf="formMovimiento.get('cantidad')?.errors?.['min']">
+                  La cantidad debe ser mayor o igual a 1.
+                </div>
+              </div>
+            </div>
+            <!-- STOCK FISICO -->
+            <div class="rs-field" *ngIf="obtenerTipoMovimiento() === 'AJUSTE'">
+              <label for="stockFisico"
+                >Stock fisico<span class="req">*</span></label
+              >
+              <input
+                type="number"
+                id="stockFisico"
+                class="rs-input"
+                placeholder="Ej: 5"
+                formControlName="stockFisico"
+              />
+              <div
+                *ngIf="formMovimiento.get('stockFisico')?.touched && formMovimiento.get('stockFisico')?.invalid"
+                class="form-error-msg"
+              >
+                <i class="bi bi-exclamation-circle"></i>
+                <div
+                  *ngIf="formMovimiento.get('stockFisico')?.errors?.['required']"
+                >
+                  El stock actual del registro es obligatorio.
+                </div>
+                <div *ngIf="formMovimiento.get('stockFisico')?.errors?.['min']">
+                  El stock puede ser mayor o igual a 0.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="rs-row">
+            <!-- MOTIVO DEL MOVIMIENTO -->
+            <div class="rs-field" style="margin-top: 15px">
+              <label for="motivo">Motivo<span class="req">*</span></label>
+              <input
+                type="text"
+                id="motivo"
+                class="rs-input"
+                placeholder="Ej: Ingreso de stock"
+                formControlName="motivo"
+                autocomplete="off"
+              />
+              <div
+                *ngIf="formMovimiento.get('motivo')?.touched && formMovimiento.get('motivo')?.invalid"
+                class="form-error-msg"
+              >
+                <i class="bi bi-exclamation-circle"></i>
+                <div *ngIf="formMovimiento.get('motivo')?.errors?.['required']">
+                  Debe ingresar el motivo del movimiento.
+                </div>
+                <div
+                  *ngIf="formMovimiento.get('motivo')?.errors?.['minlength']"
+                >
+                  El texto debe superar los 5 caracteres.
+                </div>
+                <div
+                  *ngIf="formMovimiento.get('motivo')?.errors?.['maxlength']"
+                >
+                  El texto no debe superar los 50 caracteres.
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- BOTÓN GUARDAR -->
+          <button
+            [disabled]="formMovimiento.invalid || guardando"
+            type="submit"
+            class="rs-btn-guardar"
+          >
+            <i class="bi bi-floppy-fill"></i>
+            {{ guardando ? 'Guardando...' : 'Guardar movimiento' }}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="rs-footer">
+      <button type="button" class="rs-btn-cerrar" (click)="cerrarModal()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

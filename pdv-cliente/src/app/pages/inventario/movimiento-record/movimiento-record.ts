@@ -13,6 +13,8 @@ import { MovimientoResponse } from '../../../models/Movimiento';
 // Services
 import { MovimientoService } from '../../../core/services/movimiento-service';
 import { ToastrService } from 'ngx-toastr';
+// Others
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-movimiento-record',
