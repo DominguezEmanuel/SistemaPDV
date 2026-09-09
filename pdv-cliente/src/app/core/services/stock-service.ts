@@ -27,7 +27,7 @@ export class StockService {
     });
   }
 
-  crearRegistroStock(request: StockRequest | null): Observable<StockResponse> {
+  crearRegistroStock(request: StockRequest): Observable<StockResponse> {
     return this.http.post<StockResponse>(`${this.hostBase}`, request);
   }
 

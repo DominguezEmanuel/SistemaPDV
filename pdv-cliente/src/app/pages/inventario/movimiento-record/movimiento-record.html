@@ -17,22 +17,25 @@
     </div>
     <!-- CUERPO DEL MODAL -->
     <div class="rs-body">
+      <!-- DATOS DEL REGISTRO DE STOCK -->
       <div class="rs-info-grid">
-        <!-- Datos del producto -->
         <div class="rs-section-title full">
           <i class="bi bi-layout-wtf"></i>
           Información del Stock
         </div>
+        <!-- PRODUCTO -->
         <div class="rs-field">
           <label>Producto</label>
           <div class="rs-value">{{ stock.nombreProducto }}</div>
         </div>
+        <!-- VARIANTE -->
         <div class="rs-field">
           <label>Variante</label>
           <div class="rs-value">
             {{ stock.nombreVariante === 'Unica' ? '-' : stock.nombreVariante }}
           </div>
         </div>
+        <!-- CANAL DE VENTA -->
         <div class="rs-field">
           <label>Canal de venta</label>
           <div class="rs-value">
@@ -46,6 +49,7 @@
           </div>
         </div>
       </div>
+      <!-- TABLA DE MOVIMIENTOS -->
       <div class="tabla-container">
         <table
           class="mv-table"
@@ -79,12 +83,14 @@
             </tr>
           </tbody>
         </table>
+        <!-- AVISO -->
         <div class="nu-hint">
           <i class="bi bi-info-circle"></i>
           Se observan los últimos 5 movimientos registrados para el stock
           seleccionado
         </div>
       </div>
+      <!-- AVISO 'SIN MOVIMIENTOS' -->
       <ng-template #sinRegistros>
         <div class="mv-empty-state">
           <i class="bi bi-info-circle"></i>

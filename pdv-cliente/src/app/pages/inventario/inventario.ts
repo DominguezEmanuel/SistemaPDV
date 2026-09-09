@@ -8,13 +8,13 @@ import { ToastrService } from 'ngx-toastr';
 // Models
 import { StockResponse } from '../../models/Stock';
 import { CanalResponse } from '../../models/Canal';
+import { MovimientoResponse } from '../../models/Movimiento';
 // Others
 import { StockInfo } from './stock-info/stock-info';
 import { StockForm } from './stock-form/stock-form';
 import { MovimientoRecord } from './movimiento-record/movimiento-record';
 import { MovimientoForm } from './movimiento-form/movimiento-form';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { MovimientoResponse } from '../../models/Movimiento';
 
 @Component({
   selector: 'app-inventario',
@@ -38,15 +38,15 @@ export class Inventario implements OnInit {
   estado: string | null = null;
   busquedaControl = new FormControl('');
 
-  // Variables que controlan la vista de modal de info y formulario de Stock
+  // Variables que controlan la vista del modal de info y formulario de Stock
   modalStockVisible = false;
-  registroStockSeleccionado: StockResponse | null = null;
   formStockVisible = false;
-  registroStockForm: StockResponse | null = null;
+  registroStockSeleccionado: StockResponse | null = null;
+  //registroStockForm: StockResponse | null = null;
 
-  // Variable/s para consiltar el historial de movimientos
+  // Variable/s para consultar el historial de movimientos
   modalHistorialVisible = false;
-  formularioMovimientoVisible = false;
+  formMovimientoVisible = false;
 
   // Variables para las tarjetas de resumen
   unidadesTotales!: number;
@@ -125,19 +125,20 @@ export class Inventario implements OnInit {
     // Si se envía el estado, se convierte a mayúsculas para que coincida
     // con los valores esperados en el backend
     let estadoFiltro = '';
+
     if (this.estado) {
       estadoFiltro = this.estado.toUpperCase();
     }
 
-    this.paginaActual = 0;
+    //this.paginaActual = 0;
 
-    const nombre = this.busquedaControl.value?.trim() ?? '';
+    const texto = this.busquedaControl.value?.trim() ?? '';
 
     this.stockService
       .filtrarStock(
         this.paginaActual,
         this.tamanioPagina,
-        nombre,
+        texto,
         this.idCanal,
         estadoFiltro || null,
       )
@@ -155,32 +156,23 @@ export class Inventario implements OnInit {
       });
   }
 
-  limpiarFiltros(): void {
-    this.busquedaControl.setValue('');
-
-    this.idCanal = null;
-
-    this.estado = null;
-
-    this.aplicarFiltros();
-  }
-
-  verRegistroStock(registro?: StockResponse): void {
-    if (registro) {
-      this.registroStockSeleccionado = registro;
+  verModalStock(accion: string, stock?: StockResponse): void {
+    if (accion === 'info' && stock) {
+      this.registroStockSeleccionado = stock;
+      this.modalStockVisible = true;
     } else {
       this.registroStockSeleccionado = null;
+      this.formStockVisible = true;
     }
-    this.modalStockVisible = true;
   }
 
-  verFormularioStock(stock?: StockResponse): void {
-    if (stock) {
-      this.registroStockForm = stock;
+  cerrarModalStock(): void {
+    if (this.modalStockVisible) {
+      this.modalStockVisible = false;
     } else {
-      this.registroStockForm = null;
+      this.formStockVisible = false;
     }
-    this.formStockVisible = true;
+    this.registroStockSeleccionado = null;
   }
 
   verModalMovimiento(stock: StockResponse, accion: string) {
@@ -189,9 +181,18 @@ export class Inventario implements OnInit {
       this.modalHistorialVisible = true;
     } else {
       //this.registroStockSeleccionado = null;
-      this.formularioMovimientoVisible = true;
+      this.formMovimientoVisible = true;
     }
     this.registroStockSeleccionado = stock;
+  }
+
+  cerrarModalMovimiento(): void {
+    if (this.modalHistorialVisible) {
+      this.modalHistorialVisible = false;
+    } else {
+      this.formMovimientoVisible = false;
+    }
+    this.registroStockSeleccionado = null;
   }
 
   get paginas(): number[] {
@@ -206,25 +207,6 @@ export class Inventario implements OnInit {
     this.paginaActual = pagina;
 
     this.obtenerStocks();
-  }
-
-  cerrarModalStock(): void {
-    this.modalStockVisible = false;
-    this.registroStockSeleccionado = null;
-  }
-
-  cerrarFormularioStock(): void {
-    this.formStockVisible = false;
-    this.registroStockForm = null;
-  }
-
-  cerrarModalMovimiento(): void {
-    if (this.modalHistorialVisible) {
-      this.modalHistorialVisible = false;
-    } else {
-      this.formularioMovimientoVisible = false;
-    }
-    this.registroStockSeleccionado = null;
   }
 
   onStockGuardado(event: {
@@ -255,12 +237,22 @@ export class Inventario implements OnInit {
     }
   }
 
+  limpiarFiltros(): void {
+    this.busquedaControl.setValue('');
+
+    this.idCanal = null;
+
+    this.estado = null;
+
+    this.aplicarFiltros();
+  }
+
   asignarEstadoStock(estado: string): string {
-    if (estado === 'SIN_STOCK') {
+    if (estado.toLowerCase() === 'sin_stock') {
       return 'Sin stock';
     }
 
-    if (estado === 'STOCK_BAJO') {
+    if (estado.toLowerCase() === 'stock_bajo') {
       return 'Stock bajo';
     }
 
@@ -268,11 +260,11 @@ export class Inventario implements OnInit {
   }
 
   obtenerClaseEstado(estado: string): string {
-    if (estado === 'SIN_STOCK') {
+    if (estado.toLowerCase() === 'sin_stock') {
       return 'sin-stock';
     }
 
-    if (estado === 'STOCK_BAJO') {
+    if (estado.toLowerCase() === 'stock_bajo') {
       return 'stock-bajo';
     }
 

@@ -58,21 +58,20 @@ export class StockForm implements OnInit, OnChanges {
   variantes: VarianteResponse[] = [];
   canales: CanalResponse[] = [];
   productoSeleccionado: ProductoResponse | null = null;
-  //stock: StockResponse | null = null;
 
   constructor(
     private fb: FormBuilder,
-    private toastr: ToastrService,
     private stockService: StockService,
     private canalService: CanalService,
     private productoService: ProductoService,
     private varianteService: VarianteService,
+    private toastr: ToastrService,
   ) {
     this.formStock = this.fb.group(this.getControlesFormulario());
   }
 
   ngOnInit(): void {
-    this.cargarCanales();
+    //this.cargarCanales();
     // FormControl para la búsqueda dinámica de productos
     this.busquedaControl.valueChanges
       .pipe(debounceTime(500), distinctUntilChanged())
@@ -97,7 +96,11 @@ export class StockForm implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {}
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['stockForm'] && this.stockForm) {
+      this.cargarCanales();
+    }
+  }
 
   private getControlesFormulario() {
     return {
@@ -148,7 +151,7 @@ export class StockForm implements OnInit, OnChanges {
         if (this.productos.length === 0) {
           this.toastr.info(
             'Verifica que hayas escrito bien el nombre del producto',
-            'Sin resultados',
+            'Búsqueda sin resultados',
           );
         }
       },
@@ -168,6 +171,7 @@ export class StockForm implements OnInit, OnChanges {
   }
 
   cargarVariantesPorProducto(idProducto: number): void {
+    // Reiniciar el campo variante
     this.formStock.get('variante')?.reset(null);
     this.formStock.get('variante')?.disable();
     this.variantes = [];
@@ -201,6 +205,17 @@ export class StockForm implements OnInit, OnChanges {
     this.formStock.get('variante')?.setValue(null);
   }
 
+  cargarCanales(): void {
+    this.canalService.obtenerCanales().subscribe({
+      next: (response) => {
+        this.canales = response;
+      },
+      error: (error) => {
+        this.toastr.error('Error al obtener los canales de venta', 'Error');
+      },
+    });
+  }
+
   procesarFormulario(): void {
     if (this.formStock.invalid) {
       this.formStock.markAllAsTouched();
@@ -212,13 +227,17 @@ export class StockForm implements OnInit, OnChanges {
     this.asignarValores();
 
     if (this.modo === 'crear') {
-      this.crearRegistroStock(this.nuevoRegistroStock);
+      this.crearRegistroStock();
     }
   }
 
-  crearRegistroStock(request: StockRequest | null): void {
+  crearRegistroStock(): void {
+    if (!this.nuevoRegistroStock) {
+      return;
+    }
+
     this.stockService
-      .crearRegistroStock(request)
+      .crearRegistroStock(this.nuevoRegistroStock)
       .pipe(
         finalize(() => {
           this.guardando = false;
@@ -233,17 +252,6 @@ export class StockForm implements OnInit, OnChanges {
           this.toastr.error(error.error.mensaje, 'Error');
         },
       });
-  }
-
-  cargarCanales(): void {
-    this.canalService.obtenerCanales().subscribe({
-      next: (response) => {
-        this.canales = response;
-      },
-      error: (error) => {
-        this.toastr.error('Error al obtener los canales de venta', 'Error');
-      },
-    });
   }
 
   private asignarValores(): void {
@@ -273,6 +281,7 @@ export class StockForm implements OnInit, OnChanges {
 
     this.nuevoRegistroStock = null;
     this.productoSeleccionado = null;
+    this.canales = [];
     this.productos = [];
     this.variantes = [];
     this.guardando = false;

@@ -46,7 +46,7 @@ export class MovimientoForm implements OnChanges {
   formMovimiento!: FormGroup;
   movimientoForm: MovimientoRequest | null = null;
   guardando = false;
-  modo: 'crear' | 'editar' = 'crear';
+  modo: string = 'crear';
 
   constructor(
     private fb: FormBuilder,
@@ -71,7 +71,7 @@ export class MovimientoForm implements OnChanges {
     const stockFisico = this.formMovimiento.get('stockFisico');
     const motivo = this.formMovimiento.get('motivo');
 
-    // Primero limpiamos los validadores dinámicos
+    // Limpieza de los validadores dinámicos
     cantidad?.clearValidators();
     stockFisico?.clearValidators();
     motivo?.clearValidators();
@@ -81,8 +81,6 @@ export class MovimientoForm implements OnChanges {
     switch (tipo) {
       case 'ENTRADA':
         cantidad?.setValidators([Validators.required, Validators.min(1)]);
-
-        //stockFisico?.setValidators([Validators.min(0)]);
 
         motivo?.setValidators([
           Validators.minLength(5),
@@ -96,8 +94,6 @@ export class MovimientoForm implements OnChanges {
       case 'SALIDA':
         cantidad?.setValidators([Validators.required, Validators.min(1)]);
 
-        //stockFisico?.setValidators([Validators.min(0)]);
-
         motivo?.setValidators([
           Validators.required,
           Validators.minLength(5),
@@ -109,8 +105,6 @@ export class MovimientoForm implements OnChanges {
         break;
 
       case 'AJUSTE':
-        //cantidad?.setValidators([Validators.min(1)]);
-
         stockFisico?.setValidators([Validators.required, Validators.min(0)]);
 
         motivo?.setValidators([
@@ -160,7 +154,7 @@ export class MovimientoForm implements OnChanges {
     this.guardando = true;
     this.asignarValores();
 
-    console.log('Movimiento: ', this.movimientoForm);
+    //console.log('Movimiento: ', this.movimientoForm);
     if (this.modo === 'crear') {
       this.crearMovimientoStock();
     }
@@ -218,7 +212,7 @@ export class MovimientoForm implements OnChanges {
     this.formMovimiento.markAsUntouched();
 
     this.guardando = false;
-    this.modo = 'crear';
+    //this.modo = 'crear';
     this.movimientoForm = null;
   }
 

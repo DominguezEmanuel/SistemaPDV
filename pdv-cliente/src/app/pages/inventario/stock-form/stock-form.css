@@ -21,6 +21,7 @@
   color: #14181c;
 }
 
+/* HEADER */
 .rs-header {
   display: flex;
   align-items: center;
@@ -46,6 +47,8 @@
 .rs-header h2 i {
   opacity: 0.9;
 }
+
+/* BTN CERRAR */
 .rs-close-btn {
   border: none;
   background: rgba(255, 255, 255, 0.15);
@@ -64,6 +67,7 @@
   background: rgba(255, 255, 255, 0.28);
 }
 
+/* BODY */
 .rs-body {
   padding: 26px;
   background: #ffffff;
@@ -178,22 +182,6 @@
   font-weight: 500;
 }
 
-.rs-btn-cancelar {
-  border: 1.5px solid #e4edf3;
-  color: #5b6670;
-  background: #ffffff;
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: 10px 20px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-.rs-btn-cancelar:hover {
-  background: #f5fafd;
-  color: #14181c;
-}
-
 .rs-btn-guardar {
   border: none;
   color: #ffffff;
@@ -226,4 +214,20 @@
   transform: none;
   filter: none;
   opacity: 1;
+}
+
+.rs-btn-cancelar {
+  border: 1.5px solid #e4edf3;
+  color: #5b6670;
+  background: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.rs-btn-cancelar:hover {
+  background: #f5fafd;
+  color: #14181c;
 }

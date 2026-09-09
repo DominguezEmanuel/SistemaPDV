@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StockResponse } from '../../../models/Stock';
 
@@ -16,19 +9,17 @@ import { StockResponse } from '../../../models/Stock';
   styleUrl: './stock-info.css',
 })
 export class StockInfo {
-  // Estructuras utilizadas
+  // Variables de entrada y salida del componente
   @Input() stock: StockResponse | null = null;
   @Input() visible = false;
   @Output() cerrar = new EventEmitter<void>();
 
-  constructor() {}
-
   asignarEstadoStock(estado: string): string {
-    if (estado === 'SIN_STOCK') {
+    if (estado.toLowerCase() === 'sin_stock') {
       return 'Sin stock';
     }
 
-    if (estado === 'STOCK_BAJO') {
+    if (estado.toLowerCase() === 'stock_bajo') {
       return 'Stock bajo';
     }
 
@@ -36,11 +27,11 @@ export class StockInfo {
   }
 
   obtenerClaseEstado(estado: string): string {
-    if (estado === 'SIN_STOCK') {
+    if (estado.toLowerCase() === 'sin_stock') {
       return 'sin-stock';
     }
 
-    if (estado === 'STOCK_BAJO') {
+    if (estado.toLowerCase() === 'stock_bajo') {
       return 'stock-bajo';
     }
 
