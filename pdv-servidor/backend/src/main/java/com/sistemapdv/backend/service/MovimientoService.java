@@ -48,10 +48,10 @@ public class MovimientoService {
     }
 
     /**
-     * Devuelve los últimos 5 movimientos de un Stock
+     * Devuelve los últimos movimientos de un Stock (los últimos 5)
      *
      * @param idStock Identificador del Stock para consultar sus movimientos
-     * @return Listado de los últimos 5 movimientos ordenados por fecha
+     * @return Listado de los últimos movimientos
      */
     @Transactional(readOnly = true)
     public List<MovimientoResponseDTO> getLastFiveRecordsByStock(Integer idStock){
@@ -82,14 +82,9 @@ public class MovimientoService {
 
         Usuario usuarioAutenticado = authenticationService.getUserAuthenticated();
 
-        if(!cantidadesValidas(request)){
-            throw new IllegalArgumentException("La cantidad enviada es inválida");
-        }
+        validarCantidades(request);
 
-        if(!motivoValido(request.getTipo(), request.getMotivo())){
-            throw new IllegalArgumentException("El motivo es obligatorio para el tipo de movimiento '"
-                    + request.getTipo() + "'");
-        }
+        validarMotivo(request.getTipo(), request.getMotivo());
 
         int stockAnterior = stock.getCantidadDisponible();
 
@@ -124,39 +119,34 @@ public class MovimientoService {
      *
      * @param tipo Tipo de movimiento de la request
      * @param motivo Motivo por el cual se realiza la transacción
-     * @return
-     * true -> 'motivo' enviado o no para el tipo de movimiento
-     * false -> 'motivo' NO enviado para el tipo de movimiento que lo requiere
      */
-    private boolean motivoValido(TipoMovimiento tipo, String motivo){
+    private void validarMotivo(TipoMovimiento tipo, String motivo){
         if(tipo.equals(TipoMovimiento.SALIDA) || tipo.equals(TipoMovimiento.AJUSTE)){
             if(motivo == null || motivo.isEmpty()){
-                return false;
+                throw new IllegalArgumentException("El motivo es obligatorio para el tipo de movimiento '"
+                        + tipo + "'");
             }
         }
-        return true;
     }
 
     /**
-     * Valida que las cantidades enviadas sean válidas
+     * Verifica que las cantidades enviadas sean válidas
      *
-     * Para 'ENTRADA' o 'SALIDA': se debe enviar 'cantidad' en la request y debe ser > 0
+     * Para 'ENTRADA' o 'SALIDA'-> se debe enviar 'cantidad' en la request y debe ser > 0
      *
-     * Para 'AJUSTE': se debe enviar 'stockFisico' en la request y que NO sea < 0
+     * Para 'AJUSTE'-> se debe enviar 'stockFisico' en la request y debe ser >= 0
      *
      * @param request Solicitud con los datos necesarios
-     * @return true -> cantidad enviada válida - false -> cantidad enviada inválida
      */
-    private boolean cantidadesValidas(MovimientoRequestDTO request){
+    private void validarCantidades(MovimientoRequestDTO request){
         if(request.getTipo().equals(TipoMovimiento.ENTRADA)
                 || request.getTipo().equals(TipoMovimiento.SALIDA)){
             if(request.getCantidad() == null || request.getCantidad() <= 0)
-                return false;
+                throw new IllegalArgumentException("La cantidad enviada es inválida");
         }else{
             if(request.getStockFisico() == null || request.getStockFisico() < 0)
-                return false;
+                throw new IllegalArgumentException("El stock enviado es inválido");
         }
-        return true;
     }
 
     /**
@@ -176,7 +166,7 @@ public class MovimientoService {
             case SALIDA:
                 cantidad = -request.getCantidad();
                 if(stockAnterior + cantidad < 0){
-                    throw new InsufficientStockException("Stock insuficiente");
+                    throw new InsufficientStockException("El stock es insuficiente");
                 }
                 break;
 

@@ -30,5 +30,4 @@ public class MovimientoController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(movimientoService.getRegisterById(idMovimiento));
     }
-
 }

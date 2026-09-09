@@ -41,6 +41,12 @@ public class StockService {
         this.stockAlertService = stockAlertService;
     }
 
+    /**
+     * Devuelve un registro de Stock
+     *
+     * @param id Identificador del Stock
+     * @return Datos del Stock consultado
+     */
     @Transactional(readOnly = true)
     public StockResponseDTO getStockById(Integer id){
 
@@ -51,6 +57,13 @@ public class StockService {
         return stockMapper.toResponseDTO(stock);
     }
 
+    /**
+     * Devuelve un listado de registros de stock
+     * Se aplica paginado para no enviar todos los registros
+     *
+     * @param pageable 'page' y 'size' para implementar paginacion
+     * @return Listado de registros de stock
+     */
     @Transactional(readOnly = true)
     public Page<StockResponseDTO> getAllStocks(Pageable pageable){
 
@@ -59,6 +72,12 @@ public class StockService {
         return stocks.map(stockMapper::toResponseDTO);
     }
 
+    /**
+     * Devuelve un listado de registros de stock asociados a una variante de producto
+     *
+     * @param idVariante Identificador de la variante
+     * @return Listado de stocks asociados a la variante
+     */
     @Transactional(readOnly = true)
     public List<StockResponseDTO> getStocksByIdVariant(Integer idVariante){
 
@@ -72,6 +91,12 @@ public class StockService {
                 .toList();
     }
 
+    /**
+     * Devuelve un listado de registros de stock asociados a un canal de venta
+     *
+     * @param idCanal Identificador del canal de venta
+     * @return Listado de stocks
+     */
     @Transactional(readOnly = true)
     public List<StockResponseDTO> getStocksByIdChannel(Integer idCanal){
 
@@ -85,6 +110,13 @@ public class StockService {
                 .toList();
     }
 
+    /**
+     * Devuelve un registro de stock asociado a la combinación Variante + Canal
+     *
+     * @param idCanal Identificador del canal de venta
+     * @param idVariante Identificador de la variante de producto
+     * @return Registro asociado a Variante + Canal
+     */
     @Transactional(readOnly = true)
     public StockResponseDTO getStockByChannelAndVariant(Integer idCanal, Integer idVariante) {
 
@@ -98,14 +130,20 @@ public class StockService {
                 .orElseThrow(()-> new ResourceNotFoundException("Variante con ID " +
                     idVariante + " no encontrada"));
 
-        Stock stock = stockRepository.findByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
-                        idVariante, idCanal)
+        Stock stock = stockRepository
+                .findByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(idVariante, idCanal)
                 .orElseThrow(() -> new ResourceNotFoundException("Registro no encontrado para " +
                         "variante '" + variante.getNombre() + "' y canal '" + canal.getNombre() + "'"));
 
         return stockMapper.toResponseDTO(stock);
     }
 
+    /**
+     * Crea un nuevo registro de stock y lo almacena en la base de datos
+     *
+     * @param request Solicitud con datos necesarios para la creación del registro
+     * @return Datos del nuevo registro almacenado
+     */
     @Transactional
     public StockResponseDTO createStock(StockRequestDTO request){
 
@@ -208,6 +246,15 @@ public class StockService {
         return stockMapper.toResponseDTO(stock);
     }
 
+    /**
+     * Filtra los registros de stock de acuerdo a filtros de texto, por canal o estado
+     *
+     * @param nombre Texto que filtra por coincidencia parcial
+     * @param idCanal Filtra por canal de venta
+     * @param estado Filtra por estado de stock (DISPONIBLE, STOCK_BAJO o SIN_STOCK)
+     * @param pageable
+     * @return Listado de stocks filtrados
+     */
     @Transactional(readOnly = true)
     public Page<StockResponseDTO> getByFilters(String nombre, Integer idCanal, EstadoStock estado, Pageable pageable){
         Specification<Stock> specification = (root, query, cb) -> null;
