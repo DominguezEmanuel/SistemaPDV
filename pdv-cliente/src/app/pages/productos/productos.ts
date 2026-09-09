@@ -89,6 +89,26 @@ export class Productos implements OnInit {
       });
   }
 
+  exportarPdf(): void {
+    const nombre = this.busquedaControl.value?.trim() ?? '';
+
+    this.productoService
+      .exportarPdf(nombre, this.idCategoria, this.estado)
+      .subscribe({
+        next: (response) => {
+          const blob = new Blob([response], { type: 'application/pdf' });
+
+          const url = window.URL.createObjectURL(blob);
+
+          window.open(url, '_blank');
+        },
+
+        error: (error) => {
+          this.toastr.error(error, 'Error');
+        },
+      });
+  }
+
   limpiarFiltros(): void {
     this.busquedaControl.setValue('');
 

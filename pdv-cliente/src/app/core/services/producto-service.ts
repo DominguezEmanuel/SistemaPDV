@@ -59,6 +59,30 @@ export class ProductoService {
     );
   }
 
+  exportarPdf(
+    nombre: string,
+    idCategoria: number | null,
+    activo: boolean | null,
+  ): Observable<Blob> {
+    let params = new HttpParams();
+
+    if (nombre?.trim()) {
+      params = params.set('nombre', nombre.trim());
+    }
+
+    if (idCategoria !== null) {
+      params = params.set('idCategoria', idCategoria.toString());
+    }
+
+    if (activo !== null) {
+      params = params.set('activo', activo.toString());
+    }
+    return this.http.get(`${this.hostBase}exportar-pdf`, {
+      params,
+      responseType: 'blob',
+    });
+  }
+
   buscarPorNombre(nombre: string): Observable<ProductoResponse[]> {
     const params = new HttpParams().set('nombre', nombre.trim());
 

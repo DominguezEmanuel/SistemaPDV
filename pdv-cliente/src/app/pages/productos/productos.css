@@ -113,6 +113,20 @@
   border-color: #c13b3b;
 }
 
+.btn-exportar-pdf {
+  border: 1.5px solid #c13b3b;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #c13b3b;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
 .btn-nuevo-producto {
   border: none;
   color: #ffffff;

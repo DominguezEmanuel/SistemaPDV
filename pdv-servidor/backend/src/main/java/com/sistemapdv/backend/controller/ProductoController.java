@@ -2,6 +2,7 @@ package com.sistemapdv.backend.controller;
 
 import com.sistemapdv.backend.dto.request.ProductoRequestDTO;
 import com.sistemapdv.backend.dto.response.*;
+import com.sistemapdv.backend.service.PdfService;
 import com.sistemapdv.backend.service.ProductoService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedModel;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +26,11 @@ import java.util.List;
 public class ProductoController {
 
     private final ProductoService productoService;
+    private final PdfService pdfService;
 
-    public ProductoController(ProductoService productoService) {
+    public ProductoController(ProductoService productoService, PdfService pdfService) {
         this.productoService = productoService;
+        this.pdfService = pdfService;
     }
 
     @GetMapping("/{id}")
@@ -115,5 +119,21 @@ public class ProductoController {
     @GetMapping("/{idProducto}/canales")
     public ResponseEntity<List<ProductoCanalResponseDTO>> getChannelsByProduct(@PathVariable Integer idProducto){
         return ResponseEntity.status(HttpStatus.OK).body(productoService.getChannelsByProduct(idProducto));
+    }
+
+    @GetMapping("/exportar-pdf")
+    public ResponseEntity<byte[]> exportPdf(@RequestParam(required = false) String nombre,
+                                            @RequestParam(required = false) Integer idCategoria,
+                                            @RequestParam(required = false) Boolean activo){
+
+        List<ProductoResponseDTO> productos = productoService.getProductsPdf(nombre, idCategoria, activo);
+
+        byte[] pdf = pdfService.generatePdfProduct(productos);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=listado-precios.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 }

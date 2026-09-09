@@ -101,6 +101,33 @@ public class ProductoService {
     }
 
     @Transactional(readOnly = true)
+    public List<ProductoResponseDTO> getProductsPdf(String nombre, Integer idCategoria, Boolean activo){
+        Specification<Producto> specification = (root, query, cb) -> null;
+
+        if(nombre != null && !nombre.isBlank()){
+            specification = specification.and(ProductoSpecification.nombreContiene(nombre.trim()));
+        }
+
+        if (idCategoria != null) {
+            specification = specification.and(
+                    ProductoSpecification.perteneceACategoria(idCategoria)
+            );
+        }
+
+        if (activo != null) {
+            specification = specification.and(
+                    ProductoSpecification.tieneEstado(activo)
+            );
+        }
+
+        return productoRepository
+                .findAll(specification)
+                .stream()
+                .map(productoMapper::toResponseDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<ProductoResponseDTO> filterByName(String nombre){
         Specification<Producto> specification = (root, query, cb) -> null;
 
