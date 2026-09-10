@@ -95,16 +95,38 @@ export class Productos implements OnInit {
     this.productoService
       .exportarPdf(nombre, this.idCategoria, this.estado)
       .subscribe({
-        next: (response) => {
+        next: (response: Blob) => {
           const blob = new Blob([response], { type: 'application/pdf' });
-
           const url = window.URL.createObjectURL(blob);
 
-          window.open(url, '_blank');
+          // Crear elemento <a> temporal para forzar la descarga
+          const a = document.createElement('a');
+          a.href = url;
+
+          const fechaHoy = new Date()
+            .toLocaleDateString('es-ES', {
+              day: '2-digit',
+              month: '2-digit',
+              year: '2-digit',
+            })
+            .replace(/\//g, '-');
+
+          a.download = `productos_${fechaHoy}.pdf`;
+
+          console.log('Fecha: ', new Date().getTime().toString);
+
+          document.body.appendChild(a);
+          a.click();
+
+          // Limpieza de memoria y DOM
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+
+          //window.open(url, '_blank');
         },
 
         error: (error) => {
-          this.toastr.error(error, 'Error');
+          this.toastr.error('No se pudo generar el reporte PDF', 'Error');
         },
       });
   }

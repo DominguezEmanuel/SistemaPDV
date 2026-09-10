@@ -114,7 +114,7 @@
 }
 
 .btn-exportar-pdf {
-  border: 1.5px solid #c13b3b;
+  border: none;
   color: #ffffff;
   font-weight: 600;
   font-size: 0.85rem;
@@ -123,8 +123,16 @@
   background: #c13b3b;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   white-space: nowrap;
+}
+
+.btn-exportar-pdf:disabled{
+  background: #c7cdd1;
+  color: #f5f6f7;
+  cursor: not-allowed;
+  opacity: 1;
 }
 
 .btn-nuevo-producto {

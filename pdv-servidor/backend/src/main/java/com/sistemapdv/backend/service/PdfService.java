@@ -39,7 +39,7 @@ public class PdfService {
             // Titulo
             Font fontTitle = new Font(Font.HELVETICA, 18, Font.BOLD);
 
-            Paragraph title = new Paragraph("LISTADO DE PRECIOS", fontTitle);
+            Paragraph title = new Paragraph("LISTADO DE PRODUCTOS", fontTitle);
 
             title.setAlignment(Element.ALIGN_CENTER);
             title.setSpacingAfter(10);
@@ -57,6 +57,16 @@ public class PdfService {
             fecha.setSpacingAfter(10);
 
             document.add(fecha);
+
+            // Cantidad de productos
+            Paragraph numberProducts = new Paragraph(
+                    "Total de productos exportados: " + products.size() + " productos",
+                    informationFont
+            );
+
+            numberProducts.setSpacingAfter(10);
+
+            document.add(numberProducts);
 
             // Filtros
 
@@ -93,14 +103,6 @@ public class PdfService {
             }
 
             document.add(table);
-
-            // Cantidad de productos
-            Paragraph numberProducts = new Paragraph(
-                    "\nTotal de productos: " + products.size(),
-                    informationFont
-            );
-
-            document.add(numberProducts);
 
             document.close();
 
@@ -147,6 +149,7 @@ public class PdfService {
         );
 
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setPadding(5);
 
         table.addCell(cell);

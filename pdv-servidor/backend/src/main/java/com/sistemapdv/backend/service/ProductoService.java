@@ -16,6 +16,7 @@ import com.sistemapdv.backend.repository.*;
 import com.sistemapdv.backend.repository.specification.ProductoSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,7 +122,9 @@ public class ProductoService {
         }
 
         return productoRepository
-                .findAll(specification)
+                .findAll(specification,
+                        Sort.by(Sort.Direction.ASC,
+                                "nombre"))
                 .stream()
                 .map(productoMapper::toResponseDTO)
                 .toList();

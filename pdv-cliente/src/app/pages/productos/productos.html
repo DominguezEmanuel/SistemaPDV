@@ -49,10 +49,12 @@
       Limpiar filtros
     </button>
     }
+    <!-- BOTÓN EXPORTAR PRODUCTOS EN PDF -->
     <button
       type="button"
       title="Exportar PDF"
       class="btn-exportar-pdf"
+      [disabled]="productos.length === 0"
       (click)="exportarPdf()"
     >
       <i class="bi bi-filetype-pdf"></i>
