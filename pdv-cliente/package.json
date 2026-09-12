@@ -8,8 +8,28 @@
     "electron": "electron .",
     "electron-dev": "concurrently \"ng serve\" \"wait-on http://localhost:4200 && electron .\"",
     "build": "ng build",
+    "build-electron": "ng build --configuration production && electron-builder",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
+  },
+  "build": {
+    "appId": "com.sistemapdv.cliente",
+    "productName": "Sistema PDV",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/pdv-cliente/browser/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "icon": "public/logo.ico",
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "private": true,
   "dependencies": {

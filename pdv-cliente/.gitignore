@@ -1,5 +1,18 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# Carpetas de distribución de Angular y frontend
+/dist/
+/out/
+
+# Carpetas de empaquetado de Electron
+pdv_cliente/release
+release/
+/dist-electron/
+/build/
+
+# Artefactos de compilación del backend (Spring Boot / Maven)
+/target/
+
 # Compiled output
 /dist
 /tmp
