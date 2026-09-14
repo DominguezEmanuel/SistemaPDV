@@ -22,25 +22,25 @@ public class CanalVentaController {
 
     @GetMapping("/")
     @ResponseBody
-    public List<CanalResponseDTO> getAllCanales(){
+    public List<CanalResponseDTO> getAllChannels(){
         return canalService.getAllCanales();
     }
 
     @GetMapping("/{idCanal}")
-    public ResponseEntity<CanalResponseDTO> getCanalById(@PathVariable Integer idCanal){
+    public ResponseEntity<CanalResponseDTO> getChannelById(@PathVariable Integer idCanal){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(canalService.getCanalById(idCanal));
     }
 
     @PostMapping("/")
-    public ResponseEntity<CanalResponseDTO> createCanal(@Valid @RequestBody CanalRequestDTO request){
+    public ResponseEntity<CanalResponseDTO> createChannel(@Valid @RequestBody CanalRequestDTO request){
         CanalResponseDTO nuevoCanal = canalService.createCanal(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(nuevoCanal);
     }
 
     @PutMapping("/{idCanal}")
-    public ResponseEntity<CanalResponseDTO> updateCanal(@PathVariable Integer idCanal,
+    public ResponseEntity<CanalResponseDTO> updateChannel(@PathVariable Integer idCanal,
                                                         @Valid @RequestBody CanalRequestDTO request){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(canalService.updateCanal(idCanal, request));

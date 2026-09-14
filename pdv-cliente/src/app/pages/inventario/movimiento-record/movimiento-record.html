@@ -84,7 +84,7 @@
           </tbody>
         </table>
         <!-- AVISO -->
-        <div class="nu-hint">
+        <div *ngIf="movimientos.length > 0" class="nu-hint">
           <i class="bi bi-info-circle"></i>
           Se observan los últimos 5 movimientos registrados para el stock
           seleccionado

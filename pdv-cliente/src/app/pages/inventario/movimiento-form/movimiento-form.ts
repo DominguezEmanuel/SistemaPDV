@@ -80,7 +80,11 @@ export class MovimientoForm implements OnChanges {
 
     switch (tipo) {
       case 'ENTRADA':
-        cantidad?.setValidators([Validators.required, Validators.min(1)]);
+        cantidad?.setValidators([
+          Validators.required,
+          Validators.min(1),
+          Validators.pattern(/^[0-9]+$/),
+        ]);
 
         motivo?.setValidators([
           Validators.minLength(5),
@@ -92,7 +96,11 @@ export class MovimientoForm implements OnChanges {
         break;
 
       case 'SALIDA':
-        cantidad?.setValidators([Validators.required, Validators.min(1)]);
+        cantidad?.setValidators([
+          Validators.required,
+          Validators.min(1),
+          Validators.pattern(/^[0-9]+$/),
+        ]);
 
         motivo?.setValidators([
           Validators.required,
@@ -105,7 +113,11 @@ export class MovimientoForm implements OnChanges {
         break;
 
       case 'AJUSTE':
-        stockFisico?.setValidators([Validators.required, Validators.min(0)]);
+        stockFisico?.setValidators([
+          Validators.required,
+          Validators.min(0),
+          Validators.pattern(/^[0-9]+$/),
+        ]);
 
         motivo?.setValidators([
           Validators.required,

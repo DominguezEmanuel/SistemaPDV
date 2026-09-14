@@ -87,12 +87,10 @@
 }
 .rs-field label {
   display: block;
-  font-size: 0.68rem;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: #5b6670;
-  margin-bottom: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #14181c;
+  margin-bottom: 6px;
 }
 .rs-field .rs-value {
   font-size: 0.9rem;

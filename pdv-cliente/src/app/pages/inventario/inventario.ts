@@ -228,7 +228,8 @@ export class Inventario implements OnInit {
     movimiento: MovimientoResponse | null;
     accion: 'crear' | 'editar';
   }): void {
-    this.aplicarFiltros();
+    //this.aplicarFiltros();
+    this.obtenerStocks();
     if (event.accion === 'crear') {
       this.toastr.success(
         'El movimiento de stock se creó correctamente',

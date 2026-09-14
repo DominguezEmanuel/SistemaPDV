@@ -1,6 +1,8 @@
 package com.sistemapdv.backend.repository;
 
 import com.sistemapdv.backend.entity.Stock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -36,4 +38,5 @@ public interface StockRepository extends JpaRepository<Stock, Integer>,
     """)
     List<Stock> findByProductoId(Integer idProducto);
 
+    Page<Stock> findAllByOrderByCantidadDisponibleAsc(Pageable pageable);
 }

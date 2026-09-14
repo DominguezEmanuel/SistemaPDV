@@ -29,5 +29,4 @@ export const routes: Routes = [
     ],
   },
   { path: 'login', component: Login },
-  // Crear una pagina de error
 ];

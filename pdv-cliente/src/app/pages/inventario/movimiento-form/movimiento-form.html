@@ -99,6 +99,11 @@
                 <div *ngIf="formMovimiento.get('cantidad')?.errors?.['min']">
                   La cantidad debe ser mayor o igual a 1.
                 </div>
+                <div
+                  *ngIf="formMovimiento.get('cantidad')?.errors?.['pattern']"
+                >
+                  Debe ingresar un número entero válido
+                </div>
               </div>
             </div>
             <!-- STOCK FISICO -->
@@ -125,6 +130,11 @@
                 </div>
                 <div *ngIf="formMovimiento.get('stockFisico')?.errors?.['min']">
                   El stock debe ser mayor o igual a 0.
+                </div>
+                <div
+                  *ngIf="formMovimiento.get('stockFisico')?.errors?.['pattern']"
+                >
+                  Debe ingresar un número entero válido
                 </div>
               </div>
             </div>

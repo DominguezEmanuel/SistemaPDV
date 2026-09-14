@@ -2,17 +2,14 @@ package com.sistemapdv.backend.controller;
 
 import com.sistemapdv.backend.dto.request.UsuarioRequestDTO;
 import com.sistemapdv.backend.dto.response.UsuarioResponseDTO;
-import com.sistemapdv.backend.entity.Usuario;
 import com.sistemapdv.backend.service.UsuarioService;
-import com.sistemapdv.backend.utils.enums.RolUsuario;
-import org.apache.coyote.Response;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,7 +23,6 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // Busca un usuario de acuerdo a un username y lo devuelve en caso de encontrarlo
     @GetMapping("/buscar/{username}")
     public ResponseEntity<UsuarioResponseDTO> findByUsername(@PathVariable String username) {
         UsuarioResponseDTO usuarioEncontrado = usuarioService.findByUsername(username);
@@ -34,37 +30,36 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioEncontrado);
     }
 
-    // Busca un usuario de acuerdo a su ID y lo devuelve en caso de encontrarlo
-    @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable Integer id){
-        UsuarioResponseDTO usuarioEncontrado = usuarioService.findById(id);
-        logger.info("Usuario encontrado con ID {}", id);
-        return ResponseEntity.status(HttpStatus.OK)
+    @GetMapping("/{idUsuario}")
+    public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable Integer idUsuario){
+        UsuarioResponseDTO usuarioEncontrado = usuarioService.findById(idUsuario);
+        logger.info("Usuario encontrado con ID {}", idUsuario);
+        return ResponseEntity
+                .status(HttpStatus.OK)
                 .body(usuarioEncontrado);
     }
 
-    // Devuelve la lista de todos los usuarios registrados
     @GetMapping("/")
-    @ResponseBody
-    public List<UsuarioResponseDTO> findAllUsers(){
-        List<UsuarioResponseDTO> usuarios = usuarioService.findAllUsers();
-        return usuarios;
+    public ResponseEntity<List<UsuarioResponseDTO>> findAllUsers(){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(usuarioService.findAllUsers());
     }
 
-    // Agrega un nuevo usuario al sistema
     @PostMapping("/")
-    public ResponseEntity<UsuarioResponseDTO> addUser(@RequestBody UsuarioRequestDTO request){
+    public ResponseEntity<UsuarioResponseDTO> addUser(@Valid @RequestBody UsuarioRequestDTO request){
         UsuarioResponseDTO response = usuarioService.createUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
                 .body(response);
     }
 
-    // Activa o desactiva un usuario registrado sin eliminarlo
-    @PatchMapping("/estado/{username}")
-    public ResponseEntity<UsuarioResponseDTO> setActive(@PathVariable String username,
-                                                        @RequestParam boolean activo){
-        UsuarioResponseDTO response = usuarioService.setActiveUser(username, activo);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
+    @PatchMapping("/estado/{idUsuario}")
+    public ResponseEntity<UsuarioResponseDTO> setUserStatus(@PathVariable Integer idUsuario,
+                                                            @RequestParam boolean activo){
+        UsuarioResponseDTO usuarioActualizado = usuarioService.setUserStatus(idUsuario, activo);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(usuarioActualizado);
     }
 }

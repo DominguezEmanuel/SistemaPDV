@@ -67,7 +67,7 @@ public class StockService {
     @Transactional(readOnly = true)
     public Page<StockResponseDTO> getAllStocks(Pageable pageable){
 
-        Page<Stock> stocks = stockRepository.findAll(pageable);
+        Page<Stock> stocks = stockRepository.findAllByOrderByCantidadDisponibleAsc(pageable);
 
         return stocks.map(stockMapper::toResponseDTO);
     }

@@ -1,12 +1,4 @@
-import {
-  Component,
-  OnInit,
-  OnChanges,
-  SimpleChanges,
-  EventEmitter,
-  Input,
-  Output,
-} from '@angular/core';
+import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -37,7 +29,7 @@ import { finalize } from 'rxjs';
   templateUrl: './stock-form.html',
   styleUrl: './stock-form.css',
 })
-export class StockForm implements OnInit, OnChanges {
+export class StockForm implements OnInit {
   // Variables de entrada y salida del componente
   @Input() stockForm: StockResponse | null = null;
   @Input() visible = false;
@@ -71,7 +63,7 @@ export class StockForm implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    //this.cargarCanales();
+    this.cargarCanales();
     // FormControl para la búsqueda dinámica de productos
     this.busquedaControl.valueChanges
       .pipe(debounceTime(500), distinctUntilChanged())
@@ -94,12 +86,6 @@ export class StockForm implements OnInit, OnChanges {
 
       this.seleccionarProducto(producto);
     });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['stockForm'] && this.stockForm) {
-      this.cargarCanales();
-    }
   }
 
   private getControlesFormulario() {
@@ -281,7 +267,6 @@ export class StockForm implements OnInit, OnChanges {
 
     this.nuevoRegistroStock = null;
     this.productoSeleccionado = null;
-    this.canales = [];
     this.productos = [];
     this.variantes = [];
     this.guardando = false;
