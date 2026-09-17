@@ -4,6 +4,5 @@ public enum TipoMovimiento {
     ENTRADA,
     SALIDA,
     AJUSTE,
-    VENTA,
-    DEVOLUCION
+    VENTA
 }
