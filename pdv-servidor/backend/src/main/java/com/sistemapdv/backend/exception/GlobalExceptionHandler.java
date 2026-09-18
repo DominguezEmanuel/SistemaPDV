@@ -59,6 +59,13 @@ public class GlobalExceptionHandler {
                 .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
     }
 
+    @ExceptionHandler(ClosedCashException.class)
+    public ResponseEntity<ErrorResponseDTO> reportClosedCash(ClosedCashException ex,
+                                                             HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> reportValidationErrors(
             MethodArgumentNotValidException ex,

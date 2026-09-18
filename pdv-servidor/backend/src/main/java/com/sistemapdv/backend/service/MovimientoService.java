@@ -10,7 +10,7 @@ import com.sistemapdv.backend.exception.InsufficientStockException;
 import com.sistemapdv.backend.exception.ResourceNotFoundException;
 import com.sistemapdv.backend.mapper.MovimientoMapper;
 import com.sistemapdv.backend.mapper.StockMapper;
-import com.sistemapdv.backend.repository.MovimientoRepository;
+import com.sistemapdv.backend.repository.MovimientoStockRepository;
 import com.sistemapdv.backend.repository.StockRepository;
 import com.sistemapdv.backend.utils.enums.TipoMovimiento;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class MovimientoService {
     private final StockService stockService;
     private final StockAlertService stockAlertService;
     private final AuthenticationService authenticationService;
-    private final MovimientoRepository movimientoRepository;
+    private final MovimientoStockRepository movimientoRepository;
     private final StockRepository stockRepository;
     private final StockMapper stockMapper;
     private final MovimientoMapper movimientoMapper;

@@ -5,11 +5,10 @@ import com.sistemapdv.backend.dto.response.MovimientoResponseDTO;
 import com.sistemapdv.backend.entity.MovimientoStock;
 import com.sistemapdv.backend.entity.Stock;
 import com.sistemapdv.backend.entity.Usuario;
+import com.sistemapdv.backend.utils.FormatterDates;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 
 import static java.lang.Math.abs;
 
@@ -34,7 +33,7 @@ public class MovimientoMapper {
     public MovimientoResponseDTO toResponseDTO(MovimientoStock movimientoStock){
         MovimientoResponseDTO dto = MovimientoResponseDTO.builder()
                 .idMovimiento(movimientoStock.getIdMovimiento())
-                .fechaHora(formatearFechaRegistro(movimientoStock.getFechaHora()))
+                .fechaHora(FormatterDates.formatearFechaRegistro(movimientoStock.getFechaHora()))
                 .tipo(movimientoStock.getTipoMovimiento())
                 .cantidad(movimientoStock.getCantidad())
                 .stockAnterior(movimientoStock.getStockAnterior())
@@ -44,18 +43,6 @@ public class MovimientoMapper {
                 .nombreUsuario(movimientoStock.getUsuario().getUsername())
                 .idStock(movimientoStock.getStock().getIdStock())
                 .build();
-
         return dto;
-    }
-
-    private String formatearFechaRegistro(OffsetDateTime fechaOriginal){
-
-        OffsetDateTime fechaLocal = fechaOriginal
-                .atZoneSameInstant(ZoneId.systemDefault())
-                .toOffsetDateTime();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM - HH:mm");
-
-        return fechaLocal.format(formatter);
     }
 }

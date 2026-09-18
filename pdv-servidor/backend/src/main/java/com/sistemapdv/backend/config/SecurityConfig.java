@@ -66,15 +66,6 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     // Endpoint público
                     .requestMatchers("/api/auth/login").permitAll()
-                    .requestMatchers("/api/usuarios/**").permitAll()
-                    .requestMatchers("/api/categorias/**").permitAll()
-                    .requestMatchers("/api/productos/**").permitAll()
-                    .requestMatchers("/api/variantes/**").permitAll()
-                    .requestMatchers("/api/canales-venta/**").permitAll()
-                    .requestMatchers("/api/stock/**").permitAll()
-                    .requestMatchers("/api/productos-canales/**").permitAll()
-                    .requestMatchers("/api/email/**").permitAll()
-                    .requestMatchers("/api/movimientos-stock/**").permitAll()
                     // Toda request que no haya sido permitida, requiere un usuario autenticado
                 .anyRequest().authenticated()
             )

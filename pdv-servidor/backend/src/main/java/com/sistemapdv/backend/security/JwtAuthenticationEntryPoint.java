@@ -27,7 +27,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 .fecha(LocalDateTime.now().toLocalDate().format(formateador))
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
-                .mensaje("Debe iniciar sesión para acceder a este recurso.")
+                .mensaje("Debe iniciar sesión para acceder a este recurso")
                 .path(request.getRequestURI())
                 .build();
 
