@@ -19,7 +19,7 @@ public class StockAlertService {
     private String adminEmail;
 
     private static final Logger logger =
-            LoggerFactory.getLogger(EmailService.class);
+            LoggerFactory.getLogger(StockAlertService.class);
 
     public StockAlertService(EmailService emailService) {
         this.emailService = emailService;

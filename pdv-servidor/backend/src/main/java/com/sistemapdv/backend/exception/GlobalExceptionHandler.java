@@ -41,8 +41,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponseDTO> reportIllegalArguments(IllegalArgumentException ex,
                                                                    HttpServletRequest request){
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request));
     }
 
     @ExceptionHandler(BusinessException.class)
@@ -55,8 +55,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ErrorResponseDTO> reportInsufficientStock(InsufficientStockException ex,
                                                                     HttpServletRequest request){
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request));
     }
 
     @ExceptionHandler(ClosedCashException.class)
@@ -64,6 +64,13 @@ public class GlobalExceptionHandler {
                                                              HttpServletRequest request){
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(buildError(HttpStatus.CONFLICT, ex.getMessage(), request));
+    }
+
+    @ExceptionHandler(InvalidSaleException.class)
+    public ResponseEntity<ErrorResponseDTO> reportInvalidSale(InvalidSaleException ex,
+                                                              HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

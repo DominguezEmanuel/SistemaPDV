@@ -11,7 +11,10 @@ import java.math.BigDecimal;
 @Builder
 public class DetalleVentaDTO {
     private Integer idDetalleVenta;
+
     private Integer idVariante;
+    private String nombreVariante;
+
     private Integer cantidad;
     private BigDecimal precioUnitario;
     private BigDecimal subtotal;

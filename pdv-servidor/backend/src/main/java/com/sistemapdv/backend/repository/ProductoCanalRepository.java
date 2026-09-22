@@ -17,13 +17,14 @@ public interface ProductoCanalRepository extends JpaRepository<ProductoCanal, In
     List<ProductoCanal> findByCanalVentaIdCanalVenta(Integer idCanal);
 
     // Asociación específica Producto + Canal
-    Optional<ProductoCanal>
-    findByProductoIdProductoAndCanalVentaIdCanalVenta(
+    Optional<ProductoCanal> findByProductoIdProductoAndCanalVentaIdCanalVenta(
             Integer idProducto,
-            Integer idCanal);
+            Integer idCanal
+    );
 
     // Verificar si ya existe una asociación
     boolean existsByProductoIdProductoAndCanalVentaIdCanalVenta(
             Integer idProducto,
-            Integer idCanal);
+            Integer idCanal
+    );
 }
