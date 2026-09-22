@@ -20,7 +20,6 @@ public class VentaResponseDTO {
     private String fechaHora;
 
     private Integer idUsuario;
-    private String username;
 
     private Integer idCaja;
 

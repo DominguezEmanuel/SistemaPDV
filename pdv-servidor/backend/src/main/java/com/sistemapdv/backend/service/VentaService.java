@@ -53,6 +53,7 @@ public class VentaService {
     // Monto mínimo que debe superar la compra para poder obtener descuento de precios mayoristas
     private final BigDecimal MONTO_MINIMO = BigDecimal.valueOf(15000);
 
+    // Aplicar paginación
     @Transactional(readOnly = true)
     public List<VentaResponseDTO> obtenerVentas(){
         return ventaRepository.findAll()
@@ -64,11 +65,12 @@ public class VentaService {
     @Transactional
     public VentaResponseDTO registrarVenta(VentaRequestDTO request){
 
-        // Validar canal de venta
+        // Validar canal de venta seleccionado
         CanalVenta canalVenta = canalVentaRepository.findById(request.getIdCanalVenta())
                 .orElseThrow( () -> new ResourceNotFoundException("Canal con ID "
                         + request.getIdCanalVenta() + " no encontrado"));
 
+        // Validar caja
         Caja caja = cajaRepository.findById(request.getIdCaja())
                 .orElseThrow( () -> new ResourceNotFoundException("Caja con ID "
                         + request.getIdCaja() + " no encontrada"));
@@ -92,16 +94,17 @@ public class VentaService {
 
         verificarTipoVenta(grupos);
 
-        BigDecimal totalVenta = obtenerTotalVenta(grupos);
+        BigDecimal subtotalVenta = obtenerTotalVenta(grupos);
 
-        Venta venta = ventaMapper.toVenta(caja, usuarioAutenticado, totalVenta, request.getDescuento());
+        Venta nuevaVenta = ventaMapper.toVenta(caja, usuarioAutenticado, subtotalVenta, request.getDescuento());
 
-        ventaRepository.save(venta);
+        ventaRepository.save(nuevaVenta);
 
-        crearDetallesVenta(grupos, venta);
+        crearDetallesVenta(grupos, nuevaVenta);
 
-        //Venta venta = ventaRepository.findById(venta.getIdVenta())
-         //       .orElseThrow( () -> new ResourceNotFoundException("Venta no encontrada"));
+        Venta venta = ventaRepository.findById(nuevaVenta.getIdVenta())
+               .orElseThrow( () -> new ResourceNotFoundException("Venta con ID "
+                       + nuevaVenta.getIdVenta() + " no encontrada"));
 
         return ventaMapper.toResponseDTO(venta);
     }
@@ -117,14 +120,19 @@ public class VentaService {
                     .orElseThrow(() -> new ResourceNotFoundException("Variante con ID "
                             + detalle.getIdVariante() + " no encontrada"));
 
-            // Valida que exista un registro de Stock para la variante en el canal de venta
+            // Validar que exista un registro de stock para la variante en el canal de venta seleccionado
             Stock stock = stockRepository.findByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
                     variante.getIdVariante(),
                     canalVenta.getIdCanalVenta()
-            ).orElseThrow( () -> new ResourceNotFoundException("La variante " + variante.getNombre()
-                + " no tiene un stock en el canal de venta seleccionado"));
+            ).orElseThrow( () ->
+                    new ResourceNotFoundException(
+                            "La variante " + variante.getNombre()
+                                    + " no tiene un stock en el canal de venta seleccionado"
+                    )
+            );
 
             logger.info("Variante: {}", variante.getNombre());
+            logger.info("Canal de venta: {}", canalVenta.getNombre());
             logger.info("Stock: {}", stock.getCantidadDisponible());
 
             // Compara si la cantidad solicitada es aceptable para la cantidad disponible
@@ -132,8 +140,10 @@ public class VentaService {
                 throw new InvalidSaleException("La variante " + variante.getNombre() + " no tiene stock suficiente");
             }
 
-            // Obtener producto
+            // Obtener producto de la variante
             Producto producto = variante.getProducto();
+
+            logger.info("Producto: {}", producto.getNombre());
 
             // Verificar que exista una configuración para Producto + Canal
             ProductoCanal productoCanal = productoCanalRepository.findByProductoIdProductoAndCanalVentaIdCanalVenta(
@@ -152,9 +162,13 @@ public class VentaService {
             procesado.setProducto(producto);
             procesado.setProductoCanal(productoCanal);
             procesado.setCantidad(detalle.getCantidad());
+            // Se aplica el precio minorista al inicio
             procesado.setPrecioUnitario(producto.getPrecioMinorista());
-            procesado.setSubtotal(producto.getPrecioMinorista()
-                    .multiply(BigDecimal.valueOf(detalle.getCantidad())));
+            procesado.setSubtotal(
+                    producto.getPrecioMinorista()
+                            .multiply(BigDecimal.valueOf(detalle.getCantidad())
+                    )
+            );
 
             detallesProcesados.add(procesado);
         }
@@ -164,43 +178,79 @@ public class VentaService {
 
     private void verificarTipoVenta(Map<Producto, List<DetalleVentaProcesado>> grupos){
 
-        BigDecimal totalVenta = obtenerTotalVenta(grupos);
+        BigDecimal subtotalVenta = obtenerTotalVenta(grupos);
 
-        logger.info("Total de la venta: {}", totalVenta);
+        logger.info("Subtotal de la venta: ${}", subtotalVenta);
 
-        if(totalVenta.compareTo(MONTO_MINIMO) >= 0){
-            // Seguir verificando si la compra es mayorista
+        if(subtotalVenta.compareTo(MONTO_MINIMO) >= 0){
+            // Procesar agrupación de detalles por producto
+            for (Map.Entry<Producto, List<DetalleVentaProcesado>> entry : grupos.entrySet()){
+
+                Producto producto = entry.getKey();
+
+                List<DetalleVentaProcesado> detalles = entry.getValue();
+
+                ProductoCanal productoCanal = detalles.get(0).getProductoCanal();
+
+                CanalVenta canalVenta = productoCanal.getCanalVenta();
+
+                Integer stockTotalProducto = stockRepository.findStockTotalByProductoIdAndCanalVentaId(
+                        producto.getIdProducto(), canalVenta.getIdCanalVenta()
+                );
+
+                logger.info("Agrupación del producto: {}", producto.getNombre());
+                logger.info("Stock total: {}", stockTotalProducto);
+                logger.info("Limite mayorista: {}", productoCanal.getLimiteMayorista());
+                logger.info("Canal de venta seleccionado: {}", canalVenta.getNombre());
+
+                // Verificar si el producto sigue habilitado para venderse por mayor
+                if(stockTotalProducto.compareTo(productoCanal.getLimiteMayorista()) > 0){
+                    verificarTipoProducto(producto, detalles);
+                }
+            }
         }
+    }
 
-        /*for(Map.Entry<Producto, List<DetalleVentaProcesado>> entry : grupos.entrySet()){
+    private void verificarTipoProducto(Producto producto, List<DetalleVentaProcesado> detalles){
 
-            Producto producto = entry.getKey();
+        // Sumar las cantidades que se están comprando
+        int cantidadTotal = detalles.stream()
+                .mapToInt(DetalleVentaProcesado::getCantidad)
+                .sum();
 
-            List<DetalleVentaProcesado> detalles = entry.getValue();
+        logger.info("Cantidad total: {}", cantidadTotal);
 
-            ProductoCanal productoCanal = detalles.get(0).getProductoCanal();
-
+        // Verificar tipo de producto: 'con variantes' o 'sin variantes'
+        if(producto.getTieneVariantes()){
+            // Calcular la cantidad de variantes diferentes
             int cantidadVariantesDiferentes =
                     (int) detalles.stream()
                             .map(detalle -> detalle.getVariante().getIdVariante())
                             .distinct()
                             .count();
 
-            int cantidadTotal = detalles.stream()
-                    .mapToInt(DetalleVentaProcesado::getCantidad)
-                    .sum();
+            logger.info("Cantidad de variantes diferentes: {}", cantidadVariantesDiferentes);
 
-            aplicarPrecios(producto, detalles, cantidadTotal);
+            if(cantidadTotal >= producto.getMinimoMayorista() &&
+                    cantidadVariantesDiferentes >= CANTIDAD_VARIANTES_DIFERENTES){
+                // Se aplica precio mayorista para todos los detalles del producto
+                aplicarPrecioDetalle(producto.getPrecioMayorista(), detalles);
+            }
+        }else{
+            if(cantidadTotal >= producto.getMinimoMayorista()){
+                // Se aplica precio mayorista para el detalle del producto
+                aplicarPrecioDetalle(producto.getPrecioMayorista(), detalles);
+            }
+        }
+    }
 
-            logger.info("Producto: {}", producto.getNombre());
-            logger.info("Producto-Canal: {}", productoCanal.getCanalVenta());
-            logger.info("Variantes diferentes: {}", cantidadVariantesDiferentes);
-            logger.info("Cantidad total: {}", cantidadTotal);
-            logger.info("Precio: {}", detalles.get(0).getPrecioUnitario());
-
-            // Se deben llevar al menos 3 variantes diferentes para un producto con variantes
-            //boolean alcanzaCantidadMinima = cantidadVariantesDiferentes >= CANTIDAD_VARIANTES_DIFERENTES;
-        }*/
+    private void aplicarPrecioDetalle(BigDecimal precio, List<DetalleVentaProcesado> detalles){
+        for(DetalleVentaProcesado detalle : detalles){
+            detalle.setPrecioUnitario(precio);
+            detalle.setSubtotal(
+                    precio.multiply(BigDecimal.valueOf(detalle.getCantidad()))
+            );
+        }
     }
 
     private BigDecimal obtenerTotalVenta(Map<Producto, List<DetalleVentaProcesado>> grupos){
@@ -213,8 +263,7 @@ public class VentaService {
         return totalVenta;
     }
 
-    private void crearDetallesVenta(Map<Producto, List<DetalleVentaProcesado>> grupos,
-                                    Venta venta){
+    private void crearDetallesVenta(Map<Producto, List<DetalleVentaProcesado>> grupos, Venta venta){
 
         for (Map.Entry<Producto, List<DetalleVentaProcesado>> entry : grupos.entrySet()){
 
@@ -229,26 +278,7 @@ public class VentaService {
         }
     }
 
-    private void aplicarPrecios(Producto producto, List<DetalleVentaProcesado> detalles,
-                                int cantidadTotal){
-
-        ProductoCanal productoCanal = detalles.get(0).getProductoCanal();
-
-        // Verificar si el producto sigue disponible para mayorista
-        if(productoCanal.getLimiteMayorista() >= cantidadTotal){
-            // Aplicar precio mayorista
-            for (DetalleVentaProcesado detalle: detalles){
-                detalle.setPrecioUnitario(producto.getPrecioMayorista());
-            }
-        }else{
-            // Aplicar precio minorista
-            for (DetalleVentaProcesado detalle: detalles){
-                detalle.setPrecioUnitario(producto.getPrecioMinorista());
-            }
-        }
-    }
-
-    private void registrarPagos(List<PagoDTO> pagos, Venta venta){
+    /*private void registrarPagos(List<PagoDTO> pagos, Venta venta){
         for(PagoDTO pago: pagos){
             Pago nuevoPago = new Pago();
 
@@ -258,5 +288,5 @@ public class VentaService {
 
             pagoRepository.save(nuevoPago);
         }
-    }
+    }*/
 }

@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class DetalleVentaProcesado {
 
     private VarianteProducto variante;

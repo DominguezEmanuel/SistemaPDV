@@ -6,13 +6,17 @@ import com.sistemapdv.backend.entity.Usuario;
 import com.sistemapdv.backend.entity.Venta;
 import com.sistemapdv.backend.utils.FormatterDates;
 import com.sistemapdv.backend.utils.enums.EstadoVenta;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+@AllArgsConstructor
 @Component
 public class VentaMapper {
+
+    private final DetalleVentaMapper detalleVentaMapper;
 
     public Venta toVenta(Caja caja, Usuario usuario, BigDecimal subtotal, BigDecimal descuento){
         Venta venta = Venta.builder()
@@ -32,13 +36,20 @@ public class VentaMapper {
                 .idVenta(venta.getIdVenta())
                 .fechaHora(FormatterDates.formatearFechaRegistro(venta.getFechaHora()))
                 .idUsuario(venta.getUsuario().getIdUsuario())
-                .username(venta.getUsuario().getUsername())
                 .idCaja(venta.getCaja().getIdCaja())
                 .subtotal(venta.getSubtotal())
                 .descuento(venta.getDescuento())
                 .total(venta.getTotal())
                 .estado(venta.getEstado())
                 .build();
+
+        /*responseDTO.setDetalles(
+                venta.getDetalles()
+                        .stream()
+                        .map(detalleVentaMapper::toResponseDTO)
+                        .toList()
+        );*/
+
         return responseDTO;
     }
 }

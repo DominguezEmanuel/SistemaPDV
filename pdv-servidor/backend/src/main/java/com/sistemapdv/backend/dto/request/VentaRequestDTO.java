@@ -2,6 +2,7 @@ package com.sistemapdv.backend.dto.request;
 
 import com.sistemapdv.backend.dto.DetalleVentaDTO;
 import com.sistemapdv.backend.dto.PagoDTO;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -20,6 +21,8 @@ public class VentaRequestDTO {
     @NotNull(message = "El canal de venta es obligatorio")
     private Integer idCanalVenta;
 
+    @NotNull(message = "El descuento es obligatorio")
+    @Min(message = "El descuento no puede ser menor a cero", value = 0)
     private BigDecimal descuento;
 
     private List<DetalleVentaDTO> detalles;

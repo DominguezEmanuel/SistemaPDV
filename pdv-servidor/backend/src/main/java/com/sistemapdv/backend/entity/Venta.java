@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -44,4 +45,10 @@ public class Venta {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_caja", nullable = false)
     private Caja caja;
+
+    @OneToMany(mappedBy = "venta", fetch = FetchType.LAZY)
+    private List<DetalleVenta> detalles;
+
+    @OneToMany(mappedBy = "venta", fetch = FetchType.LAZY)
+    private List<Pago> pagos;
 }

@@ -3,6 +3,7 @@ package com.sistemapdv.backend.controller;
 import com.sistemapdv.backend.dto.request.VentaRequestDTO;
 import com.sistemapdv.backend.dto.response.VentaResponseDTO;
 import com.sistemapdv.backend.service.VentaService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
@@ -29,7 +30,7 @@ public class VentaController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<VentaResponseDTO> registerSale(@RequestBody VentaRequestDTO request){
+    public ResponseEntity<VentaResponseDTO> registerSale(@Valid @RequestBody VentaRequestDTO request){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ventaService.registrarVenta(request));
     }

@@ -39,4 +39,15 @@ public interface StockRepository extends JpaRepository<Stock, Integer>,
     List<Stock> findByProductoId(Integer idProducto);
 
     Page<Stock> findAllByOrderByCantidadDisponibleAsc(Pageable pageable);
+
+    @Query("""
+    SELECT COALESCE(SUM(s.cantidadDisponible), 0)
+    FROM Stock s
+    WHERE s.varianteProducto.producto.idProducto = :idProducto
+      AND s.canalVenta.idCanalVenta = :idCanal
+    """)
+    Integer findStockTotalByProductoIdAndCanalVentaId(
+            Integer idProducto,
+            Integer idCanal
+    );
 }
