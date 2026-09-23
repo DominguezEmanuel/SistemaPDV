@@ -1,7 +1,6 @@
 package com.sistemapdv.backend.service;
 
 import com.sistemapdv.backend.dto.DetalleVentaDTO;
-import com.sistemapdv.backend.dto.PagoDTO;
 import com.sistemapdv.backend.dto.request.VentaRequestDTO;
 import com.sistemapdv.backend.dto.response.VentaResponseDTO;
 import com.sistemapdv.backend.entity.*;
@@ -13,7 +12,6 @@ import com.sistemapdv.backend.mapper.VentaMapper;
 import com.sistemapdv.backend.model.venta.DetalleVentaProcesado;
 import com.sistemapdv.backend.repository.*;
 import com.sistemapdv.backend.utils.enums.EstadoCaja;
-import com.sistemapdv.backend.utils.enums.EstadoVenta;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,10 +43,7 @@ public class VentaService {
 
     private static final Logger logger = LoggerFactory.getLogger(VentaService.class);
 
-    // Representa la cantidad mínima de variantes diferentes que se debe comprar para poder acceder al precio mayorista
-    // de un producto con variantes
-    private final int CANTIDAD_VARIANTES_DIFERENTES = 3;
-    // Monto mínimo que debe superar la compra para poder obtener descuento de precios mayoristas
+    private final int MINIMO_VARIANTES_DIFERENTES = 3;
     private final BigDecimal MONTO_MINIMO = BigDecimal.valueOf(15000);
 
     // Aplicar paginación
@@ -88,9 +81,7 @@ public class VentaService {
         // Agrupar detalles por producto
         Map<Producto, List<DetalleVentaProcesado>> grupos =
                 detallesProcesados.stream()
-                        .collect(Collectors.groupingBy(
-                                DetalleVentaProcesado::getProducto
-                        ));
+                        .collect(Collectors.groupingBy(DetalleVentaProcesado::getProducto));
 
         verificarTipoVenta(grupos);
 
@@ -102,11 +93,7 @@ public class VentaService {
 
         crearDetallesVenta(grupos, nuevaVenta);
 
-        Venta venta = ventaRepository.findById(nuevaVenta.getIdVenta())
-               .orElseThrow( () -> new ResourceNotFoundException("Venta con ID "
-                       + nuevaVenta.getIdVenta() + " no encontrada"));
-
-        return ventaMapper.toResponseDTO(venta);
+        return ventaMapper.toResponseDTO(nuevaVenta);
     }
 
     private List<DetalleVentaProcesado> procesarDetallesVenta(List<DetalleVentaDTO> detalles,
@@ -120,30 +107,13 @@ public class VentaService {
                     .orElseThrow(() -> new ResourceNotFoundException("Variante con ID "
                             + detalle.getIdVariante() + " no encontrada"));
 
-            // Validar que exista un registro de stock para la variante en el canal de venta seleccionado
-            Stock stock = stockRepository.findByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
-                    variante.getIdVariante(),
-                    canalVenta.getIdCanalVenta()
-            ).orElseThrow( () ->
-                    new ResourceNotFoundException(
-                            "La variante " + variante.getNombre()
-                                    + " no tiene un stock en el canal de venta seleccionado"
-                    )
-            );
-
-            logger.info("Variante: {}", variante.getNombre());
-            logger.info("Canal de venta: {}", canalVenta.getNombre());
-            logger.info("Stock: {}", stock.getCantidadDisponible());
-
-            // Compara si la cantidad solicitada es aceptable para la cantidad disponible
-            if(detalle.getCantidad().compareTo(stock.getCantidadDisponible()) > 0){
-                throw new InvalidSaleException("La variante " + variante.getNombre() + " no tiene stock suficiente");
+            if(!variante.getActivo()){
+                throw new InvalidSaleException("La variante con ID " + variante.getIdVariante()
+                        + " se encuentra inactiva");
             }
 
             // Obtener producto de la variante
             Producto producto = variante.getProducto();
-
-            logger.info("Producto: {}", producto.getNombre());
 
             // Verificar que exista una configuración para Producto + Canal
             ProductoCanal productoCanal = productoCanalRepository.findByProductoIdProductoAndCanalVentaIdCanalVenta(
@@ -155,6 +125,29 @@ public class VentaService {
                                     + " no se encuentra configurado para el canal de venta seleccionado"
                     )
             );
+
+            // Validar que exista un registro de stock para la variante en el canal de venta seleccionado
+            Stock stock = stockRepository.findByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
+                    variante.getIdVariante(),
+                    canalVenta.getIdCanalVenta()
+            ).orElseThrow( () ->
+                    new ResourceNotFoundException(
+                            "La variante con ID " + variante.getIdVariante()
+                                    + " no tiene un stock en el canal de venta seleccionado"
+                    )
+            );
+
+            logger.info("Producto asociado: {}", producto.getNombre());
+            logger.info("ID de variante: {}", variante.getIdVariante());
+            logger.info("Nombre de variante: {}", variante.getNombre());
+            logger.info("Canal de venta: {}", canalVenta.getNombre());
+            logger.info("Stock disponible: {}", stock.getCantidadDisponible());
+
+            // Compara si la cantidad solicitada es aceptable para la cantidad disponible
+            if(detalle.getCantidad().compareTo(stock.getCantidadDisponible()) > 0){
+                throw new InvalidSaleException("La variante con ID " + variante.getIdVariante()
+                        + " no tiene stock suficiente");
+            }
 
             DetalleVentaProcesado procesado = new DetalleVentaProcesado();
 
@@ -182,6 +175,7 @@ public class VentaService {
 
         logger.info("Subtotal de la venta: ${}", subtotalVenta);
 
+        // Monto mínimo que debe alcanzar la compra para poder acceder a precios mayoristas
         if(subtotalVenta.compareTo(MONTO_MINIMO) >= 0){
             // Procesar agrupación de detalles por producto
             for (Map.Entry<Producto, List<DetalleVentaProcesado>> entry : grupos.entrySet()){
@@ -195,7 +189,8 @@ public class VentaService {
                 CanalVenta canalVenta = productoCanal.getCanalVenta();
 
                 Integer stockTotalProducto = stockRepository.findStockTotalByProductoIdAndCanalVentaId(
-                        producto.getIdProducto(), canalVenta.getIdCanalVenta()
+                        producto.getIdProducto(),
+                        canalVenta.getIdCanalVenta()
                 );
 
                 logger.info("Agrupación del producto: {}", producto.getNombre());
@@ -232,7 +227,7 @@ public class VentaService {
             logger.info("Cantidad de variantes diferentes: {}", cantidadVariantesDiferentes);
 
             if(cantidadTotal >= producto.getMinimoMayorista() &&
-                    cantidadVariantesDiferentes >= CANTIDAD_VARIANTES_DIFERENTES){
+                    cantidadVariantesDiferentes >= MINIMO_VARIANTES_DIFERENTES){
                 // Se aplica precio mayorista para todos los detalles del producto
                 aplicarPrecioDetalle(producto.getPrecioMayorista(), detalles);
             }
@@ -245,6 +240,7 @@ public class VentaService {
     }
 
     private void aplicarPrecioDetalle(BigDecimal precio, List<DetalleVentaProcesado> detalles){
+        logger.info("Precio aplicado: ${}", precio);
         for(DetalleVentaProcesado detalle : detalles){
             detalle.setPrecioUnitario(precio);
             detalle.setSubtotal(
@@ -277,16 +273,4 @@ public class VentaService {
             }
         }
     }
-
-    /*private void registrarPagos(List<PagoDTO> pagos, Venta venta){
-        for(PagoDTO pago: pagos){
-            Pago nuevoPago = new Pago();
-
-            nuevoPago.setVenta(venta);
-            nuevoPago.setMedioPago(pago.getMedioPago());
-            nuevoPago.setImporte(pago.getImporte());
-
-            pagoRepository.save(nuevoPago);
-        }
-    }*/
 }

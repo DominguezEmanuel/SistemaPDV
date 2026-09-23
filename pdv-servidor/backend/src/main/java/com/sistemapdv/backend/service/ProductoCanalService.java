@@ -97,24 +97,28 @@ public class ProductoCanalService {
      */
     @Transactional
     public ProductoCanalResponseDTO createProductChannel(ProductoCanalRequestDTO request){
+
         // Validar producto existente
         Producto producto = productoRepository.findById(request.getIdProducto())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Producto con ID " + request.getIdProducto()
                                 + " no encontrado"));
+
         // Validar canal de venta existente
         CanalVenta canal = canalVentaRepository.findById(request.getIdCanalVenta())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Canal de venta con ID " + request.getIdCanalVenta()
                                 + " no encontrado"));
-        // Validar que no exista la configuración Producto + CanalVenta
+
+        // Validar que no exista otra configuración Producto + CanalVenta
         if(repository.existsByProductoIdProductoAndCanalVentaIdCanalVenta(
                 request.getIdProducto(),
                 request.getIdCanalVenta())){
             throw new ResourceDuplicatedException("Ya existe una configuración para "
                 + producto.getNombre() + " y " + canal.getNombre());
         }
-        // Crear el registro y guardarlo
+
+        // Crear configuración
         ProductoCanal entity = ProductoCanal.builder()
                 .producto(producto)
                 .canalVenta(canal)
