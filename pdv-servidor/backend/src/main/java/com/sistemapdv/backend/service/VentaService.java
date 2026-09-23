@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,15 +47,6 @@ public class VentaService {
     private final int MINIMO_VARIANTES_DIFERENTES = 3;
     private final BigDecimal MONTO_MINIMO = BigDecimal.valueOf(15000);
 
-    // Aplicar paginación
-    @Transactional(readOnly = true)
-    public List<VentaResponseDTO> obtenerVentas(){
-        return ventaRepository.findAll()
-                .stream()
-                .map(ventaMapper::toResponseDTO)
-                .toList();
-    }
-
     @Transactional
     public VentaResponseDTO registrarVenta(VentaRequestDTO request){
 
@@ -75,8 +67,10 @@ public class VentaService {
         // Validar usuario logueado
         Usuario usuarioAutenticado = authenticationService.getUserAuthenticated();
 
+        List<DetalleVentaDTO> detallesAgrupados = agruparDetalles(request.getDetalles());
+
         // Procesar los detalles de venta
-        List<DetalleVentaProcesado> detallesProcesados = procesarDetallesVenta(request.getDetalles(), canalVenta);
+        List<DetalleVentaProcesado> detallesProcesados = procesarDetallesVenta(detallesAgrupados, canalVenta);
 
         // Agrupar detalles por producto
         Map<Producto, List<DetalleVentaProcesado>> grupos =
@@ -87,13 +81,58 @@ public class VentaService {
 
         BigDecimal subtotalVenta = obtenerTotalVenta(grupos);
 
+        validarDescuento(request.getDescuento(), subtotalVenta);
+
         Venta nuevaVenta = ventaMapper.toVenta(caja, usuarioAutenticado, subtotalVenta, request.getDescuento());
 
         ventaRepository.save(nuevaVenta);
 
-        crearDetallesVenta(grupos, nuevaVenta);
+        List<DetalleVentaDTO> detallesResponse = crearDetallesVenta(grupos, nuevaVenta);
 
-        return ventaMapper.toResponseDTO(nuevaVenta);
+        return ventaMapper.toResponseDTO(
+                nuevaVenta,
+                detallesResponse
+        );
+    }
+
+    private void validarDescuento(BigDecimal descuento, BigDecimal subtotalVenta) {
+
+        if (descuento == null || subtotalVenta == null) {
+            throw new IllegalArgumentException("El descuento y el subtotal no pueden ser nulos");
+        }
+
+        if (descuento.compareTo(BigDecimal.ZERO) < 0) {
+            throw new InvalidSaleException("El descuento no puede ser negativo");
+        }
+
+        if (descuento.compareTo(subtotalVenta) > 0) {
+            throw new InvalidSaleException("El descuento no puede ser mayor al subtotal de la venta");
+        }
+    }
+
+    private List<DetalleVentaDTO> agruparDetalles(List<DetalleVentaDTO> detalles){
+        Map<Integer, DetalleVentaDTO> detallesAgrupados = new HashMap<>();
+
+        for (DetalleVentaDTO detalle : detalles){
+
+            if(detalle.getCantidad() <= 0){
+                throw new InvalidSaleException("La cantidad para la variante con ID "
+                        + detalle.getIdVariante() + " es inválida");
+            }
+
+            detallesAgrupados.merge(
+                    detalle.getIdVariante(),
+                    detalle,
+                    (existente, repetido) -> {
+                        existente.setCantidad(
+                                existente.getCantidad() + repetido.getCantidad()
+                        );
+                        return existente;
+                    }
+            );
+        }
+
+        return new ArrayList<>(detallesAgrupados.values());
     }
 
     private List<DetalleVentaProcesado> procesarDetallesVenta(List<DetalleVentaDTO> detalles,
@@ -188,18 +227,26 @@ public class VentaService {
 
                 CanalVenta canalVenta = productoCanal.getCanalVenta();
 
-                Integer stockTotalProducto = stockRepository.findStockTotalByProductoIdAndCanalVentaId(
+                Integer stockActualProducto = stockRepository.findStockTotalByProductoIdAndCanalVentaId(
                         producto.getIdProducto(),
                         canalVenta.getIdCanalVenta()
                 );
 
+                int cantidadSolicitada = detalles.stream()
+                        .mapToInt(DetalleVentaProcesado::getCantidad)
+                        .sum();
+
                 logger.info("Agrupación del producto: {}", producto.getNombre());
-                logger.info("Stock total: {}", stockTotalProducto);
+                logger.info("Stock actual: {}", stockActualProducto);
+                logger.info("Cantidad solicitada: {}", cantidadSolicitada);
                 logger.info("Limite mayorista: {}", productoCanal.getLimiteMayorista());
                 logger.info("Canal de venta seleccionado: {}", canalVenta.getNombre());
 
+                // Calcular en qué estado quedará el producto una vez hecha la venta
+                Integer stockResultante = stockActualProducto - cantidadSolicitada;
+
                 // Verificar si el producto sigue habilitado para venderse por mayor
-                if(stockTotalProducto.compareTo(productoCanal.getLimiteMayorista()) > 0){
+                if(stockResultante.compareTo(productoCanal.getLimiteMayorista()) >= 0){
                     verificarTipoProducto(producto, detalles);
                 }
             }
@@ -240,7 +287,7 @@ public class VentaService {
     }
 
     private void aplicarPrecioDetalle(BigDecimal precio, List<DetalleVentaProcesado> detalles){
-        logger.info("Precio aplicado: ${}", precio);
+        logger.info("Precio mayorista aplicado: ${}", precio);
         for(DetalleVentaProcesado detalle : detalles){
             detalle.setPrecioUnitario(precio);
             detalle.setSubtotal(
@@ -259,7 +306,9 @@ public class VentaService {
         return totalVenta;
     }
 
-    private void crearDetallesVenta(Map<Producto, List<DetalleVentaProcesado>> grupos, Venta venta){
+    private List<DetalleVentaDTO> crearDetallesVenta(Map<Producto, List<DetalleVentaProcesado>> grupos, Venta venta){
+
+        List<DetalleVentaDTO> detallesResponse = new ArrayList<>();
 
         for (Map.Entry<Producto, List<DetalleVentaProcesado>> entry : grupos.entrySet()){
 
@@ -270,7 +319,11 @@ public class VentaService {
                 DetalleVenta nuevoDetalleVenta = detalleVentaMapper.toDetalleVenta(detalle, venta);
 
                 detalleVentaRepository.save(nuevoDetalleVenta);
+
+                detallesResponse.add(detalleVentaMapper.toResponseDTO(nuevoDetalleVenta));
             }
         }
+
+        return detallesResponse;
     }
 }

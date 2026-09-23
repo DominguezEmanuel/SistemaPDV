@@ -15,6 +15,8 @@ public class DetalleVentaDTO {
     private Integer idVariante;
     private String nombreVariante;
 
+    private String nombreProducto;
+
     private Integer cantidad;
     private BigDecimal precioUnitario;
     private BigDecimal subtotal;

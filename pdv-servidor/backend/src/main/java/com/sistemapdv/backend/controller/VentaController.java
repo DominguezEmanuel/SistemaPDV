@@ -23,12 +23,6 @@ public class VentaController {
         this.ventaService = ventaService;
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<VentaResponseDTO>> getAllSales(){
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ventaService.obtenerVentas());
-    }
-
     @PostMapping("/")
     public ResponseEntity<VentaResponseDTO> registerSale(@Valid @RequestBody VentaRequestDTO request){
         return ResponseEntity.status(HttpStatus.CREATED)

@@ -1,1 +1,386 @@
-<p>ventas works!</p>
+<div class="page-body">
+  <div class="breadcrumb-custom">Sistema / <span>Ventas</span></div>
+
+  <!-- 1. Encabezado -->
+  <div class="venta-header">
+    <div class="venta-header-left">
+      <h1 class="page-title">Nueva venta</h1>
+      <p class="page-desc">
+        Escaneá o buscá productos para agregarlos a la venta.
+      </p>
+    </div>
+    <div class="venta-header-right">
+      <div class="venta-meta">
+        Cajera: <b>Romina Albornoz</b><br />
+        <span id="ventaFechaHora">-</span>
+      </div>
+      <div class="canal-selector">
+        <label>Canal:</label>
+        <select id="ventaCanal">
+          <option value="Tienda Física">Tienda Física</option>
+          <option value="TikTok Live">TikTok Live</option>
+          <option value="Instagram">Instagram</option>
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Mercado Libre">Mercado Libre</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Buscador / escaneo de codigo de barras -->
+  <div class="scan-box">
+    <div class="scan-box-inner">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M3 7V4a1 1 0 0 1 1-1h3"></path>
+        <path d="M17 3h3a1 1 0 0 1 1 1v3"></path>
+        <path d="M21 17v3a1 1 0 0 1-1 1h-3"></path>
+        <path d="M7 21H4a1 1 0 0 1-1-1v-3"></path>
+        <line x1="7" y1="8" x2="7" y2="16"></line>
+        <line x1="11" y1="8" x2="11" y2="16"></line>
+        <line x1="14" y1="8" x2="14" y2="16"></line>
+        <line x1="17" y1="8" x2="17" y2="16"></line>
+      </svg>
+      <input
+        type="text"
+        id="scanInput"
+        placeholder="Código de barras o nombre del producto..."
+        autocomplete="off"
+      />
+    </div>
+    <div class="scan-suggestions" id="scanSuggestions"></div>
+  </div>
+
+  <!-- Layout principal -->
+  <div class="venta-layout">
+    <!-- 3. Carrito de productos (tabla) -->
+    <div class="venta-card">
+      <div class="venta-card-header">
+        <h5>
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path
+              d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+            ></path>
+          </svg>
+          Productos de la venta
+        </h5>
+        <span class="contador-items" id="contadorItems">0 productos</span>
+      </div>
+
+      <div id="carritoVacio" class="carrito-vacio">
+        <svg
+          width="42"
+          height="42"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path
+            d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+          ></path>
+        </svg>
+        <p>
+          Todavía no agregaste productos.<br />Escaneá un código o buscá por
+          nombre arriba.
+        </p>
+      </div>
+
+      <div
+        class="tabla-carrito-wrap"
+        id="tablaCarritoWrap"
+        style="display: none"
+      >
+        <table class="tabla-carrito">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Precio unit.</th>
+              <th>Subtotal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="carritoBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5/6/7/8/9. Resumen + descuento + pago + acciones -->
+    <div>
+      <div class="venta-card" style="margin-bottom: 18px">
+        <div class="venta-card-header">
+          <h5>
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 3v16a2 2 0 0 0 2 2h16"></path>
+              <path d="M18 17V9"></path>
+              <path d="M13 17V5"></path>
+              <path d="M8 17v-3"></path>
+            </svg>
+            Resumen de venta
+          </h5>
+        </div>
+
+        <div style="padding: 16px 20px 4px">
+          <div class="resumen-row">
+            <span>Subtotal</span>
+            <b id="resumenSubtotal">$0</b>
+          </div>
+          <div class="resumen-row">
+            <span>Descuento</span>
+            <b id="resumenDescuento" style="color: #c13b3b">-$0</b>
+          </div>
+
+          <!-- 6. Descuento -->
+          <div class="descuento-row">
+            <select id="descuentoTipo">
+              <option value="monto">$</option>
+              <option value="porcentaje">%</option>
+            </select>
+            <input
+              type="number"
+              id="descuentoValor"
+              placeholder="0"
+              min="0"
+              step="1"
+            />
+          </div>
+          <div class="descuento-error" id="descuentoError">
+            El descuento no puede superar el subtotal.
+          </div>
+
+          <div class="resumen-total-row">
+            <span>TOTAL</span>
+            <b id="resumenTotal">$0</b>
+          </div>
+        </div>
+
+        <!-- 7. Medio de pago -->
+        <div style="padding: 18px 20px 4px">
+          <label
+            class="nu-label"
+            style="
+              font-size: 0.78rem;
+              font-weight: 600;
+              color: #14181c;
+              margin-bottom: 10px;
+              display: block;
+            "
+            >Medio de pago</label
+          >
+
+          <div class="medio-pago-grid">
+            <div
+              class="medio-pago-card"
+              data-medio="efectivo"
+              onclick="seleccionarMedioPago('efectivo')"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span>Efectivo</span>
+            </div>
+            <div
+              class="medio-pago-card"
+              data-medio="transferencia"
+              onclick="seleccionarMedioPago('transferencia')"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M17 1l4 4-4 4"></path>
+                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                <path d="M7 23l-4-4 4-4"></path>
+                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+              </svg>
+              <span>Transferencia</span>
+            </div>
+            <div
+              class="medio-pago-card"
+              data-medio="ambos"
+              onclick="seleccionarMedioPago('ambos')"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"
+                ></path>
+              </svg>
+              <span>Ambos</span>
+            </div>
+          </div>
+
+          <!-- Detalle Efectivo: monto recibido + vuelto -->
+          <div class="pago-detalle" id="pagoDetalleEfectivo">
+            <div class="pago-detalle-row">
+              <label>Monto recibido</label>
+              <input
+                type="number"
+                id="montoRecibido"
+                placeholder="0"
+                min="0"
+                step="1"
+              />
+            </div>
+            <div class="pago-vuelto" id="pagoVuelto">
+              <span>Vuelto</span>
+              <b id="pagoVueltoValor">$0</b>
+            </div>
+          </div>
+
+          <!-- Detalle Ambos: split efectivo/transferencia -->
+          <div class="pago-detalle" id="pagoDetalleAmbos">
+            <div class="pago-detalle-row">
+              <label>Monto en efectivo</label>
+              <input
+                type="number"
+                id="montoEfectivoSplit"
+                placeholder="0"
+                min="0"
+                step="1"
+              />
+            </div>
+            <div class="pago-detalle-row" style="margin-bottom: 6px">
+              <label>Monto por transferencia</label>
+              <input
+                type="number"
+                id="montoTransferenciaSplit"
+                placeholder="0"
+                min="0"
+                step="1"
+              />
+            </div>
+            <div class="pago-split-total">
+              Suma ingresada: <b id="pagoSplitSuma">$0</b> / Total:
+              <b id="pagoSplitTotal">$0</b>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error general -->
+        <div class="venta-error-general" id="ventaErrorGeneral">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span id="ventaErrorGeneralTexto"
+            >Completá los datos de la venta.</span
+          >
+        </div>
+
+        <!-- 8 / 9. Botones -->
+        <div class="venta-acciones">
+          <button
+            class="btn-registrar-venta"
+            id="btnRegistrarVenta"
+            type="button"
+            onclick="registrarVenta()"
+          >
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            Registrar venta
+          </button>
+          <button
+            class="btn-cancelar-venta"
+            type="button"
+            onclick="pedirConfirmacionCancelar()"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            Cancelar venta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

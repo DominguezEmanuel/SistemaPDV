@@ -1,5 +1,6 @@
 package com.sistemapdv.backend.mapper;
 
+import com.sistemapdv.backend.dto.DetalleVentaDTO;
 import com.sistemapdv.backend.dto.response.VentaResponseDTO;
 import com.sistemapdv.backend.entity.Caja;
 import com.sistemapdv.backend.entity.Usuario;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Component
@@ -31,7 +33,8 @@ public class VentaMapper {
         return venta;
     }
 
-    public VentaResponseDTO toResponseDTO(Venta venta){
+    public VentaResponseDTO toResponseDTO(Venta venta,
+                                          List<DetalleVentaDTO> detalles){
         VentaResponseDTO responseDTO = VentaResponseDTO.builder()
                 .idVenta(venta.getIdVenta())
                 .fechaHora(FormatterDates.formatearFechaRegistro(venta.getFechaHora()))
@@ -41,14 +44,8 @@ public class VentaMapper {
                 .descuento(venta.getDescuento())
                 .total(venta.getTotal())
                 .estado(venta.getEstado())
+                .detalles(detalles)
                 .build();
-
-        /*responseDTO.setDetalles(
-                venta.getDetalles()
-                        .stream()
-                        .map(detalleVentaMapper::toResponseDTO)
-                        .toList()
-        );*/
 
         return responseDTO;
     }

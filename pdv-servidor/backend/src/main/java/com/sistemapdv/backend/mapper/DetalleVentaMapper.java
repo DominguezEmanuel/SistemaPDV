@@ -30,6 +30,7 @@ public class DetalleVentaMapper {
                 .idDetalleVenta(detalle.getIdDetalleVenta())
                 .idVariante(detalle.getVariante().getIdVariante())
                 .nombreVariante(detalle.getVariante().getNombre())
+                .nombreProducto(detalle.getVariante().getProducto().getNombre())
                 .cantidad(detalle.getCantidad())
                 .precioUnitario(detalle.getPrecioUnitario())
                 .subtotal(detalle.getSubtotal())
