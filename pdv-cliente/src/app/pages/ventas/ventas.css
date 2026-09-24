@@ -61,8 +61,8 @@
   padding: 8px 14px;
 }
 .canal-selector label {
-  font-size: 0.76rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
   color: #5b6670;
   white-space: nowrap;
 }
@@ -94,7 +94,7 @@
   display: flex;
   align-items: center;
 }
-.scan-box-inner svg {
+.scan-icon {
   position: absolute;
   left: 16px;
   color: #3e93c7;
@@ -104,7 +104,7 @@
   width: 100%;
   border: none;
   background: none;
-  padding: 14px 16px 14px 46px;
+  padding: 14px 46px 14px 46px;
   font-size: 1rem;
   font-family: "Outfit", sans-serif;
   color: #14181c;
@@ -114,6 +114,29 @@
 }
 .scan-box input::placeholder {
   color: #a9b6bf;
+}
+.btn-limpiar-busqueda {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #7d8b95;
+  cursor: pointer;
+}
+.btn-limpiar-busqueda i {
+  position: static;
+}
+.btn-limpiar-busqueda:hover {
+  background: #eef5f8;
+  color: #1c5a85;
 }
 
 .scan-suggestions {
@@ -231,7 +254,7 @@
   align-items: center;
   gap: 8px;
 }
-.venta-card-header h5 svg {
+.venta-card-header h5 i {
   color: #3e93c7;
 }
 .venta-card-header .contador-items {
@@ -375,7 +398,7 @@
   padding: 46px 20px;
   color: #5b6670;
 }
-.carrito-vacio svg {
+.carrito-vacio i {
   color: #a9b6bf;
   margin-bottom: 12px;
 }
@@ -486,7 +509,7 @@
 .medio-pago-card:hover {
   background: #f5fafd;
 }
-.medio-pago-card svg {
+.medio-pago-card i {
   color: #5b6670;
   margin-bottom: 5px;
 }
@@ -501,7 +524,7 @@
   background: #dceef8;
   box-shadow: 0 0 0 3px rgba(62, 147, 199, 0.18);
 }
-.medio-pago-card.seleccionado svg {
+.medio-pago-card.seleccionado i {
   color: #1c5a85;
 }
 
