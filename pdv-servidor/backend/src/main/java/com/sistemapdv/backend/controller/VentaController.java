@@ -1,6 +1,7 @@
 package com.sistemapdv.backend.controller;
 
 import com.sistemapdv.backend.dto.request.VentaRequestDTO;
+import com.sistemapdv.backend.dto.response.VarianteVentaResponseDTO;
 import com.sistemapdv.backend.dto.response.VentaResponseDTO;
 import com.sistemapdv.backend.service.VentaService;
 import jakarta.validation.Valid;
@@ -27,5 +28,18 @@ public class VentaController {
     public ResponseEntity<VentaResponseDTO> registerSale(@Valid @RequestBody VentaRequestDTO request){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ventaService.registrarVenta(request));
+    }
+
+    @GetMapping("/{idVenta}")
+    public ResponseEntity<VentaResponseDTO> getSaleById(@PathVariable Integer idVenta){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ventaService.obtenerVentaPorId(idVenta));
+    }
+
+    @GetMapping("/variantes")
+    public ResponseEntity<VarianteVentaResponseDTO> findVariant(@RequestParam String codigoBarras,
+                                                                 @RequestParam Integer idCanalVenta){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ventaService.buscarVarianteParaVenta(codigoBarras, idCanalVenta));
     }
 }

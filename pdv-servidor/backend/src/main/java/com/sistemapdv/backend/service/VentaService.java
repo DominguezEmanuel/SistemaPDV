@@ -2,6 +2,7 @@ package com.sistemapdv.backend.service;
 
 import com.sistemapdv.backend.dto.DetalleVentaDTO;
 import com.sistemapdv.backend.dto.request.VentaRequestDTO;
+import com.sistemapdv.backend.dto.response.VarianteVentaResponseDTO;
 import com.sistemapdv.backend.dto.response.VentaResponseDTO;
 import com.sistemapdv.backend.entity.*;
 import com.sistemapdv.backend.exception.ClosedCashException;
@@ -115,9 +116,9 @@ public class VentaService {
 
         for (DetalleVentaDTO detalle : detalles){
 
-            if(detalle.getCantidad() <= 0){
-                throw new InvalidSaleException("La cantidad para la variante con ID "
-                        + detalle.getIdVariante() + " es inválida");
+            if(detalle.getCantidad().compareTo(0) <= 0){
+                throw new InvalidSaleException("La cantidad enviada '"
+                        + detalle.getCantidad() + "' es inválida");
             }
 
             detallesAgrupados.merge(
@@ -184,8 +185,8 @@ public class VentaService {
 
             // Compara si la cantidad solicitada es aceptable para la cantidad disponible
             if(detalle.getCantidad().compareTo(stock.getCantidadDisponible()) > 0){
-                throw new InvalidSaleException("La variante con ID " + variante.getIdVariante()
-                        + " no tiene stock suficiente");
+                throw new InvalidSaleException("El producto " + producto.getNombre()
+                        + " no tiene stock suficiente en " + canalVenta.getNombre());
             }
 
             DetalleVentaProcesado procesado = new DetalleVentaProcesado();
@@ -325,5 +326,66 @@ public class VentaService {
         }
 
         return detallesResponse;
+    }
+
+    @Transactional(readOnly = true)
+    public VarianteVentaResponseDTO buscarVarianteParaVenta(String codigoBarras, Integer idCanalVenta){
+
+        if(codigoBarras == null || idCanalVenta == null){
+            throw new IllegalArgumentException("El código de barras y canal de venta no pueden ser nulos");
+        }
+
+        CanalVenta canalVenta = canalVentaRepository.findById(idCanalVenta)
+                .orElseThrow( () -> new ResourceNotFoundException("Canal de venta con ID "
+                        + idCanalVenta + " no encontrado"));
+
+        VarianteProducto variante = varianteProductoRepository.findByCodigoBarras(codigoBarras)
+                .orElseThrow( () -> new ResourceNotFoundException("No se encontró ninguna variante"));
+
+        if(!variante.getActivo()){
+            throw new IllegalArgumentException("La variante seleccionada se encuentra inactiva");
+        }
+
+        Producto producto = variante.getProducto();
+
+        if (!producto.getActivo()){
+            throw new IllegalArgumentException("El producto asociado se encuentra inactivo");
+        }
+
+        if(!productoCanalRepository.existsByProductoIdProductoAndCanalVentaIdCanalVenta(
+                producto.getIdProducto(),
+                canalVenta.getIdCanalVenta())
+        ){
+            throw new ResourceNotFoundException("El producto " + producto.getNombre()
+                    + " no tiene una configuración en el canal de venta seleccionado");
+        }
+
+        Stock stock = stockRepository.findByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
+                variante.getIdVariante(), idCanalVenta)
+                .orElseThrow( () -> new ResourceNotFoundException("La variante " + variante.getNombre()
+                + " no tiene stock en el canal de venta seleccionado"));
+
+        logger.info("Variante: {}", variante.getNombre());
+        logger.info("Producto: {}", producto.getNombre());
+        logger.info("Canal seleccionado: {}", canalVenta.getNombre());
+        logger.info("Stock: {}", stock.getCantidadDisponible());
+
+        return ventaMapper.toVarianteVenta(variante, producto, stock);
+    }
+
+    @Transactional(readOnly = true)
+    public VentaResponseDTO obtenerVentaPorId(Integer idVenta){
+        Venta venta = ventaRepository.findById(idVenta)
+                .orElseThrow( () -> new ResourceNotFoundException("Venta con ID " +
+                        idVenta + " no encontrada"));
+
+        List<DetalleVenta> detalles = detalleVentaRepository.findByVentaIdVenta(venta.getIdVenta());
+
+        return ventaMapper.toResponseDTO(
+                venta,
+                detalles.stream()
+                        .map(detalleVentaMapper::toResponseDTO)
+                        .toList()
+        );
     }
 }

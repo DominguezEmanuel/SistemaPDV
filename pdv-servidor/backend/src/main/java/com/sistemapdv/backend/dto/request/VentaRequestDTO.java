@@ -3,6 +3,7 @@ package com.sistemapdv.backend.dto.request;
 import com.sistemapdv.backend.dto.DetalleVentaDTO;
 import com.sistemapdv.backend.dto.PagoDTO;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -25,7 +26,9 @@ public class VentaRequestDTO {
     @Min(message = "El descuento no puede ser menor a cero", value = 0)
     private BigDecimal descuento;
 
+    @NotEmpty(message = "Debe enviar al menos un detalle de venta")
     private List<DetalleVentaDTO> detalles;
 
+    @NotEmpty(message = "Debe enviar al menos un pago de la venta")
     private List<PagoDTO> pagos;
 }
