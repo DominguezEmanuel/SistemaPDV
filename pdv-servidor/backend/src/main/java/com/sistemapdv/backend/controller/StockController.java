@@ -4,7 +4,7 @@ import com.sistemapdv.backend.dto.request.MovimientoRequestDTO;
 import com.sistemapdv.backend.dto.request.StockRequestDTO;
 import com.sistemapdv.backend.dto.response.MovimientoResponseDTO;
 import com.sistemapdv.backend.dto.response.StockResponseDTO;
-import com.sistemapdv.backend.service.MovimientoService;
+import com.sistemapdv.backend.service.MovimientoStockService;
 import com.sistemapdv.backend.service.StockService;
 import com.sistemapdv.backend.utils.enums.EstadoStock;
 import jakarta.validation.Valid;
@@ -22,9 +22,9 @@ import java.util.List;
 public class StockController {
 
     private final StockService stockService;
-    private final MovimientoService movimientoService;
+    private final MovimientoStockService movimientoService;
 
-    public StockController(StockService stockService, MovimientoService movimientoService) {
+    public StockController(StockService stockService, MovimientoStockService movimientoService) {
         this.stockService = stockService;
         this.movimientoService = movimientoService;
     }

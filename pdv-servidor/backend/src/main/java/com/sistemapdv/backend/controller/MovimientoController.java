@@ -1,7 +1,7 @@
 package com.sistemapdv.backend.controller;
 
 import com.sistemapdv.backend.dto.response.MovimientoResponseDTO;
-import com.sistemapdv.backend.service.MovimientoService;
+import com.sistemapdv.backend.service.MovimientoStockService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MovimientoController {
 
-    private final MovimientoService movimientoService;
+    private final MovimientoStockService movimientoService;
 
     @GetMapping("/{idStock}/listado")
     public ResponseEntity<List<MovimientoResponseDTO>> getLastFiveRecords(@PathVariable Integer idStock){

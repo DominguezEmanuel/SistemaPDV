@@ -1,6 +1,6 @@
 package com.sistemapdv.backend.dto.response;
 
-import com.sistemapdv.backend.utils.enums.TipoMovimiento;
+import com.sistemapdv.backend.utils.enums.TipoMovimientoStock;
 import lombok.*;
 
 @Getter
@@ -12,7 +12,7 @@ public class MovimientoResponseDTO {
 
     private Integer idMovimiento;
     private String fechaHora;
-    private TipoMovimiento tipo;
+    private TipoMovimientoStock tipo;
     private Integer cantidad;
     private Integer stockAnterior;
     private Integer stockResultante;

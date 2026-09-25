@@ -1,6 +1,6 @@
 package com.sistemapdv.backend.dto.request;
 
-import com.sistemapdv.backend.utils.enums.TipoMovimiento;
+import com.sistemapdv.backend.utils.enums.TipoMovimientoStock;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -11,7 +11,7 @@ import lombok.*;
 public class MovimientoRequestDTO {
 
     @NotNull(message = "El tipo de movimiento es obligatorio")
-    private TipoMovimiento tipo;
+    private TipoMovimientoStock tipo;
 
     // Se enviará 'cantidad' o 'stockFisico' de acuerdo al tipo de movimiento
     private Integer cantidad;

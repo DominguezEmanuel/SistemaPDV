@@ -1,10 +1,9 @@
 package com.sistemapdv.backend.entity;
 
-import com.sistemapdv.backend.utils.enums.TipoMovimiento;
+import com.sistemapdv.backend.utils.enums.TipoMovimientoStock;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -26,7 +25,7 @@ public class MovimientoStock {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_movimiento", nullable = false)
-    private TipoMovimiento tipoMovimiento;
+    private TipoMovimientoStock tipoMovimiento;
 
     @Column(name = "cantidad", nullable = false)
     private Integer cantidad;

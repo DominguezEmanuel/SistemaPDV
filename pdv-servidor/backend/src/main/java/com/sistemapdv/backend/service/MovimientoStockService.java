@@ -12,7 +12,7 @@ import com.sistemapdv.backend.mapper.MovimientoMapper;
 import com.sistemapdv.backend.mapper.StockMapper;
 import com.sistemapdv.backend.repository.MovimientoStockRepository;
 import com.sistemapdv.backend.repository.StockRepository;
-import com.sistemapdv.backend.utils.enums.TipoMovimiento;
+import com.sistemapdv.backend.utils.enums.TipoMovimientoStock;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class MovimientoService {
+public class MovimientoStockService {
 
     private final StockService stockService;
     private final StockAlertService stockAlertService;
@@ -117,14 +117,16 @@ public class MovimientoService {
      *
      * Para 'ENTRADA': 'motivo' es opcional
      *
-     * @param tipo Tipo de movimiento de la request
+     * @param tipoMovimiento Tipo de movimiento de la request
      * @param motivo Motivo por el cual se realiza la transacción
      */
-    private void validarMotivo(TipoMovimiento tipo, String motivo){
-        if(tipo.equals(TipoMovimiento.SALIDA) || tipo.equals(TipoMovimiento.AJUSTE)){
+    private void validarMotivo(TipoMovimientoStock tipoMovimiento, String motivo){
+        if(tipoMovimiento.equals(TipoMovimientoStock.SALIDA)
+                || tipoMovimiento.equals(TipoMovimientoStock.VENTA)
+                || tipoMovimiento.equals(TipoMovimientoStock.AJUSTE)){
             if(motivo == null || motivo.isEmpty()){
                 throw new IllegalArgumentException("El motivo es obligatorio para el tipo de movimiento '"
-                        + tipo + "'");
+                        + tipoMovimiento + "'");
             }
         }
     }
@@ -132,15 +134,16 @@ public class MovimientoService {
     /**
      * Verifica que las cantidades enviadas sean válidas
      *
-     * Para 'ENTRADA' o 'SALIDA'-> se debe enviar 'cantidad' en la request y debe ser > 0
+     * Para 'ENTRADA', 'SALIDA' o 'VENTA'-> se debe enviar 'cantidad' en la request y debe ser > 0
      *
      * Para 'AJUSTE'-> se debe enviar 'stockFisico' en la request y debe ser >= 0
      *
      * @param request Solicitud con los datos necesarios
      */
     private void validarCantidades(MovimientoRequestDTO request){
-        if(request.getTipo().equals(TipoMovimiento.ENTRADA)
-                || request.getTipo().equals(TipoMovimiento.SALIDA)){
+        if(request.getTipo().equals(TipoMovimientoStock.ENTRADA)
+                || request.getTipo().equals(TipoMovimientoStock.SALIDA)
+                || request.getTipo().equals(TipoMovimientoStock.VENTA)){
             if(request.getCantidad() == null || request.getCantidad() <= 0)
                 throw new IllegalArgumentException("La cantidad enviada es inválida");
         }else{
@@ -164,6 +167,7 @@ public class MovimientoService {
                 break;
 
             case SALIDA:
+            case VENTA:
                 cantidad = -request.getCantidad();
                 if(stockAnterior + cantidad < 0){
                     throw new InsufficientStockException("El stock es insuficiente");

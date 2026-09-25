@@ -1,6 +1,8 @@
 package com.sistemapdv.backend.service;
 
 import com.sistemapdv.backend.dto.DetalleVentaDTO;
+import com.sistemapdv.backend.dto.PagoDTO;
+import com.sistemapdv.backend.dto.request.MovimientoRequestDTO;
 import com.sistemapdv.backend.dto.request.VentaRequestDTO;
 import com.sistemapdv.backend.dto.response.VarianteVentaResponseDTO;
 import com.sistemapdv.backend.dto.response.VentaResponseDTO;
@@ -9,10 +11,13 @@ import com.sistemapdv.backend.exception.ClosedCashException;
 import com.sistemapdv.backend.exception.InvalidSaleException;
 import com.sistemapdv.backend.exception.ResourceNotFoundException;
 import com.sistemapdv.backend.mapper.DetalleVentaMapper;
+import com.sistemapdv.backend.mapper.PagoMapper;
 import com.sistemapdv.backend.mapper.VentaMapper;
 import com.sistemapdv.backend.model.venta.DetalleVentaProcesado;
 import com.sistemapdv.backend.repository.*;
 import com.sistemapdv.backend.utils.enums.EstadoCaja;
+import com.sistemapdv.backend.utils.enums.MedioPago;
+import com.sistemapdv.backend.utils.enums.TipoMovimientoStock;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +47,8 @@ public class VentaService {
     private final PagoRepository pagoRepository;
     private final DetalleVentaMapper detalleVentaMapper;
     private final VentaMapper ventaMapper;
+    private final PagoMapper pagoMapper;
+    private final MovimientoStockService movimientoStockService;
 
     private static final Logger logger = LoggerFactory.getLogger(VentaService.class);
 
@@ -86,9 +93,13 @@ public class VentaService {
 
         Venta nuevaVenta = ventaMapper.toVenta(caja, usuarioAutenticado, subtotalVenta, request.getDescuento());
 
+        validarPagos(request.getPagos(), nuevaVenta.getTotal());
+
         ventaRepository.save(nuevaVenta);
 
         List<DetalleVentaDTO> detallesResponse = crearDetallesVenta(grupos, nuevaVenta);
+
+        crearPagos(request.getPagos(), nuevaVenta);
 
         return ventaMapper.toResponseDTO(
                 nuevaVenta,
@@ -211,12 +222,10 @@ public class VentaService {
 
     private void verificarTipoVenta(Map<Producto, List<DetalleVentaProcesado>> grupos){
 
-        BigDecimal subtotalVenta = obtenerTotalVenta(grupos);
-
-        logger.info("Subtotal de la venta: ${}", subtotalVenta);
+        BigDecimal totalVenta = obtenerTotalVenta(grupos);
 
         // Monto mínimo que debe alcanzar la compra para poder acceder a precios mayoristas
-        if(subtotalVenta.compareTo(MONTO_MINIMO) >= 0){
+        if(totalVenta.compareTo(MONTO_MINIMO) >= 0){
             // Procesar agrupación de detalles por producto
             for (Map.Entry<Producto, List<DetalleVentaProcesado>> entry : grupos.entrySet()){
 
@@ -304,6 +313,9 @@ public class VentaService {
                 .map(detalle -> detalle.getPrecioUnitario()
                         .multiply(BigDecimal.valueOf(detalle.getCantidad())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        logger.info("Total de la venta: ${}", totalVenta);
+
         return totalVenta;
     }
 
@@ -321,11 +333,67 @@ public class VentaService {
 
                 detalleVentaRepository.save(nuevoDetalleVenta);
 
+                descontarStock(detalle);
+
                 detallesResponse.add(detalleVentaMapper.toResponseDTO(nuevoDetalleVenta));
             }
         }
 
         return detallesResponse;
+    }
+
+    private void descontarStock(DetalleVentaProcesado detalle){
+        logger.info("Descontando stock...");
+
+        Stock stock = stockRepository.findByVarianteProductoIdVarianteAndCanalVentaIdCanalVenta(
+                detalle.getVariante().getIdVariante(),
+                detalle.getProductoCanal().getCanalVenta().getIdCanalVenta()
+        ).orElseThrow( () -> new ResourceNotFoundException("Registro de stock no encontrado"));
+
+        logger.info("Descontar stock del producto: {}", detalle.getProducto().getNombre());
+        logger.info("Variante seleccionada: {}", detalle.getVariante().getNombre());
+        logger.info("Stock actual de variante: {}", stock.getCantidadDisponible());
+
+        MovimientoRequestDTO movimientoRequest = new MovimientoRequestDTO(
+                TipoMovimientoStock.VENTA,
+                detalle.getCantidad(),
+                null,
+                "Venta registrada"
+        );
+        movimientoStockService.registerMovimiento(stock.getIdStock(), movimientoRequest);
+    }
+
+    private void validarPagos(List<PagoDTO> pagos, BigDecimal totalVenta){
+        for (PagoDTO pago : pagos){
+
+            if(!(pago.getMedioPago().equals(MedioPago.EFECTIVO) ||
+                    pago.getMedioPago().equals(MedioPago.TRANSFERENCIA))){
+                throw new InvalidSaleException("Medio de pago inválido");
+            }
+
+            if(pago.getImporte().compareTo(BigDecimal.ZERO) <= 0){
+                throw new InvalidSaleException("Importe de pago inválido");
+            }
+
+        }
+
+        BigDecimal sumaImportePagos = pagos
+                .stream()
+                .map(pago -> pago.getImporte())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if(sumaImportePagos.compareTo(totalVenta) != 0){
+            throw new InvalidSaleException("La suma de los pagos es distinta al total de la venta");
+        }
+    }
+
+    private void crearPagos(List<PagoDTO> pagos, Venta venta){
+        for (PagoDTO pago : pagos){
+
+            Pago nuevoPago = pagoMapper.toPago(pago, venta);
+
+            pagoRepository.save(nuevoPago);
+        }
     }
 
     @Transactional(readOnly = true)
