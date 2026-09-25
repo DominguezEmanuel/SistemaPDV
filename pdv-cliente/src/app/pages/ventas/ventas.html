@@ -10,10 +10,10 @@
       </p>
     </div>
     <div class="venta-header-right">
-      <!--<div class="venta-meta">
-        Cajera: <b>Romina Albornoz</b><br />
-        <span id="ventaFechaHora">-</span>
-      </div>-->
+      <div class="venta-meta">
+        Cajero: <b>{{ nombreUsuario }}</b><br />
+        <span>{{ fechaHora }}</span>
+      </div>
       <div class="canal-selector">
         <label>Canal:</label>
         <select [(ngModel)]="idCanalVenta">
@@ -34,6 +34,7 @@
         placeholder="Ingrese código de barras..."
         autocomplete="off"
         [formControl]="busquedaControl"
+        (keyup.enter)="buscarPorCodigoBarras()"
       />
       <button
         type="button"
@@ -45,7 +46,7 @@
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
-    <div class="scan-suggestions" id="scanSuggestions"></div>
+    <!--<div class="scan-suggestions" id="scanSuggestions"></div>-->
   </div>
 
   <!-- Layout principal -->
@@ -67,11 +68,7 @@
         <p>Todavía no agregaste productos.<br />Escaneá un código arriba.</p>
       </div>
 
-      <div
-        *ngIf="carrito.length > 0"
-        class="tabla-carrito-wrap"
-        id="tablaCarritoWrap"
-      >
+      <div *ngIf="carrito.length > 0" class="tabla-carrito-wrap">
         <table class="tabla-carrito">
           <thead>
             <tr>
@@ -121,7 +118,7 @@
               <td>{{ formatearMoneda(item.precioMinorista) }}</td>
               <!-- Subtotal -->
               <td class="subtotal-num">
-                {{ formatearMoneda(calcularSubtotal(item)) }}
+                {{ formatearMoneda(calcularSubtotalItem(item)) }}
               </td>
               <!-- Eliminar de la venta -->
               <td>
@@ -135,12 +132,12 @@
       </div>
     </div>
 
-    <!-- 5/6/7/8/9. Resumen + descuento + pago + acciones -->
+    <!-- Resumen + descuento + pago + acciones -->
     <div>
       <div class="venta-card" style="margin-bottom: 18px">
         <div class="venta-card-header">
           <h5>
-            <i class="bi bi-grid-1x2-fill"></i>
+            <i class="bi bi-columns-gap"></i>
             Resumen de venta
           </h5>
         </div>
@@ -148,11 +145,11 @@
         <div style="padding: 16px 20px 4px">
           <div class="resumen-row">
             <span>Subtotal</span>
-            <b id="resumenSubtotal">$0</b>
+            <b>{{ formatearMoneda(subtotalVenta) }}</b>
           </div>
           <div class="resumen-row">
             <span>Descuento</span>
-            <b id="resumenDescuento" style="color: #c13b3b">-$0</b>
+            <b style="color: #c13b3b">-$0</b>
           </div>
 
           <!-- 6. Descuento -->
@@ -160,15 +157,16 @@
             <select id="descuentoTipo">
               <option value="monto">$</option>
             </select>
-            <input type="number" placeholder="0" min="0" step="1" />
+            <input type="number" placeholder="0" />
           </div>
-          <div class="descuento-error" id="descuentoError">
+          <!-- Alerta descuento incorrecto -->
+          <div class="descuento-error">
             El descuento no puede superar el subtotal.
           </div>
 
           <div class="resumen-total-row">
             <span>TOTAL</span>
-            <b>$0</b>
+            <b>{{ formatearMoneda(totalVenta) }}</b>
           </div>
         </div>
 
